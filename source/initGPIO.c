@@ -11,9 +11,6 @@ unsigned int *getGPIOPtr(void)
 		printf("unable to open");
 	}
 	
-	// Note: The original line below causes error
-	//unsigned int *gpioPtr = (unsigned int *)mmap(0,4096,PROT_READ|cat,MAP_SHARED,fdgpio,0);
-	
 	unsigned int *gpioPtr = (unsigned int *)mmap(0,4096,PROT_READ+PROT_WRITE,MAP_SHARED,fdgpio,0);
 
 	
