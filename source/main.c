@@ -13,9 +13,6 @@
 #define DAT 10
 #define INP_GPIO(g) *(gpioPtr + ((g) / 10)) &= ~(7 << (((g) % 10) * 3))
 #define OUT_GPIO(g) *(gpioPtr + ((g) / 10)) |= (1 << (((g) % 10) * 3))
-#define SET_GPIO_ALT(g, a) *(gpioPtr + (((g) / 10))) |= (((a) <= 3 ? (a) + 4 : (a) == 4 ? 3  \
-                                                                                        : 2) \
-                                                         << (((g) % 10) * 3))
 #define GPSET0 7  // 28/4
 #define GPCLR0 10 // 40/4
 #define GPLEV0 13
@@ -51,15 +48,43 @@ void writeGPIO(unsigned int pinNumber, unsigned int bit)
 // Reading from pins 0 to 31
 int readGPIO(unsigned int pinNumber)
 {
-    return (gpioPtr[GPLEV0] >> 3) & 1;
+    return (gpioPtr[GPLEV0] >> pinNumber) & 1;
 }
 
 void debugButtons(int buttons[])
 {
-    for (size_t i = 0; i < NUM_BUTTONS; i++)
+    for (size_t i = 1; i <= NUM_BUTTONS; i++)
     {
         printf("buttons[%d] = %d\n", i, buttons[i]);
     }
+}
+
+char* getButtonName(int buttonIndex) {
+    switch (buttonIndex)
+    {
+    case 1:
+        printf("You pressed B\n");
+        return "B"; 
+        break;
+    case 2:
+        printf("You pressed Y\n");
+        return "Y"; 
+        break;
+    default:
+        break;
+    }
+}
+
+const char* checkForButtonPress(int buttons[])
+{
+    for (size_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        if(buttons[i] == 0) {
+            // return getButtonName(i+1);
+            debugButtons(buttons);
+        }
+    }
+    return "";
 }
 
 void readControllerInput(int buttons[])
@@ -72,9 +97,8 @@ void readControllerInput(int buttons[])
 
     writeGPIO(LAT, LOW);
 
-    int i = 0;
     int buttonSignal;
-    while (i <= 16)
+    for (size_t i = 1; i <= NUM_BUTTONS; i++)
     {
         // wait 6 ms
         delayMicroseconds(6);
@@ -83,10 +107,15 @@ void readControllerInput(int buttons[])
         // wait 6 ms
         delayMicroseconds(6);
         buttonSignal = readGPIO(DAT); // Read bit i
-        buttons[i] = buttonSignal;
+        printf("button %d = %d\n", i, buttonSignal);
+        // buttons[i-1] = buttonSignal;
+        // if(buttonSignal == 0) {
+        //     getButtonName(buttonSignal);
+        // }
+        // debugButtons(buttons);
         writeGPIO(CLK, HIGH); // Rising edge; new cycle
-        i++;                  // Next button
     }
+    // checkForButtonPress(buttons);
 }
 
 int main()
@@ -107,10 +136,12 @@ int main()
     do
     {
         memset(buttons, 0, NUM_BUTTONS * sizeof(int));
-        debugButtons(buttons);
+        // debugButtons(buttons);
+        sleep(3);
         readControllerInput(buttons);
-        debugButtons(buttons);
-    } while (0);
+        // debugButtons(buttons);
+        // checkForButtonPress(buttons);
+    } while (1);
 
     return 0;
 }
