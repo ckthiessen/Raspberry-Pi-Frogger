@@ -59,7 +59,7 @@ void debugButtons(int buttons[])
     }
 }
 
-char *getButtonName(int buttonIndex)
+void printButtonName(int buttonIndex)
 {
     char *name;
     switch (buttonIndex)
@@ -113,11 +113,10 @@ int checkForButtonPress(int buttons[])
     {
         if (buttons[i] == 0)
         {
-            getButtonName(i + 1);
-            return 1;
+            return i + 1;
         }
     }
-    return 0;
+    return -1;
 }
 
 int readControllerInput(int buttons[])
@@ -158,17 +157,21 @@ int main()
     initSNES(gpioPtr);
 
     // Store sampled buttons
-    printf("Please press a button...\n");
 
     int buttons[NUM_BUTTONS];
-    do
-    {
-        memset(buttons, 0, NUM_BUTTONS * sizeof(int));
-        // debugButtons(buttons);
-        // sleep(3);
-        while (readControllerInput(buttons) != 1);
-        
-    } while (1);
+    int buttonIndex;
 
+    while(1) {
+        printf("Please press a button...\n");
+        memset(buttons, 0, NUM_BUTTONS * sizeof(int));
+
+        // Wait until buttonIndex is a valid button 
+        while((buttonIndex = readControllerInput(buttons)) == -1);
+        if(buttonIndex == 4) {
+            printf("Program is terminating...\n");
+            break;
+        }
+        printButtonName(buttonIndex);
+    }
     return 0;
 }
