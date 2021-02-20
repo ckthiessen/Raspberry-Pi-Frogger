@@ -174,12 +174,17 @@ int main()
 
     while(1) {
         printf("Please press a button...\n");
+
         buttonIndex = -1;
 
         // Wait until buttonIndex is a valid button 
-        while(buttonIndex == -1) {
+        // delayMicroseconds(200000);
+        while(1) {
+            // printf("HERE");
             buttonIndex = readControllerInput();
-            // printf("BI: %d\n", buttonIndex);
+            if(buttonIndex != -1 && buttonIndex != prevPress) {
+                break;
+            }
         }
 
         if(buttonIndex == 4) {
@@ -188,8 +193,9 @@ int main()
         }
 
         if(buttonIndex != prevPress) { 
-            prevPress = buttonIndex;
+            printf("BI: %d\n", buttonIndex);
             printButtonName(buttonIndex);
+            prevPress = buttonIndex;
         }
     }
     return 0;
