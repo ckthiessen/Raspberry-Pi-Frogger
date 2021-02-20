@@ -53,7 +53,7 @@ int readGPIO(unsigned int pinNumber)
 
 void debugButtons(int buttons[])
 {
-    for (size_t i = 1; i <= NUM_BUTTONS; i++)
+    for (size_t i = 0; i < NUM_BUTTONS; i++)
     {
         printf("buttons[%d] = %d\n", i, buttons[i]);
     }
@@ -113,14 +113,26 @@ int checkForButtonPress(int buttons[])
     {
         if (buttons[i] == 0)
         {
+            // debugButtons(buttons);
             return i + 1;
         }
     }
+    // Did not detect button press
     return -1;
 }
 
-int readControllerInput(int buttons[])
+void clearArray(int buttons[]) {
+    for (size_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        buttons[i] = 1;
+    }
+}
+
+int readControllerInput()
 {
+    int buttons[NUM_BUTTONS];
+    // clearArray(buttons);
+
     writeGPIO(CLK, HIGH);
     writeGPIO(LAT, HIGH);
 
@@ -157,21 +169,28 @@ int main()
     initSNES(gpioPtr);
 
     // Store sampled buttons
-
-    int buttons[NUM_BUTTONS];
     int buttonIndex;
+    int prevPress = -1;
 
     while(1) {
         printf("Please press a button...\n");
-        memset(buttons, 0, NUM_BUTTONS * sizeof(int));
+        buttonIndex = -1;
 
         // Wait until buttonIndex is a valid button 
-        while((buttonIndex = readControllerInput(buttons)) == -1);
+        while(buttonIndex == -1) {
+            buttonIndex = readControllerInput();
+            // printf("BI: %d\n", buttonIndex);
+        }
+
         if(buttonIndex == 4) {
             printf("Program is terminating...\n");
             break;
         }
-        printButtonName(buttonIndex);
+
+        if(buttonIndex != prevPress) { 
+            prevPress = buttonIndex;
+            printButtonName(buttonIndex);
+        }
     }
     return 0;
 }
