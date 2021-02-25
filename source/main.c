@@ -134,15 +134,10 @@ void clearArray(int buttons[]) {
 
 int buttons[NUM_BUTTONS];
 
-//TESTING THIS
-int prevButtons[NUM_BUTTONS];
-
 int readControllerInput()
 {
     initSNES(gpioPtr);
 
-    //int buttons[NUM_BUTTONS];
-    //clearArray(buttons); //-----------------------
 
     writeGPIO(CLK, HIGH);
     writeGPIO(LAT, HIGH);
@@ -186,29 +181,23 @@ int main()
     while(1) {
         printf("Please press a button...\n");
 
-        buttonIndex = -1; //--------------------------
+        buttonIndex = -1;
+
         // Wait until buttonIndex is a valid button 
         delayMicroseconds(150000);
         while(1) {
-            // printf("HERE");
-            //clearArray(buttons);//--------------------------
             buttonIndex = -1;
 
             buttonIndex = readControllerInput();
-            // need some kind of a break here if button status is the same?
+            // if press the same button two or more times:
             if(buttonIndex != -1 && buttonIndex == prevPress){
-                //delayMicroseconds(400000);
                 printButtonName(buttonIndex);
-            //    prevPress = buttonIndex;
-                //delayMicroseconds(400000);
                 break;
             }
-            //prevPress = -1;
+            // if press button that wasn't the previous button
             else if(buttonIndex != -1 && buttonIndex != prevPress) {
                 break;
             }
-            //prevPress = -1;
-            //buttonIndex = -1;
         }
 
         if(buttonIndex == 4) {
@@ -221,20 +210,6 @@ int main()
             printButtonName(buttonIndex);
             prevPress = buttonIndex;
         }
-
-        //delayMicroseconds(400000);
-
-        //TESTING
-        //prevButtons[NUM_BUTTONS] = buttons[NUM_BUTTONS];
-        //prevButtons = buttons;
-        //clearArray(buttons);
-
-        //if(buttonIndex != -1 && buttonIndex == prevPress) {
-        //    printf("BI: %d\n", buttonIndex);
-        //    printButtonName(buttonIndex);
-        //}
-
-        //clearArray(buttons);
     }
     return 0;
 }
