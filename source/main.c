@@ -101,10 +101,14 @@ void printButtonName(int buttonIndex)
         name = "Right";
         break;
     default:
+        name = "nul"; //-----------------
         break;
     }
+    
     // return name;
     printf("You pressed %s\n", name);
+    
+    
 }
 
 int checkForButtonPress(int buttons[])
@@ -130,12 +134,15 @@ void clearArray(int buttons[]) {
 
 int buttons[NUM_BUTTONS];
 
+//TESTING THIS
+int prevButtons[NUM_BUTTONS];
+
 int readControllerInput()
 {
     initSNES(gpioPtr);
 
-    int buttons[NUM_BUTTONS];
-    clearArray(buttons); //-----------------------
+    //int buttons[NUM_BUTTONS];
+    //clearArray(buttons); //-----------------------
 
     writeGPIO(CLK, HIGH);
     writeGPIO(LAT, HIGH);
@@ -169,25 +176,8 @@ int main()
     // Get gpio pointer
     gpioPtr = getGPIOPtr();
 
-//-----------------For Debugging-------------------------------------
-    //printf("pointer address: %p\n", gpioPtr);
-//----------------------------------------------------
-
     // Initialize the SNES controller
     initSNES(gpioPtr);
-
-//-----------------For Debugging--------------------------------------------------
-    //printf("pointer address: %d\n", INP_GPIO(CLK));
-    //printf("pointer address: %d\n", OUT_GPIO(CLK));
-    //printf("pointer address: %d\n", INP_GPIO(LAT));
-    //printf("pointer address: %d\n", OUT_GPIO(LAT));
-    //printf("pointer address: %d\n", INP_GPIO(DAT));
-    //INP_GPIO(CLK); // CLK
-    //OUT_GPIO(CLK);
-    //INP_GPIO(LAT); // LATCH
-    //OUT_GPIO(LAT);
-    //INP_GPIO(DAT); // DATA
-//-----------------------------------------------------------------------
 
     // Store sampled buttons
     int buttonIndex;
@@ -196,16 +186,29 @@ int main()
     while(1) {
         printf("Please press a button...\n");
 
-        buttonIndex = -1;
-
+        buttonIndex = -1; //--------------------------
         // Wait until buttonIndex is a valid button 
-        // delayMicroseconds(200000);
+        delayMicroseconds(150000);
         while(1) {
             // printf("HERE");
+            //clearArray(buttons);//--------------------------
+            buttonIndex = -1;
+
             buttonIndex = readControllerInput();
-            if(buttonIndex != -1 && buttonIndex != prevPress) {
+            // need some kind of a break here if button status is the same?
+            if(buttonIndex != -1 && buttonIndex == prevPress){
+                //delayMicroseconds(400000);
+                printButtonName(buttonIndex);
+            //    prevPress = buttonIndex;
+                //delayMicroseconds(400000);
                 break;
             }
+            //prevPress = -1;
+            else if(buttonIndex != -1 && buttonIndex != prevPress) {
+                break;
+            }
+            //prevPress = -1;
+            //buttonIndex = -1;
         }
 
         if(buttonIndex == 4) {
@@ -218,6 +221,19 @@ int main()
             printButtonName(buttonIndex);
             prevPress = buttonIndex;
         }
+
+        //delayMicroseconds(400000);
+
+        //TESTING
+        //prevButtons[NUM_BUTTONS] = buttons[NUM_BUTTONS];
+        //prevButtons = buttons;
+        //clearArray(buttons);
+
+        //if(buttonIndex != -1 && buttonIndex == prevPress) {
+        //    printf("BI: %d\n", buttonIndex);
+        //    printButtonName(buttonIndex);
+        //}
+
         //clearArray(buttons);
     }
     return 0;
