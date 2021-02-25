@@ -113,7 +113,7 @@ int checkForButtonPress(int buttons[])
     {
         if (buttons[i] == 0)
         {
-            // debugButtons(buttons);
+            //debugButtons(buttons);
             return i + 1;
         }
     }
@@ -128,10 +128,14 @@ void clearArray(int buttons[]) {
     }
 }
 
+int buttons[NUM_BUTTONS];
+
 int readControllerInput()
 {
+    initSNES(gpioPtr);
+
     int buttons[NUM_BUTTONS];
-    // clearArray(buttons);
+    clearArray(buttons); //-----------------------
 
     writeGPIO(CLK, HIGH);
     writeGPIO(LAT, HIGH);
@@ -165,8 +169,25 @@ int main()
     // Get gpio pointer
     gpioPtr = getGPIOPtr();
 
+//-----------------For Debugging-------------------------------------
+    //printf("pointer address: %p\n", gpioPtr);
+//----------------------------------------------------
+
     // Initialize the SNES controller
     initSNES(gpioPtr);
+
+//-----------------For Debugging--------------------------------------------------
+    //printf("pointer address: %d\n", INP_GPIO(CLK));
+    //printf("pointer address: %d\n", OUT_GPIO(CLK));
+    //printf("pointer address: %d\n", INP_GPIO(LAT));
+    //printf("pointer address: %d\n", OUT_GPIO(LAT));
+    //printf("pointer address: %d\n", INP_GPIO(DAT));
+    //INP_GPIO(CLK); // CLK
+    //OUT_GPIO(CLK);
+    //INP_GPIO(LAT); // LATCH
+    //OUT_GPIO(LAT);
+    //INP_GPIO(DAT); // DATA
+//-----------------------------------------------------------------------
 
     // Store sampled buttons
     int buttonIndex;
@@ -197,6 +218,7 @@ int main()
             printButtonName(buttonIndex);
             prevPress = buttonIndex;
         }
+        //clearArray(buttons);
     }
     return 0;
 }
