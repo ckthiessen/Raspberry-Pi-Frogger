@@ -27,7 +27,7 @@
 unsigned int *gpioPtr;
 
 /*
-@Params: gpioPtr: The register GPIO base address gpioPtr
+@Params: gpioPtr: The register GPIO base address 
 @Returns: This subroutine does not return anything
 This subroutine initializes a GPIO line for the three SNES lines: the latch line, the clock line, and the data line
 */
@@ -40,10 +40,9 @@ void init_GPIO(unsigned int *gpioPtr)
     INP_GPIO(DAT); // DATA
 }
 
-// Writing from pins 0 to 31
 /*
 @Params: pinNumber: The unsigned integer pin number that we are writing a bit to - in this case the GPIO latch line or the GPIO clock line
-@Params: bit: The unsigned integer bit that we are writing to the pin
+         bit: The unsigned integer bit that we are writing to the pin
 @Returns: This subroutine does not return anything
 This subroutine writes a bit to a GPIO line depending on the pin we use as input.  In our program we use this to 
 either write a bit to the GPIO latch line or the GPIO clock line.
@@ -60,7 +59,6 @@ void writeGPIO_LAT_CLK(unsigned int pinNumber, unsigned int bit)
     }
 }
 
-// Reading from pins 0 to 31
 /*
 @Params: pinNumber: The unsigned integer pin number that we are reading a bit from - in this case from the GPIO data line
 @Returns: Integer Number: the bit that is read from the GPIO data line
@@ -118,17 +116,15 @@ void Print_Message(int buttonIndex)
         name = "Right";
         break;
     default:
+        name = "";
         break;
     }
-    // return name;
     printf("You pressed %s\n", name);
-    
-    
 }
 
 /*
 @Params: buttons[]: integer array that tracks the status of the buttons 
-@Returns: Integer Number: button number from 0-12 if that button has been pressed or -1 if no button has been pressed
+@Returns: Integer Number: button number from 1-12 if that button has been pressed or -1 if no button has been pressed
 This subroutine checks if a button has been press by iterating through the button integer array.  Called in Read_SNES()
 */
 int checkForButtonPress(int buttons[])
@@ -147,8 +143,7 @@ int checkForButtonPress(int buttons[])
 
 /*
 @Returns: Integer Number: the button number that corresponds to a button if it is pressed or lack thereof.
-This is the main SNES subroutine.  Reads input (buttons pressed or not pressed) from a SNES controller.  The returns
-the button number/code of a pressed button in a register.
+Reads input (buttons pressed or not pressed) from a SNES controller.
 */
 int Read_SNES()
 {
@@ -185,7 +180,10 @@ int Read_SNES()
     return checkForButtonPress(buttons);
 }
 
-//======================Main Function============================
+/*
+@Returns: 0 if the program exits normally
+Handles the setup, the main program loop, and tear down of the application.
+*/
 int main()
 {
     printf("Created by: Cole Thiessen and Isaac Lutzko\n");
@@ -200,9 +198,10 @@ int main()
     int buttonIndex;
     int prevPress = -1;
 
-    // While the program is still running and a user has not pressed START which ends the program
-    while(buttonIndex != START) {
-        
+    // While a user has not pressed START
+    while (buttonIndex != START)
+    {
+
         printf("\n");
         printf("Please press a button...\n");
 
@@ -211,26 +210,32 @@ int main()
         // Delay to prevent printing too much -- 175000 microseconds because not too slow and still very responsive
         delayMicroseconds(175000);
 
-        while(1) {
+        // Loop until button is pressed
+        while (1)
+        {
             buttonIndex = -1;
 
             // Get button code that corresponds to the button that is pressed or lack thereof
             buttonIndex = Read_SNES();
 
             // If same button pressed two or more times or held pressed:
-            if(buttonIndex != -1 && buttonIndex == prevPress){
+            if (buttonIndex != -1 && buttonIndex == prevPress)
+            {
                 printf("\n");
                 // Print appropriate message for button press
                 Print_Message(buttonIndex);
                 break;
             }
             // If pressed button is not the previously pressed button
-            else if(buttonIndex != -1 && buttonIndex != prevPress) {
+            else if (buttonIndex != -1 && buttonIndex != prevPress)
+            {
                 break;
             }
         }
 
-        if(buttonIndex != prevPress && buttonIndex != START) { 
+        // If a new button was pressed and it was not the start button
+        if (buttonIndex != prevPress && buttonIndex != START)
+        {
             printf("\n");
             // Print appropriate message for button press
             Print_Message(buttonIndex);
