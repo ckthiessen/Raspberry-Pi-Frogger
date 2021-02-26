@@ -198,16 +198,18 @@ int main()
             }
         }
 
-        if(buttonIndex == 4) {
-            printf("Program is terminating...\n");
-            break;
-        }
+        //if(buttonIndex == 4) {
+        //    printf("Program is terminating...\n");
+        //    break;
+        //}
 
-        if(buttonIndex != prevPress) { 
+        if(buttonIndex != prevPress && buttonIndex != 4) { 
             printf("BI: %d\n", buttonIndex);
             printButtonName(buttonIndex);
             prevPress = buttonIndex;
         }
     }
+    printf("Program is terminating...\n");
+
     return 0;
 }
