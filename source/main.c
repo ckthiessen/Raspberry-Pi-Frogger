@@ -101,10 +101,8 @@ void printButtonName(int buttonIndex)
         name = "Right";
         break;
     default:
-        name = "nul"; //-----------------
         break;
     }
-    
     // return name;
     printf("You pressed %s\n", name);
     
@@ -132,12 +130,12 @@ void clearArray(int buttons[]) {
     }
 }
 
-int buttons[NUM_BUTTONS];
 
 int readControllerInput()
 {
-    initSNES(gpioPtr);
+    //initSNES(gpioPtr);
 
+    int buttons[NUM_BUTTONS];
 
     writeGPIO(CLK, HIGH);
     writeGPIO(LAT, HIGH);
@@ -178,13 +176,13 @@ int main()
     int buttonIndex;
     int prevPress = -1;
 
-    while(1) {
+    while(buttonIndex != 4) {
         printf("Please press a button...\n");
 
         buttonIndex = -1;
 
         // Wait until buttonIndex is a valid button 
-        delayMicroseconds(150000);
+        delayMicroseconds(175000);
         while(1) {
             buttonIndex = -1;
 
