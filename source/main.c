@@ -30,6 +30,7 @@ unsigned int *gpioPtr;
 @Params: gpioPtr: The register GPIO base address 
 @Returns: This subroutine does not return anything
 This subroutine initializes a GPIO line for the three SNES lines: the latch line, the clock line, and the data line
+Code taken from lecture. Written by Jalal Kawash
 */
 void init_GPIO(unsigned int *gpioPtr)
 {
@@ -46,6 +47,7 @@ void init_GPIO(unsigned int *gpioPtr)
 @Returns: This subroutine does not return anything
 This subroutine writes a bit to a GPIO line depending on the pin we use as input.  In our program we use this to 
 either write a bit to the GPIO latch line or the GPIO clock line.
+Code taken from lecture. Written by Jalal Kawash
 */
 void writeGPIO_LAT_CLK(unsigned int pinNumber, unsigned int bit)
 {
@@ -63,6 +65,7 @@ void writeGPIO_LAT_CLK(unsigned int pinNumber, unsigned int bit)
 @Params: pinNumber: The unsigned integer pin number that we are reading a bit from - in this case from the GPIO data line
 @Returns: Integer Number: the bit that is read from the GPIO data line
 This subroutine reads a bit from the GPIO data line
+Code taken from lecture. Written by Jalal Kawash
 */
 int Read_Data(unsigned int pinNumber)
 {
