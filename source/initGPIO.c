@@ -3,6 +3,9 @@
 #include <sys/mman.h>
 #include "initGPIO.h"
 
+// Gets the base address of the GPIO base register 
+// @Returns: GPIO Base Address Pointer
+// Code was taken from tutorials. 
 unsigned int *getGPIOPtr(void)
 {
 	int fdgpio = open("/dev/gpiomem", O_RDWR);

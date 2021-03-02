@@ -1,3 +1,5 @@
+# Following MakeFile taken from tutorial
+
 ###############################################################################
 #	makefile
 #	by Mohamad Elzohbi.

@@ -123,7 +123,11 @@ void Print_Message(int buttonIndex)
         break;
     }
     printf("You pressed %s\n", name);
+    printf("\nPlease press a button...\n");
 }
+
+// Create a global variable to track the previous button press
+int prevPress = -1;
 
 /*
 @Params: buttons[]: integer array that tracks the status of the buttons 
@@ -139,6 +143,9 @@ int checkForButtonPress(int buttons[])
             // Did detect button press
             return i + 1;
         }
+    }
+    if(prevPress != -1) {
+        prevPress = -1;
     }
     // Did not detect button press
     return -1;
@@ -184,6 +191,7 @@ int Read_SNES()
     return checkForButtonPress(buttons);
 }
 
+
 /*
 @Returns: 0 if the program exits normally
 Handles the setup, the main program loop, and tear down of the application.
@@ -200,19 +208,16 @@ int main()
 
     // Store sampled buttons
     int buttonIndex;
-    int prevPress = -1;
+
+    printf("Please press a button...\n");
 
     // While a user has not pressed START
     while (buttonIndex != START)
     {
-
-        printf("\n");
-        printf("Please press a button...\n");
-
         buttonIndex = -1;
 
         // Delay to prevent printing too much -- 200000 microseconds because not too slow and still very responsive
-        delayMicroseconds(200000);
+        delayMicroseconds(50000);
 
         // Loop until button is pressed
         while (1)
@@ -222,16 +227,8 @@ int main()
             // Get button code that corresponds to the button that is pressed or lack thereof
             buttonIndex = Read_SNES();
 
-            // If same button pressed two or more times or held pressed:
-            if (buttonIndex != -1 && buttonIndex == prevPress)
-            {
-                printf("\n");
-                // Print appropriate message for button press
-                Print_Message(buttonIndex);
-                break;
-            }
-            // If pressed button is not the previously pressed button
-            else if (buttonIndex != -1 && buttonIndex != prevPress)
+            // If pressed button is not the previously pressed button then break inner loop
+            if (buttonIndex != -1) 
             {
                 break;
             }
