@@ -147,6 +147,7 @@ int checkForButtonPress(int buttons[])
 /*
 @Returns: Integer Number: the button number that corresponds to a button if it is pressed or lack thereof.
 Reads input (buttons pressed or not pressed) from a SNES controller.
+Written based on pseudocode by Jalal Kawash. Taken from lecture. 
 */
 int Read_SNES()
 {
@@ -210,8 +211,8 @@ int main()
 
         buttonIndex = -1;
 
-        // Delay to prevent printing too much -- 175000 microseconds because not too slow and still very responsive
-        delayMicroseconds(175000);
+        // Delay to prevent printing too much -- 200000 microseconds because not too slow and still very responsive
+        delayMicroseconds(200000);
 
         // Loop until button is pressed
         while (1)
