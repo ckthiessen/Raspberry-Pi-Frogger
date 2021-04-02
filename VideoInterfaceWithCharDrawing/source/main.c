@@ -4,6 +4,7 @@
 #include <time.h>
 #include <sys/mman.h>
 #include "framebuffer.h"
+#include "charscreen.h"
 //#include <wiringPi.h>	//delayMicroseconds(int)
 #include <stdbool.h>	//true, false
 #define GAME_WIDTH 1280
