@@ -93,8 +93,31 @@ Pixel *pixel;
 
 // }
 
+
+// void render() {
+// 	for(int row = 0; row < NUM_TILES; row++) { 
+// 		for(int col = 0; col < NUM_TILES; col++) { 
+// 			char tile = map.board[row][col];
+// 			switch (tile)
+// 			{
+// 			case '-':
+// 				drawTile(row+1, col+1, 0xFFFF);
+// 				break;
+// 			case 'c':
+// 				drawTile(row+1, col+1, 0x6660);
+// 			default:
+// 				break;
+// 			}
+// 		}
+// 	}
+// }
+
+
 void drawTile(int yOffset, int xOffset, char tile) {
 	/* initialize a pixel */
+	
+	yOffset = yOffset ;
+	// xOffset = xOffset ;
 
 	for (int y = TILE_HEIGHT*(yOffset-1); y < TILE_HEIGHT*yOffset; y++) {
 		for (int x = TILE_WIDTH*(xOffset-1); x < TILE_WIDTH*xOffset; x++) {
@@ -117,36 +140,47 @@ void drawTile(int yOffset, int xOffset, char tile) {
 	}
 }
 
-// void render() {
-// 	for(int row = 0; row < NUM_TILES; row++) { 
-// 		for(int col = 0; col < NUM_TILES; col++) { 
-// 			char tile = map.board[row][col];
-// 			switch (tile)
-// 			{
-// 			case '-':
-// 				drawTile(row+1, col+1, 0xFFFF);
-// 				break;
-// 			case 'c':
-// 				drawTile(row+1, col+1, 0x6660);
-// 			default:
-// 				break;
-// 			}
-// 		}
-// 	}
-// }
-
 unsigned long elapsed = 0;
-
 void update() {
 	for(int row = 0; row < NUM_TILES; row++) { 
 		int offset = (elapsed * 2) % 20;
+		// int offset = (int)((float)(TILE_WIDTH*TILE_HEIGHT) * elapsed) % (TILE_WIDTH*TILE_HEIGHT);
+		// int offset = (int)((float)20*elapsed)%20;
+
 		for(int col = 0; col < NUM_TILES; col++) { 
+		// for(int col = 0; col < 1280; col++) { 
 			char tile = map.board[row][(offset + col) % 20];
+			// char tile = map.board[row][(offset + col) % 64];
+
+			// pass row + 1 offset differently to smooth
+			
+			// pass col + 1 offset differently to smooth
+
+			// drawTile(row+1, col+1, tile);
 			drawTile(row+1, col+1, tile);
 		}
 		printf("\n");
 	}
 }
+
+// void update() {
+// 	for (int row = 0; row < 1280; row++) {
+// 		int offset = (elapsed * 2) % 20;
+
+// 		for(int col = 0; col < NUM_TILES; col++) { 
+// 			char tile = map.board[row][(offset + col) % 20];
+// 			// pass row + 1 offset differently to smooth
+			
+// 			// pass col + 1 offset differently to smooth
+
+// 			// drawTile(row+1, col+1, tile);
+// 			drawTile(row+1, col+1, tile);
+// 		}
+// 		printf("\n");
+// 	}
+// }
+
+
 
 
 void printBoard() {
@@ -179,6 +213,8 @@ int main(){
 		diff = start + 1 - time(NULL);
 		// wait = diff > 0 ? diff : 0;
 		usleep(1000 * 1000); // Sleep 1 second
+		// usleep(182.5 * 182.5);
+		
 		elapsed++;
 		printf("%ld\n", elapsed);
 	}
