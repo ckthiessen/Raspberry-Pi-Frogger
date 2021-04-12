@@ -48,16 +48,109 @@ struct Map {
 	// "--------------------"
 } map;
 
+
+// just 7 as row just to start, will have more for logs and what not
+char objectArr[7][50] = 
+{
+	// cars/buses
+"--bbbb------------bbbb---------bbbb------bbbb-----", //bw
+"cc-------cc----------cc------cc-------cc-----cc---",	//fw
+"-----cc----------cc--------cc----cc----cc---cc--cc",	//bw
+"------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
+"--cc------cc------cc--------cc----cc--cc---cc-cc--", //bw
+"-----cc--------cc--------cc-----cc-cc----cc--cc---", //fw
+"----cc-----cc--------cc-------cc----cc--------cc--" //bw
+
+// logs
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+};
+
+
+
+
+int mapCounter = 0;
 void generateStartingMap() {
 	for(int row = 0; row < NUM_TILES; row++) {
 		for(int col = 0; col < NUM_TILES; col++) {
-			map.board[row][col] = '-';
+			if(row == 11){
+				map.board[row][col] = objectArr[0][mapCounter];
+			}
+			else if(row == 12){
+				map.board[row][col] = objectArr[1][mapCounter];
+			}
+			else if(row == 13){
+				map.board[row][col] = objectArr[2][mapCounter];
+			}
+			else if(row == 14){
+				map.board[row][col] = objectArr[3][mapCounter];
+			}
+			else if(row == 15){
+				map.board[row][col] = objectArr[4][mapCounter];
+			}
+			else if(row == 16){
+				map.board[row][col] = objectArr[5][mapCounter];
+			}
+			else if(row == 17){
+				map.board[row][col] = objectArr[6][mapCounter];
+			}
+			else{
+				map.board[row][col] = '-';
+			}
+
+
+			if (mapCounter < 50){
+				mapCounter++;
+			}
+			else {
+				mapCounter = 0;
+			}
+			
 		}
+		
 	}
+
+
 	// map.board[18][18] = 'c';
 	// map.board[18][17] = 'c';
-	map.board[18][2] = 'c';
-	map.board[18][3] = 'c';
+
+	//cars/buses
+	// map.board[17][2] = 'c';
+	// map.board[17][3] = 'c';
+
+	// map.board[17][17] = 'c';
+	// map.board[17][18] = 'c';
+
+	// map.board[17][10] = 'c';
+	// map.board[17][9] = 'c';
+
+	// map.board[16][5] = 'c';
+	// map.board[16][6] = 'c';
+
+	// map.board[16][13] = 'c';
+	// map.board[16][14] = 'c';
+
+	// map.board[15][1] = 'c';
+	// map.board[15][2] = 'c';
+
+	// map.board[15][1] = 'c';
+	// map.board[15][2] = 'c';
+
+	//score card rows
+
+
+	// half way safe rows
+
+	//logs/channel row
+
+	//end of 1st screen
+
+
 }
 
 struct fbs framebufferstruct;
@@ -93,7 +186,6 @@ Pixel *pixel;
 
 // }
 
-
 // void render() {
 // 	for(int row = 0; row < NUM_TILES; row++) { 
 // 		for(int col = 0; col < NUM_TILES; col++) { 
@@ -112,20 +204,26 @@ Pixel *pixel;
 // 	}
 // }
 
+// int counter_draw = 0;
 
 void drawTile(int yOffset, int xOffset, char tile) {
 	/* initialize a pixel */
 	
-	yOffset = yOffset ;
+	// yOffset = yOffset ;
 	// xOffset = xOffset ;
 
 	for (int y = TILE_HEIGHT*(yOffset-1); y < TILE_HEIGHT*yOffset; y++) {
-		for (int x = TILE_WIDTH*(xOffset-1); x < TILE_WIDTH*xOffset; x++) {
+		// for (int x = (TILE_WIDTH*(xOffset-1)); x < (TILE_WIDTH*xOffset); x++) {
+		for (int x = (TILE_WIDTH*(xOffset-1)); x < (TILE_WIDTH*xOffset); x++) {
+		// for (int x = ((TILE_WIDTH*(xOffset-1))+counter_draw); x < ((TILE_WIDTH*xOffset)+counter_draw); x++) {
 			int color;
 			switch (tile)
 			{
 			case '-':
 				color = 0xFFFF;
+				break;
+			case 'b':
+				color = 0x2200;
 				break;
 			case 'c':
 				color = 0x6660;
@@ -136,25 +234,29 @@ void drawTile(int yOffset, int xOffset, char tile) {
 			pixel->x = x;
 			pixel->y = y;
 			drawPixel(pixel);
+
 		}
 	}
+	// if(counter_draw == 32) counter_draw = 0;
+	// counter_draw ++;
 }
+
+// int counter_draw = 0;
 
 unsigned long elapsed = 0;
 void update() {
 	for(int row = 0; row < NUM_TILES; row++) { 
-		int offset = (elapsed * 2) % 20;
-		// int offset = (int)((float)(TILE_WIDTH*TILE_HEIGHT) * elapsed) % (TILE_WIDTH*TILE_HEIGHT);
-		// int offset = (int)((float)20*elapsed)%20;
+		// int offset = (elapsed * 2) % 20;
+		int offset = (elapsed) % 20;
+		// int offset = (int)((float)TILE_WIDTH * elapsed * 2.0f) % 20;
 
 		for(int col = 0; col < NUM_TILES; col++) { 
 		// for(int col = 0; col < 1280; col++) { 
-			char tile = map.board[row][(offset + col) % 20];
-			// char tile = map.board[row][(offset + col) % 64];
+			// char tile = map.board[row][(offset + col) % 20];
 
-			// pass row + 1 offset differently to smooth
-			
-			// pass col + 1 offset differently to smooth
+			// for(int it = 0; it < )
+
+			char tile = map.board[row][(offset + col) % 20]; //*********************
 
 			// drawTile(row+1, col+1, tile);
 			drawTile(row+1, col+1, tile);
@@ -202,9 +304,11 @@ int main(){
 	unsigned int wait = 0;
 	double diff = 0;
 
+	int counter = 0;
 	
 	generateStartingMap();
 	while(true) {
+
 		time_t start = time(NULL);
 		// processInput();
 		update();
@@ -214,9 +318,19 @@ int main(){
 		// wait = diff > 0 ? diff : 0;
 		usleep(1000 * 1000); // Sleep 1 second
 		// usleep(182.5 * 182.5);
-		
+
+		// counter++;
+
+		// if(counter == 32){
+		// 	elapsed++;
+		// 	counter = 0;
+		// }
 		elapsed++;
+		// counter++;
 		printf("%ld\n", elapsed);
+
+		// generateStartingMap();
+
 	}
 	// Uncomment to render with pixels
 	// render();
