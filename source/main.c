@@ -23,6 +23,15 @@ typedef struct {
 	int x, y;
 } Pixel;
 
+
+// possible struct for game screen;
+typedef struct {
+	int x, y;
+	int color;
+	// int 
+} screen_frame;
+
+
 struct Map {
 	char board[NUM_TILES][NUM_TILES];
 	// "--------------------"
@@ -48,6 +57,10 @@ struct Map {
 	// "--------------------"
 } map;
 
+struct gameMap {
+	char screen[1280][720];
+} game_screen;
+
 
 // just 7 as row just to start, will have more for logs and what not
 char objectArr[7][50] = 
@@ -56,7 +69,7 @@ char objectArr[7][50] =
 "--bbbb------------bbbb---------bbbb------bbbb-----", //bw
 "cc-------cc----------cc------cc-------cc-----cc---",	//fw
 "-----cc----------cc--------cc----cc----cc---cc--cc",	//bw
-"------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
+"------bbbb--------------bbbb---bbbb----bbbb--bbbb-", //fw
 "--cc------cc------cc--------cc----cc--cc---cc-cc--", //bw
 "-----cc--------cc--------cc-----cc-cc----cc--cc---", //fw
 "----cc-----cc--------cc-------cc----cc--------cc--" //bw
@@ -74,89 +87,70 @@ char objectArr[7][50] =
 
 
 
-int mapCounter = 0;
-void generateStartingMap() {
-	for(int row = 0; row < NUM_TILES; row++) {
-		for(int col = 0; col < NUM_TILES; col++) {
-			if(row == 11){
-				map.board[row][col] = objectArr[0][mapCounter];
-			}
-			else if(row == 12){
-				map.board[row][col] = objectArr[1][mapCounter];
-			}
-			else if(row == 13){
-				map.board[row][col] = objectArr[2][mapCounter];
-			}
-			else if(row == 14){
-				map.board[row][col] = objectArr[3][mapCounter];
-			}
-			else if(row == 15){
-				map.board[row][col] = objectArr[4][mapCounter];
-			}
-			else if(row == 16){
-				map.board[row][col] = objectArr[5][mapCounter];
-			}
-			else if(row == 17){
-				map.board[row][col] = objectArr[6][mapCounter];
-			}
-			else{
-				map.board[row][col] = '-';
-			}
+// int mapCounter = 0;
+// void generateStartingMap() {
+// 	for(int row = 0; row < NUM_TILES; row++) {
+// 		for(int col = 0; col < NUM_TILES; col++) {
+// 			if(row == 11){
+// 				map.board[row][col] = objectArr[0][mapCounter];
+// 			}
+// 			// else if(row == 12){
+// 			// 	map.board[row][col] = objectArr[1][mapCounter];
+// 			// }
+// 			// else if(row == 13){
+// 			// 	map.board[row][col] = objectArr[2][mapCounter];
+// 			// }
+// 			// else if(row == 14){
+// 			// 	map.board[row][col] = objectArr[3][mapCounter];
+// 			// }
+// 			// else if(row == 15){
+// 			// 	map.board[row][col] = objectArr[4][mapCounter];
+// 			// }
+// 			// else if(row == 16){
+// 			// 	map.board[row][col] = objectArr[5][mapCounter];
+// 			// }
+// 			// else if(row == 17){
+// 			// 	map.board[row][col] = objectArr[6][mapCounter];
+// 			// }
+// 			else{
+// 				map.board[row][col] = '-';
+// 			}
 
 
-			if (mapCounter < 50){
-				mapCounter++;
-			}
-			else {
-				mapCounter = 0;
-			}
+// 			if (mapCounter < 50){
+// 				mapCounter++;
+// 			}
+// 			else {
+// 				mapCounter = 0;
+// 			}
 			
-		}
+// 		}
 		
-	}
+// 	}
+
+// 	// map.board[18][18] = 'c';
+// 	// map.board[18][17] = 'c';
+
+// 	//cars/buses
+
+// 	//score card rows
+
+// 	// half way safe rows
+
+// 	//logs/channel row
+
+// 	//end of 1st screen
 
 
-	// map.board[18][18] = 'c';
-	// map.board[18][17] = 'c';
-
-	//cars/buses
-	// map.board[17][2] = 'c';
-	// map.board[17][3] = 'c';
-
-	// map.board[17][17] = 'c';
-	// map.board[17][18] = 'c';
-
-	// map.board[17][10] = 'c';
-	// map.board[17][9] = 'c';
-
-	// map.board[16][5] = 'c';
-	// map.board[16][6] = 'c';
-
-	// map.board[16][13] = 'c';
-	// map.board[16][14] = 'c';
-
-	// map.board[15][1] = 'c';
-	// map.board[15][2] = 'c';
-
-	// map.board[15][1] = 'c';
-	// map.board[15][2] = 'c';
-
-	//score card rows
-
-
-	// half way safe rows
-
-	//logs/channel row
-
-	//end of 1st screen
-
-
-}
+// }
 
 struct fbs framebufferstruct;
 void drawPixel(Pixel *pixel);
 
 Pixel *pixel;
+
+screen_frame *screen;
+void drawScreen(screen_frame *screen);
 
 // void drawTile(int yOffset, int xOffset, int color, Pixel *pixel) {
 // void drawTile(int yOffset, int xOffset, int color) {
@@ -204,42 +198,94 @@ Pixel *pixel;
 // 	}
 // }
 
+			// else if(row == 12){
+			// 	map.board[row][col] = objectArr[1][mapCounter];
+			// }
+			// else if(row == 13){
+			// 	map.board[row][col] = objectArr[2][mapCounter];
+			// }
+			// else if(row == 14){
+			// 	map.board[row][col] = objectArr[3][mapCounter];
+			// }
+			// else if(row == 15){
+			// 	map.board[row][col] = objectArr[4][mapCounter];
+			// }
+			// else if(row == 16){
+			// 	map.board[row][col] = objectArr[5][mapCounter];
+			// }
+			// else if(row == 17){
+			// 	map.board[row][col] = objectArr[6][mapCounter];
+			// }
+int mapCounter = 0;
+void game_state(){
+	for(int row = 0; row < 1280; row++) {
+		int offset = (elapsed) % 720;
+		for(int col = 0; col < 720; col++) {
+			if(row == 11){
+				game_screen.screen[row][col] = objectArr[0][mapCounter];
+			}
+
+			else{
+				game_screen.screen[row][col] = '-';
+			}
+
+
+			if (mapCounter < 1280){
+				mapCounter++;
+			}
+			else {
+				mapCounter = 0;
+			}
+			
+		}
+		
+	}
+}
+
+
+
+
+
+
+
+
+
 // int counter_draw = 0;
 
-void drawTile(int yOffset, int xOffset, char tile) {
-	/* initialize a pixel */
+// void drawTile(int yOffset, int xOffset, char tile) {
+// 	/* initialize a pixel */
 	
-	// yOffset = yOffset ;
-	// xOffset = xOffset ;
+// 	// yOffset = yOffset ;
+// 	// xOffset = xOffset ;
 
-	for (int y = TILE_HEIGHT*(yOffset-1); y < TILE_HEIGHT*yOffset; y++) {
-		// for (int x = (TILE_WIDTH*(xOffset-1)); x < (TILE_WIDTH*xOffset); x++) {
-		for (int x = (TILE_WIDTH*(xOffset-1)); x < (TILE_WIDTH*xOffset); x++) {
-		// for (int x = ((TILE_WIDTH*(xOffset-1))+counter_draw); x < ((TILE_WIDTH*xOffset)+counter_draw); x++) {
-			int color;
-			switch (tile)
-			{
-			case '-':
-				color = 0xFFFF;
-				break;
-			case 'b':
-				color = 0x2200;
-				break;
-			case 'c':
-				color = 0x6660;
-			default:
-				break;
-			}
-			pixel->color = color;
-			pixel->x = x;
-			pixel->y = y;
-			drawPixel(pixel);
+// 	for (int y = TILE_HEIGHT*(yOffset-1); y < TILE_HEIGHT*yOffset; y++) {
+// 		// for (int x = (TILE_WIDTH*(xOffset-1)); x < (TILE_WIDTH*xOffset); x++) {
+// 		for (int x = (TILE_WIDTH*(xOffset-1)); x < (TILE_WIDTH*xOffset); x++) {
+// 		// for (int x = ((TILE_WIDTH*(xOffset-1))+counter_draw); x < ((TILE_WIDTH*xOffset)+counter_draw); x++) {
+// 			int color;
+// 			switch (tile)
+// 			{
+// 			case '-':
+// 				color = 0xFFFF;
+// 				break;
+// 			case 'b':
+// 				color = 0x2200;
+// 				break;
+// 			case 'c':
+// 				color = 0x6660;
+// 			default:
+// 				break;
+// 			}
+// 			pixel->color = color;
+// 			pixel->x = x;
+// 			pixel->y = y;
+// 			drawPixel(pixel);
 
-		}
-	}
-	// if(counter_draw == 32) counter_draw = 0;
-	// counter_draw ++;
-}
+// 		}
+// 	}
+// 	// if(counter_draw == 32) counter_draw = 0;
+// 	// counter_draw ++;
+// }
 
 // int counter_draw = 0;
 
@@ -306,13 +352,25 @@ int main(){
 
 	int counter = 0;
 	
-	generateStartingMap();
+	// generateStartingMap();
+	game_state(screen); 
+
 	while(true) {
+
+		//------------------------
+		// generateStartingMap();
+		//------------------------
+
+		game_state(screen); // generate state of game
 
 		time_t start = time(NULL);
 		// processInput();
-		update();
+		// update();
 		// render();
+
+		//drawScreen call (similar to update)
+		// drawScreen();	// draw the screen 
+
 
 		diff = start + 1 - time(NULL);
 		// wait = diff > 0 ? diff : 0;
@@ -347,8 +405,16 @@ int main(){
 
 
 /* Draw a pixel */
-void drawPixel(Pixel *pixel){
-	long int location = (pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
-                       (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
-	*((unsigned short int*)(framebufferstruct.fptr + location)) = pixel->color;
+ void drawPixel(Pixel *pixel){
+ 	long int location = (pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
+                        (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
+ 	*((unsigned short int*)(framebufferstruct.fptr + location)) = pixel->color;
+ }
+
+// void drawPixel(Map *map){
+// 	memcpy(map->framebuffer->fptr, map-> , 1280*720*2);
+// }
+
+void drawScreen(screen_frame *screen) {
+	memcpy(screen->framebufferstruct->fptr, screen->game_state, 1280*720);
 }
