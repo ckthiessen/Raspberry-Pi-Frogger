@@ -25,6 +25,7 @@ typedef struct {
 
 struct Map {
 	char board[NUM_TILES][NUM_TILES];
+	unsigned short stage[GAME_WIDTH][GAME_HEIGHT];
 	// "--------------------"
 	// "--------------------"
 	// "--------------------"
@@ -49,49 +50,17 @@ struct Map {
 } map;
 
 void generateStartingMap() {
-	for(int row = 0; row < NUM_TILES; row++) {
-		for(int col = 0; col < NUM_TILES; col++) {
-			map.board[row][col] = '-';
+	for(int row = 0; row < GAME_HEIGHT; row++) {
+		for(int col = 0; col < GAME_WIDTH; col++) {
+			map.stage[col][row] = 0x6660;
 		}
 	}
-	// map.board[18][18] = 'c';
-	// map.board[18][17] = 'c';
-	map.board[18][2] = 'c';
-	map.board[18][3] = 'c';
 }
 
 struct fbs framebufferstruct;
 void drawPixel(Pixel *pixel);
 
 Pixel *pixel;
-
-// void drawTile(int yOffset, int xOffset, int color, Pixel *pixel) {
-// void drawTile(int yOffset, int xOffset, int color) {
-// 	/* initialize a pixel */
-	
-// 	// Pixel *pixel;
-// 	// pixel = malloc(sizeof(Pixel));
-// 	// printf("yst %d\n", GAME_CENTER*yOffset);
-// 	// printf("yend %d\n", GAME_CENTER*(TILE_HEIGHT*yOffset));
-// 	// printf("xst %d\n", GAME_CENTER*xOffset));
-// 	// printf("xend %d\n", GAME_CENTER*(TILE_HEIGHT*xOffset));
-// 	// for (int y = (GAME_CENTER*yOffset); y < GAME_CENTER+(TILE_HEIGHT*yOffset); y++) {
-// 	for (int y = TILE_HEIGHT*(yOffset-1); y < TILE_HEIGHT*yOffset; y++) {
-// 		// printf("%d\n", y);
-// 		// for (int x = (GAME_CENTER*xOffset); x < GAME_CENTER+(TILE_WIDTH*xOffset); x++) {
-// 		for (int x = TILE_WIDTH*(xOffset-1); x < TILE_WIDTH*xOffset; x++) {
-// 			// printf("%d\n", x);
-// 			pixel->color = color;
-// 			pixel->x = x;
-// 			pixel->y = y;
-// 			drawPixel(pixel);
-// 		}
-// 	}
-// 	/* free pixel's allocated memory */
-// 	// free(pixel);
-// 	// pixel = NULL;
-
-// }
 
 void drawTile(int yOffset, int xOffset, char tile) {
 	/* initialize a pixel */
@@ -159,6 +128,11 @@ void printBoard() {
 	}
 }
 
+/* Draw a frame */
+void drawFrame() {
+	memcpy(framebufferstruct.fptr, map.stage, 1280*720*2);
+}
+
 
 /* main function */
 int main(){
@@ -166,21 +140,13 @@ int main(){
 	framebufferstruct = initFbInfo();
 	pixel = malloc(sizeof(Pixel));
 	unsigned int wait = 0;
-	double diff = 0;
-
 	
 	generateStartingMap();
 	while(true) {
-		time_t start = time(NULL);
-		// processInput();
-		update();
-		// render();
-
-		diff = start + 1 - time(NULL);
-		// wait = diff > 0 ? diff : 0;
 		usleep(1000 * 1000); // Sleep 1 second
-		elapsed++;
-		printf("%ld\n", elapsed);
+		drawFrame();
+		wait++;
+		printf("%d\n", wait);
 	}
 	// Uncomment to render with pixels
 	// render();
@@ -197,7 +163,7 @@ int main(){
 
 
 /* Draw a pixel */
-void drawPixel(Pixel *pixel){
+void drawPixel(Pixel *pixel) {
 	long int location = (pixel->x +framebufferstruct.xOff) * (framebufferstruct.bits/8) +
                        (pixel->y+framebufferstruct.yOff) * framebufferstruct.lineLength;
 	*((unsigned short int*)(framebufferstruct.fptr + location)) = pixel->color;
