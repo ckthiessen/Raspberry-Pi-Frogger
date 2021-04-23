@@ -44,7 +44,6 @@ struct fbs initFbInfo(void)
 
     // Figure out the size of the screen in bytes
     screensize = vinfo.xres_virtual * vinfo.yres_virtual * vinfo.bits_per_pixel / 8;
-    printf("Hello: %d",vinfo.bits_per_pixel);
 
     // Map the device to memory
     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);

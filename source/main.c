@@ -17,15 +17,18 @@
 // #define SECONDS_PER_FRAME 1/10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
+typedef unsigned int color;
+
 /* Definitions */
 typedef struct {
 	int color;
 	int x, y;
 } Pixel;
 
+
 struct Map {
 	char board[NUM_TILES][NUM_TILES];
-	unsigned short stage[GAME_WIDTH][GAME_HEIGHT];
+	color stage[GAME_WIDTH][GAME_HEIGHT];
 	// "--------------------"
 	// "--------------------"
 	// "--------------------"
@@ -50,12 +53,28 @@ struct Map {
 } map;
 
 void generateStartingMap() {
-	for(int row = 0; row < GAME_HEIGHT; row++) {
+	for(int row = 0; row < GAME_HEIGHT/2; row++) {
 		for(int col = 0; col < GAME_WIDTH; col++) {
-			map.stage[col][row] = 0x6660;
+			map.stage[row][col] = 0xFFFF;
+		}
+	}
+
+	for(int row = GAME_HEIGHT/2; row < GAME_HEIGHT; row++) {
+		for(int col = 0; col < GAME_WIDTH; col++) {
+			map.stage[row][col] = 0x07e0;
 		}
 	}
 }
+
+// void generateStartingMap() {
+// 	for(int row = 0; row < NUM_TILES; row++) {
+// 		for(int col = 0; col < NUM_TILES; col++) {
+// 			map.board[row][col] = '-';
+// 		}
+// 	}
+// 	map.board[18][0] = 'c';
+// 	map.board[18][1] = 'c';
+// }
 
 struct fbs framebufferstruct;
 void drawPixel(Pixel *pixel);
@@ -104,6 +123,33 @@ void drawTile(int yOffset, int xOffset, char tile) {
 // 	}
 // }
 
+
+void updateStage(int row, int col, color rgb) {
+	for(int row = 0; row < NUM_TILES; row++) { 
+		for(int col = 0; col < NUM_TILES; col++) { 
+
+		}
+	}
+}
+
+void mapBoardToStage() {
+	for(int row = 0; row < NUM_TILES; row++) { 
+		for(int col = 0; col < NUM_TILES; col++) { 
+			char tile = map.board[row][col];
+			switch (tile)
+			{
+			case '-':
+				updateStage(row+1, col+1, 0xFFFF);
+				break;
+			case 'c':
+				updateStage(row+1, col+1, 0x6660);
+			default:
+				break;
+			}
+		}
+	}
+}
+
 unsigned long elapsed = 0;
 
 void update() {
@@ -146,7 +192,7 @@ int main(){
 		usleep(1000 * 1000); // Sleep 1 second
 		drawFrame();
 		wait++;
-		printf("%d\n", wait);
+		// printf("%d\n", wait);
 	}
 	// Uncomment to render with pixels
 	// render();
