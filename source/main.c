@@ -17,8 +17,6 @@
 // #define SECONDS_PER_FRAME 1/10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
-typedef unsigned int color;
-
 /* Definitions */
 typedef struct {
 	int color;
@@ -28,7 +26,7 @@ typedef struct {
 
 struct Map {
 	char board[NUM_TILES][NUM_TILES];
-	color stage[GAME_WIDTH][GAME_HEIGHT];
+	unsigned short stage[GAME_WIDTH*GAME_HEIGHT];
 	// "--------------------"
 	// "--------------------"
 	// "--------------------"
@@ -52,55 +50,40 @@ struct Map {
 	// "--------------------"
 } map;
 
-void generateStartingMap() {
-	for(int row = 0; row < GAME_HEIGHT/2; row++) {
-		for(int col = 0; col < GAME_WIDTH; col++) {
-			map.stage[row][col] = 0xFFFF;
-		}
-	}
-
-	for(int row = GAME_HEIGHT/2; row < GAME_HEIGHT; row++) {
-		for(int col = 0; col < GAME_WIDTH; col++) {
-			map.stage[row][col] = 0x07e0;
-		}
-	}
-}
-
 // void generateStartingMap() {
-// 	for(int row = 0; row < NUM_TILES; row++) {
-// 		for(int col = 0; col < NUM_TILES; col++) {
-// 			map.board[row][col] = '-';
+// 	for(int row = 0; row < GAME_HEIGHT; row++) {
+// 		for(int col = 0; col < GAME_WIDTH; col++) {
+// 			map.stage[row][col] = 0xffff;
 // 		}
 // 	}
-// 	map.board[18][0] = 'c';
-// 	map.board[18][1] = 'c';
+
+// 	// for(int row = GAME_HEIGHT/2; row < GAME_HEIGHT; row++) {
+// 	// 	for(int col = 0; col < GAME_WIDTH; col++) {
+// 	// 		map.stage[row][col] = 0x07e0;
+// 	// 	}
+// 	// }
 // }
+
+void generateStartingMap() {
+	for(int row = 0; row < NUM_TILES; row++) {
+		for(int col = 0; col < NUM_TILES; col++) {
+			map.board[row][col] = '-';
+		}
+	}
+	map.board[15][19] = 'c';
+	map.board[15][18] = 'c';
+}
 
 struct fbs framebufferstruct;
 void drawPixel(Pixel *pixel);
 
 Pixel *pixel;
 
-void drawTile(int yOffset, int xOffset, char tile) {
+void updateStage(int yOffset, int xOffset, int color) {
 	/* initialize a pixel */
-
 	for (int y = TILE_HEIGHT*(yOffset-1); y < TILE_HEIGHT*yOffset; y++) {
 		for (int x = TILE_WIDTH*(xOffset-1); x < TILE_WIDTH*xOffset; x++) {
-			int color;
-			switch (tile)
-			{
-			case '-':
-				color = 0xFFFF;
-				break;
-			case 'c':
-				color = 0x6660;
-			default:
-				break;
-			}
-			pixel->color = color;
-			pixel->x = x;
-			pixel->y = y;
-			drawPixel(pixel);
+			map.stage[(y*GAME_WIDTH) + x] = color;
 		}
 	}
 }
@@ -124,44 +107,38 @@ void drawTile(int yOffset, int xOffset, char tile) {
 // }
 
 
-void updateStage(int row, int col, color rgb) {
-	for(int row = 0; row < NUM_TILES; row++) { 
-		for(int col = 0; col < NUM_TILES; col++) { 
-
-		}
-	}
-}
-
 void mapBoardToStage() {
 	for(int row = 0; row < NUM_TILES; row++) { 
 		for(int col = 0; col < NUM_TILES; col++) { 
 			char tile = map.board[row][col];
+			printf("%c", tile);
 			switch (tile)
 			{
 			case '-':
 				updateStage(row+1, col+1, 0xFFFF);
 				break;
 			case 'c':
-				updateStage(row+1, col+1, 0x6660);
+				updateStage(row+1, col+1, 0xF000);
 			default:
 				break;
 			}
 		}
+		printf("\n");
 	}
 }
 
 unsigned long elapsed = 0;
 
-void update() {
-	for(int row = 0; row < NUM_TILES; row++) { 
-		int offset = (elapsed * 2) % 20;
-		for(int col = 0; col < NUM_TILES; col++) { 
-			char tile = map.board[row][(offset + col) % 20];
-			drawTile(row+1, col+1, tile);
-		}
-		printf("\n");
-	}
-}
+// void update() {
+// 	for(int row = 0; row < NUM_TILES; row++) { 
+// 		int offset = (elapsed * 2) % 20;
+// 		for(int col = 0; col < NUM_TILES; col++) { 
+// 			char tile = map.board[row][(offset + col) % 20];
+// 			drawTile(row+1, col+1, tile);
+// 		}
+// 		printf("\n");
+// 	}
+// }
 
 
 void printBoard() {
@@ -184,21 +161,10 @@ void drawFrame() {
 int main(){
 	/* initialize + get FBS */
 	framebufferstruct = initFbInfo();
-	pixel = malloc(sizeof(Pixel));
-	unsigned int wait = 0;
 	
 	generateStartingMap();
-	while(true) {
-		usleep(1000 * 1000); // Sleep 1 second
-		drawFrame();
-		wait++;
-		// printf("%d\n", wait);
-	}
-	// Uncomment to render with pixels
-	// render();
-	
-	free(pixel);
-	pixel = NULL;
+	mapBoardToStage();
+	drawFrame();
 	
 	// mummap = "memory unmap"; frees the following mapping from memory
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
