@@ -259,10 +259,6 @@ int main()
 		drawFrame();
 	}
 
-	while (1)
-	{
-	}
-
 	// mummap = "memory unmap"; frees the following mapping from memory
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
 
