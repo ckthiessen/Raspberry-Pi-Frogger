@@ -9,6 +9,7 @@
 #include <string.h>
 #include <wiringPi.h>
 #include "initGPIO.h"
+#include "controller.h"
 
 #define CLK 11
 #define LAT 9
@@ -21,7 +22,6 @@
 #define NUM_BUTTONS 16
 #define HIGH 1
 #define LOW 0
-#define START 4
 
 // Register gpio base address global
 unsigned int *gpioPtr;
@@ -144,7 +144,8 @@ int checkForButtonPress(int buttons[])
             return i + 1;
         }
     }
-    if(prevPress != -1) {
+    if (prevPress != -1)
+    {
         prevPress = -1;
     }
     // Did not detect button press
@@ -191,15 +192,12 @@ int Read_SNES()
     return checkForButtonPress(buttons);
 }
 
-
 /*
 @Returns: 0 if the program exits normally
 Handles the setup, the main program loop, and tear down of the application.
 */
-// int main()
+// int sampleController()
 // {
-//     printf("Created by: Cole Thiessen and Isaac Lutzko\n");
-
 //     // Get gpio pointer
 //     gpioPtr = getGPIOPtr();
 
@@ -228,7 +226,7 @@ Handles the setup, the main program loop, and tear down of the application.
 //             buttonIndex = Read_SNES();
 
 //             // If pressed button is not the previously pressed button then break inner loop
-//             if (buttonIndex != -1) 
+//             if (buttonIndex != -1)
 //             {
 //                 break;
 //             }
@@ -244,8 +242,27 @@ Handles the setup, the main program loop, and tear down of the application.
 //             prevPress = buttonIndex;
 //         }
 //     }
-//     printf("\n");
-//     printf("Program is terminating...\n");
-
 //     return 0;
 // }
+
+int sampleController()
+{
+    // Get gpio pointer
+    gpioPtr = getGPIOPtr();
+
+    // Initialize the SNES controller
+    init_GPIO(gpioPtr);
+
+    // Store sampled buttons
+    int buttonIndex;
+
+    buttonIndex = -1;
+
+    // Delay to prevent printing too much -- 200000 microseconds because not too slow and still very responsive
+    delayMicroseconds(100000);
+
+    // Get button code that corresponds to the button that is pressed or lack thereof
+    buttonIndex = Read_SNES();
+
+    return buttonIndex;
+}
