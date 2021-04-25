@@ -113,7 +113,7 @@ void update()
 			{
 				char tile = map.board[row][col];
 				boardBuffer[row][col] = '-';
-				boardBuffer[row][(col + 2) % NUM_MAP_TILES] = tile;
+				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = tile;
 			}
 		}
 	}
@@ -121,7 +121,7 @@ void update()
 }
 
 void pauseGame()
-{
+{ 
 	game.action = NO_ACTION;
 	while(true) {
 		if(game.action == START) {
@@ -159,6 +159,7 @@ void doUserAction()
 {
 	if (game.action == START)
 	{
+		usleep(1000*1000);
 		pauseGame();
 	}
 	else
@@ -203,6 +204,12 @@ void *getUserInput()
 	}
 }
 
+void resetGame() {
+	game.scrollOffset = 30;
+	game.action = -1;
+	game.frogLocation = FROG_START;
+}
+
 /* main function */
 int main()
 {
@@ -211,7 +218,7 @@ int main()
 
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
-
+	resetGame();
 	// generateStartingMap();
 	while (true)
 	{

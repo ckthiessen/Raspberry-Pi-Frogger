@@ -17,22 +17,14 @@ typedef struct
 	unsigned short row, col;
 } Coordinate;
 
-/* Definitions */
-typedef struct
-{
-	short velocity;
-} Lane;
+Coordinate FROG_START = { 49, 19 };
 
 struct Game
 {
 	short scrollOffset; // Offset used for scrolling
 	short action;
 	Coordinate frogLocation;
-} game = {
-	30,		// Sroll offset initialized to 30 to display bottom 20 rows
-	-1,		// Player action initialized to -1 (no action)
-	{49, 19} // Starting coordinate for the frog
-};
+} game;
 
 struct Map
 {
@@ -79,10 +71,10 @@ struct Map
 	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
 	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
 	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
 	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
 	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
@@ -90,6 +82,59 @@ struct Map
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
 	 "gggggggggggggggggggfggggggggggggggggggggggggggggg"},
 	{}};
+
+short laneVelocities[NUM_MAP_TILES] = {
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	1,
+	-1,
+	1,
+	1,
+	-2,
+	-1,
+	-1,
+	3,
+	1,
+	-1,
+	2,
+	1,
+	0,
+};
 
 #endif
 
