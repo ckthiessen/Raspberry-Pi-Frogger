@@ -78,23 +78,29 @@ void mapBoardToStage()
 		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
 			char tile = map.board[row][col];
+			int color; 
 			switch (tile)
 			{
 			case '-':
-				updateStage(row + 1, col + 1, 0x8410);
+				color = 0x8410;
 				break;
 			case 'b':
-				updateStage(row + 1, col + 1, 0x001F);
+				color = 0x001F;
 				break;
 			case 'c':
-				updateStage(row + 1, col + 1, 0xF800);
+				color = 0xF800;
 				break;
 			case 'f':
-				updateStage(row + 1, col + 1, 0x6660);
+				color = 0x6660;
+				break;
+			case 'g':
+				color = 0x0420;
 				break;
 			default:
+				color = 0xFFFF;
 				break;
 			}
+			updateStage(row + 1, col + 1, color, velocity);
 		}
 	}
 }
@@ -220,9 +226,14 @@ int main()
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 	resetGame();
 	// generateStartingMap();
+	game.elapsedTime = 0.0;
+	float lastRenderTime = 0.0;
 	while (true)
 	{
-		usleep(500 * 1000); // Sleep 1 second
+		usleep((((float)SECONDS_PER_FRAME) * 1000) * 1000); // 30 Frames per second
+		// usleep(500 * 1000); // 30 Frames per second
+		game.elapsedTime += (float) SECONDS_PER_FRAME;
+		// printf("%f\n", game.elapsedTime);
 		if (game.action != -1)
 		{
 			doUserAction();
