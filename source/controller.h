@@ -6,6 +6,7 @@
 #define DOWN 6
 #define LEFT 7
 #define RIGHT 8
+#define NO_ACTION -1
 
 
 int sampleController();

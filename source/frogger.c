@@ -3,67 +3,14 @@
 #include <string.h>
 #include <time.h>
 #include <sys/mman.h>
-#include "framebuffer.h"
-#include "controller.h"
 #include <wiringPi.h> //delayMicroseconds(int)
 #include <stdbool.h>  //true, false
 #include <unistd.h>
 #include <pthread.h>
+#include "frogger.h"
+#include "framebuffer.h"
+#include "controller.h"
 
-#define GAME_WIDTH 1280
-#define GAME_HEIGHT 720
-#define GAME_CENTER 200
-#define TILE_HEIGHT 36
-#define TILE_WIDTH 64
-#define NUM_TILES 20
-// #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-// #define SECONDS_PER_FRAME 1/10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
-#define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
-
-typedef struct
-{
-	unsigned short row, col;
-} Coordinate;
-
-/* Definitions */
-typedef struct
-{
-	int color;
-	int x, y;
-} Pixel;
-
-struct Game
-{
-	short action;
-	Coordinate frogLocation;
-} game = {-1, {18, 9}};
-
-struct Map
-{
-	char board[NUM_TILES][NUM_TILES];
-	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "--------------------"
-	// "cc------------------"
-	// "--------------------"
-	// "--------------------"
-} map;
 
 // void generateStartingMap() {
 // 	for(int row = 0; row < GAME_HEIGHT; row++) {
@@ -79,30 +26,27 @@ struct Map
 // 	// }
 // }
 
-void generateStartingMap()
-{
-	for (int row = 0; row < NUM_TILES; row++)
-	{
-		for (int col = 0; col < NUM_TILES; col++)
-		{
-			map.board[row][col] = '-';
-		}
-	}
-	map.board[15][19] = 'c';
-	map.board[15][18] = 'c';
-	map.board[18][9] = 'f';
-}
+// void generateStartingMap()
+// {
+// 	for (int row = 0; row < NUM_TILES; row++)
+// 	{
+// 		for (int col = 0; col < NUM_TILES; col++)
+// 		{
+// 			map.board[row][col] = '-';
+// 		}
+// 	}
+// 	map.board[15][19] = 'c';
+// 	map.board[15][18] = 'c';
+// 	map.board[18][9] = 'f';
+// }
 
 struct fbs framebufferstruct;
-void drawPixel(Pixel *pixel);
-
-Pixel *pixel;
 
 void updateStage(int yOffset, int xOffset, int color)
 {
-	for (int y = TILE_HEIGHT * (yOffset - 1); y < TILE_HEIGHT * yOffset; y++)
+	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset - 1); y < TILE_HEIGHT * (yOffset - game.scrollOffset); y++)
 	{
-		for (int x = TILE_WIDTH * (xOffset - 1); x < TILE_WIDTH * xOffset; x++)
+		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET - 1); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x++)
 		{
 			map.stage[(y * GAME_WIDTH) + x] = color;
 		}
@@ -129,20 +73,25 @@ void updateStage(int yOffset, int xOffset, int color)
 
 void mapBoardToStage()
 {
-	for (int row = 0; row < NUM_TILES; row++)
+	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
-		for (int col = 0; col < NUM_TILES; col++)
+		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
 			char tile = map.board[row][col];
 			switch (tile)
 			{
 			case '-':
-				updateStage(row + 1, col + 1, 0xFFFF);
+				updateStage(row + 1, col + 1, 0x8410);
+				break;
+			case 'b':
+				updateStage(row + 1, col + 1, 0x001F);
 				break;
 			case 'c':
-				updateStage(row + 1, col + 1, 0xF000);
+				updateStage(row + 1, col + 1, 0xF800);
+				break;
 			case 'f':
 				updateStage(row + 1, col + 1, 0x6660);
+				break;
 			default:
 				break;
 			}
@@ -152,18 +101,34 @@ void mapBoardToStage()
 
 unsigned long elapsed = 0;
 
-// void update() {
-// 	for(int row = 0; row < NUM_TILES; row++) {
-// 		for(int col = 0; col < NUM_TILES; col++) {
-// 			if(game.action != 1) {
-
-// 			}
-// 		}
-// 	}
-// }
+void update()
+{
+	char boardBuffer[NUM_MAP_TILES][NUM_MAP_TILES];
+	memcpy(boardBuffer, map.board, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
+	for (int row = 0; row < NUM_MAP_TILES; row++)
+	{
+		for (int col = 0; col < NUM_MAP_TILES; col++)
+		{
+			if (map.board[row][col] == 'c' || map.board[row][col] == 'b')
+			{
+				char tile = map.board[row][col];
+				boardBuffer[row][col] = '-';
+				boardBuffer[row][(col + 2) % NUM_MAP_TILES] = tile;
+			}
+		}
+	}
+	memcpy(map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
+}
 
 void pauseGame()
 {
+	game.action = NO_ACTION;
+	while(true) {
+		if(game.action == START) {
+			break;
+		}
+	}
+
 }
 
 void moveFrog(int direction)
@@ -204,9 +169,10 @@ void doUserAction()
 
 void printBoard()
 {
-	for (int row = 0; row < NUM_TILES; row++)
+	printf("Top of board: %d\n", game.scrollOffset);
+	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
-		for (int col = 0; col < NUM_TILES; col++)
+		for (int col = 0; col < NUM_RENDERED_TILES; col++)
 		{
 			char tile = map.board[row][col];
 			printf("%c", tile);
@@ -216,7 +182,7 @@ void printBoard()
 }
 
 /* Draw a frame */
-void drawFrame()
+void drawStageToFrameBuffer()
 {
 	memcpy(framebufferstruct.fptr, map.stage, 1280 * 720 * 2);
 }
@@ -246,7 +212,7 @@ int main()
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 
-	generateStartingMap();
+	// generateStartingMap();
 	while (true)
 	{
 		usleep(500 * 1000); // Sleep 1 second
@@ -255,20 +221,15 @@ int main()
 			doUserAction();
 			game.action = -1;
 		}
+		update();
 		mapBoardToStage();
-		drawFrame();
+		drawStageToFrameBuffer();
+		// printBoard();
+		// break;
 	}
 
 	// mummap = "memory unmap"; frees the following mapping from memory
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
 
 	return 0;
-}
-
-/* Draw a pixel */
-void drawPixel(Pixel *pixel)
-{
-	long int location = (pixel->x + framebufferstruct.xOff) * (framebufferstruct.bits / 8) +
-						(pixel->y + framebufferstruct.yOff) * framebufferstruct.lineLength;
-	*((unsigned short int *)(framebufferstruct.fptr + location)) = pixel->color;
 }
