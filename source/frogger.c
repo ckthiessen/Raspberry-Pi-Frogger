@@ -75,26 +75,29 @@ void mapBoardToStage()
 {
 	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
-		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
+		int position = (int)(game.elapsedTime * laneVelocities[row]) % NUM_MAP_TILES;
+		for (int col = 0; col < GAME_WIDTH / TILE_WIDTH; col++)
 		{
-			char tile = map.board[row][col];
-			switch (tile)
-			{
-			case '-':
-				updateStage(row + 1, col + 1, 0x8410);
-				break;
-			case 'b':
-				updateStage(row + 1, col + 1, 0x001F);
-				break;
-			case 'c':
-				updateStage(row + 1, col + 1, 0xF800);
-				break;
-			case 'f':
-				updateStage(row + 1, col + 1, 0x6660);
-				break;
-			default:
-				break;
-			}
+			char tile = map.board[(position + col + NUM_MAP_TILES) % NUM_MAP_TILES];
+			updateStage();
+			// char tile = map.board[row][col];
+			// switch (tile)
+			// {
+			// case '-':
+			// 	updateStage(row + 1, col + 1, 0x8410);
+			// 	break;
+			// case 'b':
+			// 	updateStage(row + 1, col + 1, 0x001F);
+			// 	break;
+			// case 'c':
+			// 	updateStage(row + 1, col + 1, 0xF800);
+			// 	break;
+			// case 'f':
+			// 	updateStage(row + 1, col + 1, 0x6660);
+			// 	break;
+			// default:
+			// 	break;
+			// }
 		}
 	}
 }
@@ -107,14 +110,15 @@ void update()
 	memcpy(boardBuffer, map.board, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
 	for (int row = 0; row < NUM_MAP_TILES; row++)
 	{
+		// int tileOffset = (int)(game.elapsedTime * (float)laneVelocities[row] * (float)NUM_MAP_TILES) % NUM_MAP_TILES;
 		for (int col = 0; col < NUM_MAP_TILES; col++)
 		{
-			if (map.board[row][col] == 'c' || map.board[row][col] == 'b')
-			{
-				char tile = map.board[row][col];
-				boardBuffer[row][col] = '-';
-				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = tile;
-			}
+			// if (map.board[row][col] == 'c' || map.board[row][col] == 'b')
+			// {
+			// 	char tile = map.board[row][col];
+			// 	boardBuffer[row][col] = '-';
+			// 	boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = tile;
+			// }
 		}
 	}
 	memcpy(map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
@@ -215,14 +219,19 @@ int main()
 {
 	/* initialize + get FBS */
 	framebufferstruct = initFbInfo();
+	// time_t timer = time(NULL);
+	// long start = clock();
 
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 	resetGame();
 	// generateStartingMap();
+	game.elapsedTime = 0.0;
 	while (true)
 	{
-		usleep(500 * 1000); // Sleep 1 second
+		usleep(((float) SECONDS_PER_FRAME * 1000) * 1000); // Sleep 1 second
+		game.elapsedTime += (float) SECONDS_PER_FRAME;
+		printf("%f\n", game.elapsedTime);
 		if (game.action != -1)
 		{
 			doUserAction();
