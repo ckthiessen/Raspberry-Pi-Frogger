@@ -100,7 +100,7 @@ void mapBoardToStage()
 				color = 0xFFFF;
 				break;
 			}
-			updateStage(row + 1, col + 1, color, velocity);
+			updateStage(row + 1, col + 1, color);
 		}
 	}
 }
@@ -227,7 +227,6 @@ int main()
 	resetGame();
 	// generateStartingMap();
 	game.elapsedTime = 0.0;
-	float lastRenderTime = 0.0;
 	while (true)
 	{
 		usleep((((float)SECONDS_PER_FRAME) * 1000) * 1000); // 30 Frames per second

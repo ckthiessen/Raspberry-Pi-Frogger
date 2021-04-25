@@ -9,8 +9,8 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-// #define SECONDS_PER_FRAME 1/10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
-#define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 1/10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+// #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 typedef struct
 {
@@ -24,6 +24,7 @@ struct Game
 	short scrollOffset; // Offset used for scrolling
 	short action;
 	Coordinate frogLocation;
+	float elapsedTime;
 } game;
 
 struct Map
