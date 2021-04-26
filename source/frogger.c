@@ -42,16 +42,28 @@
 
 struct fbs framebufferstruct;
 
-void updateStage(int yOffset, int xOffset, int color)
+void updateStage(int yOffset, int xOffset, int color, int tileOffset)
 {
 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset - 1); y < TILE_HEIGHT * (yOffset - game.scrollOffset); y++)
 	{
-		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET - 1); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x++)
+		for (int x = TILE_WIDTH * (xOffset - 1) - tileOffset; x < TILE_WIDTH * xOffset - tileOffset; x++)
 		{
 			map.stage[(y * GAME_WIDTH) + x] = color;
 		}
 	}
 }
+
+// void updateStage(int yOffset, int xOffset, int color)
+// {
+// 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset - 1); y < TILE_HEIGHT * (yOffset - game.scrollOffset); y++)
+// 	{
+// 		for (int x = TILE_WIDTH * (xOffset - 1) - tileOffset; x < TILE_WIDTH * xOffset - tileOffset; x++)
+// 		{
+// 			if(map.stage[(y * GAME_WIDTH) + x] == 0x6660) { continue; }
+// 			map.stage[(y * GAME_WIDTH) + x] = color;
+// 		}
+// 	}
+// }
 
 // void render() {
 // 	for(int row = 0; row < NUM_TILES; row++) {
@@ -73,31 +85,31 @@ void updateStage(int yOffset, int xOffset, int color)
 
 void mapBoardToStage()
 {
+	int x = -1, y = 0;
 	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
 		int position = (int)(game.elapsedTime * laneVelocities[row]) % NUM_MAP_TILES;
-		for (int col = 0; col < GAME_WIDTH / TILE_WIDTH; col++)
+		int tileOffset = (int)((float) TILE_WIDTH * game.elapsedTime * laneVelocities[row]) % TILE_WIDTH;
+		// printf("%d\n", tileOffset);
+		for (int col = 0; col < NUM_RENDERED_TILES; col++)
 		{
-			char tile = map.board[(position + col + NUM_MAP_TILES) % NUM_MAP_TILES];
-			updateStage();
+			char tile = map.board[row][(position + col) % NUM_MAP_TILES];
+			// printf("%c\n", tile);
 			// char tile = map.board[row][col];
-			// switch (tile)
-			// {
-			// case '-':
-			// 	updateStage(row + 1, col + 1, 0x8410);
-			// 	break;
-			// case 'b':
-			// 	updateStage(row + 1, col + 1, 0x001F);
-			// 	break;
-			// case 'c':
-			// 	updateStage(row + 1, col + 1, 0xF800);
-			// 	break;
-			// case 'f':
-			// 	updateStage(row + 1, col + 1, 0x6660);
-			// 	break;
-			// default:
-			// 	break;
-			// }
+			switch (tile)
+			{
+			case '-':
+				updateStage(row + 1, col + 1, 0x8410, tileOffset);
+				break;
+			case 'b':
+				updateStage(row + 1, col + 1, 0x001F, tileOffset);
+				break;
+			case 'c':
+				updateStage(row + 1, col + 1, 0xF800, tileOffset);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }
@@ -231,14 +243,15 @@ int main()
 	{
 		usleep(((float) SECONDS_PER_FRAME * 1000) * 1000); // Sleep 1 second
 		game.elapsedTime += (float) SECONDS_PER_FRAME;
-		printf("%f\n", game.elapsedTime);
+		// printf("%f\n", game.elapsedTime);
 		if (game.action != -1)
 		{
 			doUserAction();
 			game.action = -1;
 		}
-		update();
+		// update();
 		mapBoardToStage();
+		updateStage(game.frogLocation.row + 1, game.frogLocation.col + 1, 0x6660, 0);
 		drawStageToFrameBuffer();
 		// printBoard();
 		// break;
