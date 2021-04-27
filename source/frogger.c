@@ -111,6 +111,11 @@ void mapBoardToStage()
 				break;
 			}
 		}
+		updateStage(row + 1, 1 + HORIZONTAL_OFFSET, 0x0000, 0);
+		updateStage(row + 1, 20 + HORIZONTAL_OFFSET, 0x0000, 0);
+		// 	if(row == 49) {
+		// printf("\n");
+		// 	}
 	}
 }
 
