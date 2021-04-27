@@ -46,7 +46,7 @@ void updateStage(int yOffset, int xOffset, int color, int tileOffset)
 {
 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset - 1); y < TILE_HEIGHT * (yOffset - game.scrollOffset); y++)
 	{
-		for (int x = TILE_WIDTH * (xOffset - 1) - tileOffset; x < TILE_WIDTH * xOffset - tileOffset; x++)
+		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET - 1) - tileOffset; x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET) - tileOffset; x++)
 		{
 			map.stage[(y * GAME_WIDTH) + x] = color;
 		}
@@ -91,7 +91,7 @@ void mapBoardToStage()
 		int position = (int)(game.elapsedTime * laneVelocities[row]) % NUM_MAP_TILES;
 		int tileOffset = (int)((float) TILE_WIDTH * game.elapsedTime * laneVelocities[row]) % TILE_WIDTH;
 		// printf("%d\n", tileOffset);
-		for (int col = 0; col < NUM_RENDERED_TILES; col++)
+		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
 			char tile = map.board[row][(position + col) % NUM_MAP_TILES];
 			// printf("%c\n", tile);
@@ -160,6 +160,9 @@ void moveFrog(int direction)
 	case UP:
 		map.board[game.frogLocation.row - 1][game.frogLocation.col] = 'f';
 		game.frogLocation.row--;
+		if(game.frogLocation.row < 40 && !(game.frogLocation.row < 10)) {
+			game.scrollOffset--;
+		}
 		break;
 	case DOWN:
 		map.board[game.frogLocation.row + 1][game.frogLocation.col] = 'f';
