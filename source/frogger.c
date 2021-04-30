@@ -48,6 +48,15 @@ void mapBoardToStage(bool debug)
 			case 'g':
 				color = 0x0420;
 				break;
+			case 'l':
+				color = 0x8B00;
+				break;
+			case ',':
+				color = 0x34DE;
+				break;
+			case '.':
+				color = 0x0000;
+				break;
 			default:
 				color = 0xFFFF;
 				break;
@@ -63,12 +72,14 @@ void checkCollision()
 {
 	if (
 		map.board[game.frogLocation.row][game.frogLocation.col] == 'c' ||
+		map.board[game.frogLocation.row][game.frogLocation.col] == ',' ||
 		map.board[game.frogLocation.row][game.frogLocation.col] == 'b')
 	{
 		resetFrogPosition();
 		game.lives--;
 		printf("Lives remaining: %d\n", game.lives);
 	}
+
 }
 
 void update()
@@ -79,11 +90,23 @@ void update()
 	{
 		for (int col = 0; col < NUM_MAP_TILES; col++)
 		{
-			if (map.board[row][col] == 'c' || map.board[row][col] == 'b')
+			char obstacle = map.board[row][col];
+			char background = '\0';
+			switch (obstacle)
 			{
-				char tile = map.board[row][col];
-				boardBuffer[row][col] = '-';
-				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = tile;
+			case 'c':
+			case 'b':
+				background = '-';
+				break;
+			case 'l':
+				background = ',';
+				break;
+			default:
+				break;
+			}
+			if (background != '\0') {
+				boardBuffer[row][col] = background;
+				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = obstacle;
 			}
 		}
 	}
@@ -107,7 +130,6 @@ void pauseGame()
 
 void moveFrog(int direction)
 {
-	map.board[game.frogLocation.row][game.frogLocation.col] = '-';
 	switch (game.action)
 	{
 	case UP:
@@ -179,6 +201,14 @@ void initializeGame()
 	game.lives = 3;
 }
 
+void updateFrogLocation()
+{
+	if(map.board[game.frogLocation.row][game.frogLocation.col] == 'l') {
+		game.frogLocation.col += laneVelocities[game.frogLocation.row];
+	}
+	updateStage(game.frogLocation.row, game.frogLocation.col, 0x6660);
+}
+
 /* main function */
 int main()
 {
@@ -204,7 +234,7 @@ int main()
 		}
 		update();
 		mapBoardToStage(false);
-		updateStage(game.frogLocation.row, game.frogLocation.col, 0x6660);
+		updateFrogLocation();
 		drawStageToFrameBuffer();
 		// printBoard();
 		// break;

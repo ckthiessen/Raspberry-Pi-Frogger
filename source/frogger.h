@@ -9,7 +9,7 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 3 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 1 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 void updateStage(int yOffset, int xOffset, int color);
@@ -22,6 +22,7 @@ void doUserAction();
 void drawStageToFrameBuffer();
 void *getUserInput();
 void resetFrogPosition();
+void updateFrogLocation();
 void initializeGame();
 
 typedef struct
@@ -45,45 +46,45 @@ struct Map
 	char board[NUM_MAP_TILES][NUM_MAP_TILES];
 	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
 } map = {
-	{"--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
+	{".................................................", //bw
+	 ".................................................", //fw
+	 ".................................................", //bw
+	 ".................................................", //fw
+	 ".................................................", //bw
+	 ".................................................", //bw
+	 ".................................................", //bw
+	 ".................................................", //bw
+	 ".................................................", //bw
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
+	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
+	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
+	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
+	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
 	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
 	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
 	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
@@ -131,13 +132,13 @@ short laneVelocities[NUM_MAP_TILES] = {
 	1,
 	1,
 	1,
-	1,
-	1,
-	1,
-	1,
+	-1,
 	1,
 	-1,
 	1,
+	1,
+	-1,
+	0,
 	1,
 	-2,
 	-1,
