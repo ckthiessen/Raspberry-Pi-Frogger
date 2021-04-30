@@ -9,7 +9,7 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 1/10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 1/4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 typedef struct
@@ -81,7 +81,7 @@ struct Map
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "gggggggggggggggggggfggggggggggggggggggggggggggggg"},
+	 "gggggggggfggggggggggggggggggggggggggggggggggggggg"},
 	{}};
 
 short laneVelocities[NUM_MAP_TILES] = {
@@ -129,7 +129,7 @@ short laneVelocities[NUM_MAP_TILES] = {
 	-2,
 	-1,
 	-1,
-	3,
+	2,
 	1,
 	-1,
 	2,

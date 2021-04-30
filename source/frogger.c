@@ -90,9 +90,6 @@ void mapBoardToStage()
 			case 'c':
 				color = 0xF800;
 				break;
-			case 'f':
-				color = 0x6660;
-				break;
 			case 'g':
 				color = 0x0420;
 				break;
@@ -145,10 +142,16 @@ void moveFrog(int direction)
 	case UP:
 		map.board[game.frogLocation.row - 1][game.frogLocation.col] = 'f';
 		game.frogLocation.row--;
+		if(game.frogLocation.row < 40 && game.frogLocation.row >= 10) {
+			game.scrollOffset--;
+		}
 		break;
 	case DOWN:
 		map.board[game.frogLocation.row + 1][game.frogLocation.col] = 'f';
 		game.frogLocation.row++;
+		if(game.frogLocation.row < 40 && game.frogLocation.row >= 10) {
+			game.scrollOffset++;
+		}
 		break;
 	case LEFT:
 		map.board[game.frogLocation.row][game.frogLocation.col - 1] = 'f';
@@ -240,6 +243,7 @@ int main()
 		}
 		update();
 		mapBoardToStage();
+		updateStage(game.frogLocation.row + 1, game.frogLocation.col + 1, 0x6660);
 		drawStageToFrameBuffer();
 		// printBoard();
 		// break;
