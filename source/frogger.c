@@ -11,35 +11,6 @@
 #include "framebuffer.h"
 #include "controller.h"
 
-
-// void generateStartingMap() {
-// 	for(int row = 0; row < GAME_HEIGHT; row++) {
-// 		for(int col = 0; col < GAME_WIDTH; col++) {
-// 			map.stage[row][col] = 0xffff;
-// 		}
-// 	}
-
-// 	// for(int row = GAME_HEIGHT/2; row < GAME_HEIGHT; row++) {
-// 	// 	for(int col = 0; col < GAME_WIDTH; col++) {
-// 	// 		map.stage[row][col] = 0x07e0;
-// 	// 	}
-// 	// }
-// }
-
-// void generateStartingMap()
-// {
-// 	for (int row = 0; row < NUM_TILES; row++)
-// 	{
-// 		for (int col = 0; col < NUM_TILES; col++)
-// 		{
-// 			map.board[row][col] = '-';
-// 		}
-// 	}
-// 	map.board[15][19] = 'c';
-// 	map.board[15][18] = 'c';
-// 	map.board[18][9] = 'f';
-// }
-
 struct fbs framebufferstruct;
 
 void updateStage(int yOffset, int xOffset, int color)
@@ -53,24 +24,6 @@ void updateStage(int yOffset, int xOffset, int color)
 	}
 }
 
-// void render() {
-// 	for(int row = 0; row < NUM_TILES; row++) {
-// 		for(int col = 0; col < NUM_TILES; col++) {
-// 			char tile = map.board[row][col];
-// 			switch (tile)
-// 			{
-// 			case '-':
-// 				drawTile(row+1, col+1, 0xFFFF);
-// 				break;
-// 			case 'c':
-// 				drawTile(row+1, col+1, 0x6660);
-// 			default:
-// 				break;
-// 			}
-// 		}
-// 	}
-// }
-
 void mapBoardToStage(bool debug)
 {
 	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
@@ -78,8 +31,9 @@ void mapBoardToStage(bool debug)
 		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
 			char tile = map.board[row][col];
-			int color; 
-			if(debug) printf("%c", tile);
+			int color;
+			if (debug)
+				printf("%c", tile);
 			switch (tile)
 			{
 			case '-':
@@ -100,21 +54,20 @@ void mapBoardToStage(bool debug)
 			}
 			updateStage(row, col, color);
 		}
-	if (debug) printf("\n");
+		if (debug)
+			printf("\n");
 	}
 }
 
-unsigned long elapsed = 0;
-
-void checkCollision() {
+void checkCollision()
+{
 	if (
 		map.board[game.frogLocation.row][game.frogLocation.col] == 'c' ||
-		map.board[game.frogLocation.row][game.frogLocation.col] == 'b'
-	) {
+		map.board[game.frogLocation.row][game.frogLocation.col] == 'b')
+	{
 		resetFrogPosition();
 		game.lives--;
 		printf("Lives remaining: %d\n", game.lives);
-
 	}
 }
 
@@ -139,16 +92,17 @@ void update()
 }
 
 void pauseGame()
-{ 
+{
 	game.action = NO_ACTION;
 	bool paused = true;
-	while(paused) {
-		if(game.action == START) {
+	while (paused)
+	{
+		if (game.action == START)
+		{
 			paused = false;
-			usleep(250*1000);
+			usleep(250 * 1000);
 		}
 	}
-
 }
 
 void moveFrog(int direction)
@@ -157,25 +111,23 @@ void moveFrog(int direction)
 	switch (game.action)
 	{
 	case UP:
-		map.board[game.frogLocation.row - 1][game.frogLocation.col] = 'f';
 		game.frogLocation.row--;
-		if(game.frogLocation.row < 40 && game.frogLocation.row >= 10) {
+		if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
+		{
 			game.scrollOffset--;
 		}
 		break;
 	case DOWN:
-		map.board[game.frogLocation.row + 1][game.frogLocation.col] = 'f';
 		game.frogLocation.row++;
-		if(game.frogLocation.row < 40 && game.frogLocation.row >= 10) {
+		if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
+		{
 			game.scrollOffset++;
 		}
 		break;
 	case LEFT:
-		map.board[game.frogLocation.row][game.frogLocation.col - 1] = 'f';
 		game.frogLocation.col--;
 		break;
 	case RIGHT:
-		map.board[game.frogLocation.row][game.frogLocation.col + 1] = 'f';
 		game.frogLocation.col++;
 		break;
 	}
@@ -190,20 +142,6 @@ void doUserAction()
 	else
 	{
 		moveFrog(game.action);
-	}
-}
-
-void printBoard()
-{
-	printf("Top of board: %d\n", game.scrollOffset);
-	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
-	{
-		for (int col = 0; col < NUM_RENDERED_TILES; col++)
-		{
-			char tile = map.board[row][col];
-			printf("%c", tile);
-		}
-		printf("\n");
 	}
 }
 
@@ -229,13 +167,15 @@ void *getUserInput()
 	}
 }
 
-void resetFrogPosition() {
+void resetFrogPosition()
+{
 	game.scrollOffset = 30;
 	game.action = -1;
 	game.frogLocation = FROG_START;
 }
 
-void initializeGame() {
+void initializeGame()
+{
 	game.lives = 3;
 }
 
@@ -255,7 +195,7 @@ int main()
 	{
 		usleep((((float)SECONDS_PER_FRAME) * 1000) * 1000); // 30 Frames per second
 		// usleep(500 * 1000); // 30 Frames per second
-		game.elapsedTime += (float) SECONDS_PER_FRAME;
+		game.elapsedTime += (float)SECONDS_PER_FRAME;
 		// printf("%f\n", game.elapsedTime);
 		if (game.action != -1)
 		{

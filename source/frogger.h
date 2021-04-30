@@ -9,7 +9,7 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 1/4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 3 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 void updateStage(int yOffset, int xOffset, int color);
@@ -29,7 +29,7 @@ typedef struct
 	unsigned short row, col;
 } Coordinate;
 
-Coordinate FROG_START = { 49, 19 };
+Coordinate FROG_START = {49, 19};
 
 struct Game
 {
@@ -84,8 +84,8 @@ struct Map
 	 "cc-------cc----------cc------cc-------cc-----cc--", //fw
 	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
 	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
 	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
+	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
 	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
@@ -94,7 +94,7 @@ struct Map
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "gggggggggfggggggggggggggggggggggggggggggggggggggg"},
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"},
 	{}};
 
 short laneVelocities[NUM_MAP_TILES] = {
@@ -151,5 +151,3 @@ short laneVelocities[NUM_MAP_TILES] = {
 };
 
 #endif
-
-
