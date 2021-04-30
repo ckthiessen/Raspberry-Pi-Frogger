@@ -32,7 +32,7 @@ unsigned int *gpioPtr;
 This subroutine initializes a GPIO line for the three SNES lines: the latch line, the clock line, and the data line
 Code taken from lecture. Written by Jalal Kawash
 */
-void init_GPIO(unsigned int *gpioPtr)
+void init_GPIO(void)
 {
     INP_GPIO(CLK); // CLK
     OUT_GPIO(CLK); // CLK
@@ -79,7 +79,7 @@ This subroutine prints a messasge for a button that has been pressed
 */
 void Print_Message(int buttonIndex)
 {
-    char *name;
+    const char *name;
     switch (buttonIndex)
     {
     case 1:
@@ -157,7 +157,7 @@ int checkForButtonPress(int buttons[])
 Reads input (buttons pressed or not pressed) from a SNES controller.
 Written based on pseudocode by Jalal Kawash. Taken from lecture. 
 */
-int Read_SNES()
+int Read_SNES(void)
 {
     // integer button array that keeps track of the status of the buttons on the SNES
     int buttons[NUM_BUTTONS];
@@ -245,13 +245,13 @@ Handles the setup, the main program loop, and tear down of the application.
 //     return 0;
 // }
 
-int sampleController()
+int sampleController(void)
 {
     // Get gpio pointer
     gpioPtr = getGPIOPtr();
 
     // Initialize the SNES controller
-    init_GPIO(gpioPtr);
+    init_GPIO();
 
     // Store sampled buttons
     int buttonIndex;

@@ -14,6 +14,13 @@ BUILD = build/
 # The directory in which source files are stored.
 SOURCE = source/
 
+CFLAGS += -Wall -Wextra -Wpedantic \
+          -Wformat=2 -Wno-unused-parameter -Wshadow \
+          -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
+          -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
+		  -Wjump-misses-init -Wlogical-op
+
+
 # The names of all object files that must be generated. Deduced from the 
 # assembly code files in source.
 OBJECTS := $(patsubst $(SOURCE)%.s,$(BUILD)%.o,$(wildcard $(SOURCE)*.s))
@@ -28,7 +35,7 @@ $(BUILD)%.o: $(SOURCE)%.s
 	as --gstabs -I $(SOURCE) $< -o $@
 
 $(BUILD)%.o: $(SOURCE)%.c
-	gcc -g -c -O0 -Wall -I $(SOURCE) $< -o $@
+	gcc -g -c -O0 $(CFLAGS) -I $(SOURCE) $< -o $@
 
 # Rule to clean files.
 clean : 

@@ -10,7 +10,9 @@
 #define SELECT 9
 
 
-int sampleController();
+int sampleController(void);
+int Read_SNES(void);
+void init_GPIO(void);
 
 
 #endif

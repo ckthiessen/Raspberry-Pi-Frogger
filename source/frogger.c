@@ -68,7 +68,7 @@ void mapBoardToStage(bool debug)
 	}
 }
 
-void checkCollision()
+void checkCollision(void)
 {
 	if (
 		map.board[game.frogLocation.row][game.frogLocation.col] == 'c' ||
@@ -82,7 +82,7 @@ void checkCollision()
 
 }
 
-void update()
+void update(void)
 {
 	char boardBuffer[NUM_MAP_TILES][NUM_MAP_TILES];
 	memcpy(boardBuffer, map.board, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
@@ -111,10 +111,10 @@ void update()
 		}
 	}
 	memcpy(map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	checkCollision();
+	// checkCollision();
 }
 
-void pauseGame()
+void pauseGame(void)
 {
 	game.action = NO_ACTION;
 	bool paused = true;
@@ -155,7 +155,7 @@ void moveFrog(int direction)
 	}
 }
 
-void doUserAction()
+void doUserAction(void)
 {
 	if (game.action == START)
 	{
@@ -168,12 +168,12 @@ void doUserAction()
 }
 
 /* Draw a frame */
-void drawStageToFrameBuffer()
+void drawStageToFrameBuffer(void)
 {
 	memcpy(framebufferstruct.fptr, map.stage, 1280 * 720 * 2);
 }
 
-void *getUserInput()
+void *getUserInput(void *arg)
 {
 	while (true)
 	{
@@ -187,21 +187,22 @@ void *getUserInput()
 			game.action = buttonPress;
 		}
 	}
+	return NULL;
 }
 
-void resetFrogPosition()
+void resetFrogPosition(void)
 {
 	game.scrollOffset = 30;
 	game.action = -1;
 	game.frogLocation = FROG_START;
 }
 
-void initializeGame()
+void initializeGame(void)
 {
 	game.lives = 3;
 }
 
-void updateFrogLocation()
+void updateFrogLocation(void)
 {
 	if(map.board[game.frogLocation.row][game.frogLocation.col] == 'l') {
 		game.frogLocation.col += laneVelocities[game.frogLocation.row];
@@ -210,7 +211,7 @@ void updateFrogLocation()
 }
 
 /* main function */
-int main()
+int main(int argc, char* argv[])
 {
 	/* initialize + get FBS */
 	framebufferstruct = initFbInfo();

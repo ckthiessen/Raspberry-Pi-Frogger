@@ -9,21 +9,21 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 1 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 3 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 void updateStage(int yOffset, int xOffset, int color);
 void mapBoardToStage(bool debug);
-void checkCollision();
-void update();
-void pauseGame();
+void checkCollision(void);
+void update(void);
+void pauseGame(void);
 void moveFrog(int direction);
-void doUserAction();
-void drawStageToFrameBuffer();
-void *getUserInput();
-void resetFrogPosition();
-void updateFrogLocation();
-void initializeGame();
+void doUserAction(void);
+void drawStageToFrameBuffer(void);
+void *getUserInput(void *);
+void resetFrogPosition(void);
+void updateFrogLocation(void);
+void initializeGame(void);
 
 typedef struct
 {
@@ -96,7 +96,7 @@ struct Map
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
 	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
 	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"},
-	{}};
+	{0}};
 
 short laneVelocities[NUM_MAP_TILES] = {
 	1,
