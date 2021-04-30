@@ -214,10 +214,14 @@ void *getUserInput()
 	}
 }
 
-void resetGame() {
+void resetFrogPosition() {
 	game.scrollOffset = 30;
 	game.action = -1;
 	game.frogLocation = FROG_START;
+}
+
+void initializeGame() {
+	game.lives = 3;
 }
 
 /* main function */
@@ -228,7 +232,8 @@ int main()
 
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
-	resetGame();
+	initializeGame();
+	resetFrogPosition();
 	// generateStartingMap();
 	game.elapsedTime = 0.0;
 	while (true)

@@ -25,6 +25,7 @@ struct Game
 	short action;
 	Coordinate frogLocation;
 	float elapsedTime;
+	int lives;
 } game;
 
 struct Map
