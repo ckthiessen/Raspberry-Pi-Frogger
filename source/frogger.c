@@ -126,9 +126,11 @@ void update()
 void pauseGame()
 { 
 	game.action = NO_ACTION;
-	while(true) {
+	bool paused = true;
+	while(paused) {
 		if(game.action == START) {
-			break;
+			paused = false;
+			usleep(250*1000);
 		}
 	}
 
@@ -168,7 +170,6 @@ void doUserAction()
 {
 	if (game.action == START)
 	{
-		usleep(1000*1000);
 		pauseGame();
 	}
 	else
