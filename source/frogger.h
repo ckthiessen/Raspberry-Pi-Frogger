@@ -12,6 +12,18 @@
 #define SECONDS_PER_FRAME 1/4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
+void updateStage(int yOffset, int xOffset, int color);
+void mapBoardToStage(bool debug);
+void checkCollision();
+void update();
+void pauseGame();
+void moveFrog(int direction);
+void doUserAction();
+void drawStageToFrameBuffer();
+void *getUserInput();
+void resetFrogPosition();
+void initializeGame();
+
 typedef struct
 {
 	unsigned short row, col;
