@@ -106,6 +106,18 @@ void mapBoardToStage(bool debug)
 
 unsigned long elapsed = 0;
 
+void checkCollision() {
+	if (
+		map.board[game.frogLocation.row][game.frogLocation.col] == 'c' ||
+		map.board[game.frogLocation.row][game.frogLocation.col] == 'b'
+	) {
+		resetFrogPosition();
+		game.lives--;
+		printf("Lives remaining: %d\n", game.lives);
+
+	}
+}
+
 void update()
 {
 	char boardBuffer[NUM_MAP_TILES][NUM_MAP_TILES];
@@ -123,6 +135,7 @@ void update()
 		}
 	}
 	memcpy(map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
+	checkCollision();
 }
 
 void pauseGame()
