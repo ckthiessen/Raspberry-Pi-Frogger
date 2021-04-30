@@ -7,6 +7,7 @@
 #define LEFT 7
 #define RIGHT 8
 #define NO_ACTION -1
+#define SELECT 9
 
 
 int sampleController();
