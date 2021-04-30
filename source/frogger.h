@@ -45,58 +45,60 @@ struct Map
 {
 	char board[NUM_MAP_TILES][NUM_MAP_TILES];
 	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
-} map = {
-	{".................................................", //bw
-	 ".................................................", //fw
-	 ".................................................", //bw
-	 ".................................................", //fw
-	 ".................................................", //bw
-	 ".................................................", //bw
-	 ".................................................", //bw
-	 ".................................................", //bw
-	 ".................................................", //bw
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
+} Map;
+
+char INITIAL_BOARD[NUM_MAP_TILES][NUM_MAP_TILES] =
+	{".................................................",
+	 ".................................................",
+	 ".................................................",
+	 ".................................................",
+	 ".................................................",
+	 ".................................................",
+	 ".................................................",
+	 ".................................................",
+	 ".................................................",
 	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll", //bw
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll", //fw
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,", //fw
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,", //bw
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "--bbbb------------bbbb---------bbbb------bbbb----", //bw
-	 "-----cc----------cc--------cc----cc----cc---cc-cc", //bw
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb", //fw
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-", //bw
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--", //fw
-	 "----cc-----cc--------cc-------cc----cc--------cc-", //bw
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"},
-	{0}};
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
+	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
+	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
+	 "----cc-----cc--------cc-------cc----cc--------cc-",
+	 "--bbbb------------bbbb---------bbbb------bbbb----",
+	 "-----cc----------cc--------cc----cc----cc---cc-cc",
+	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb",
+	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
+	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
+	 "----cc-----cc--------cc-------cc----cc--------cc-",
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
+	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
+	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
+	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
+	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
+	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
+	 "----cc-----cc--------cc-------cc----cc--------cc-",
+	 "--bbbb------------bbbb---------bbbb------bbbb----",
+	 "-----cc----------cc--------cc----cc----cc---cc-cc",
+	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb",
+	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
+	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
+	 "----cc-----cc--------cc-------cc----cc--------cc-",
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"
+	 };
 
 short laneVelocities[NUM_MAP_TILES] = {
 	1,
