@@ -44,9 +44,9 @@ struct fbs framebufferstruct;
 
 void updateStage(int yOffset, int xOffset, int color)
 {
-	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset - 1); y < TILE_HEIGHT * (yOffset - game.scrollOffset); y++)
+	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 	{
-		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET - 1); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x++)
+		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 		{
 			map.stage[(y * GAME_WIDTH) + x] = color;
 		}
@@ -71,7 +71,7 @@ void updateStage(int yOffset, int xOffset, int color)
 // 	}
 // }
 
-void mapBoardToStage()
+void mapBoardToStage(bool debug)
 {
 	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
@@ -79,6 +79,7 @@ void mapBoardToStage()
 		{
 			char tile = map.board[row][col];
 			int color; 
+			if(debug) printf("%c", tile);
 			switch (tile)
 			{
 			case '-':
@@ -97,8 +98,9 @@ void mapBoardToStage()
 				color = 0xFFFF;
 				break;
 			}
-			updateStage(row + 1, col + 1, color);
+			updateStage(row, col, color);
 		}
+	if (debug) printf("\n");
 	}
 }
 
@@ -248,8 +250,8 @@ int main()
 			game.action = -1;
 		}
 		update();
-		mapBoardToStage();
-		updateStage(game.frogLocation.row + 1, game.frogLocation.col + 1, 0x6660);
+		mapBoardToStage(false);
+		updateStage(game.frogLocation.row, game.frogLocation.col, 0x6660);
 		drawStageToFrameBuffer();
 		// printBoard();
 		// break;
