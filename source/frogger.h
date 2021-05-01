@@ -9,7 +9,7 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 3 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 1 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 void updateStage(int yOffset, int xOffset, int color);
@@ -32,22 +32,23 @@ typedef struct
 
 Coordinate FROG_START = {49, 19};
 
-struct Game
-{
-	short scrollOffset; // Offset used for scrolling
-	short action;
-	Coordinate frogLocation;
-	float elapsedTime;
-	int lives;
-} game;
-
-struct Map
+typedef struct
 {
 	char board[NUM_MAP_TILES][NUM_MAP_TILES];
 	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
 } Map;
 
-char INITIAL_BOARD[NUM_MAP_TILES][NUM_MAP_TILES] =
+struct Game
+{
+	short scrollOffset; // Offset used for scrolling
+	short action;
+	Coordinate frogLocation;
+	double elapsedTime;
+	int lives;
+	Map map;
+} game;
+
+Map INITIAL_MAP = {
 	{".................................................",
 	 ".................................................",
 	 ".................................................",
@@ -97,8 +98,8 @@ char INITIAL_BOARD[NUM_MAP_TILES][NUM_MAP_TILES] =
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
 	 "----cc-----cc--------cc-------cc----cc--------cc-",
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"
-	 };
+	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"},
+	{0}};
 
 short laneVelocities[NUM_MAP_TILES] = {
 	1,
