@@ -9,7 +9,7 @@
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 1 / 4 // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define SECONDS_PER_FRAME 1 / 10 // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 void updateStage(int yOffset, int xOffset, int color);
@@ -68,17 +68,17 @@ Map INITIAL_MAP = {
 	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
 	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
 	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
-	 "----cc-----cc--------cc-------cc----cc--------cc-",
-	 "--bbbb------------bbbb---------bbbb------bbbb----",
-	 "-----cc----------cc--------cc----cc----cc---cc-cc",
-	 "------bbbb--------------bbbb---bbbb----bbbb--bbbb",
-	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
-	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
-	 "----cc-----cc--------cc-------cc----cc--------cc-",
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
+	 ".................................................",
+	 ".......rrr..rrr.rr.rrr.rrrrrr....................",
+	 ".......hh..ss...rr..ss...hhhh....................",
+	 ".......hh.......rrr.....hhhhh....................",
+	 ".......hhhhh....rrr.ss.....hhh...................",
+	 ".......hhh.ss.....r..rr.....hh...................",
+	 ".......rrr....ss...hh...ss..hh...................",
+	 ".......rrr.rr.hhrr.ss.......rr...................",
+	 ".........r..ss.rrhhrr.ss....rr...................",
+	 ".........hh....rr..ss...hhh.rr...................",
+	 ".................................................",
 	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
 	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
 	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
@@ -88,7 +88,7 @@ Map INITIAL_MAP = {
 	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
 	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
 	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg",
+	 ".................................................",
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
 	 "----cc-----cc--------cc-------cc----cc--------cc-",
@@ -98,7 +98,7 @@ Map INITIAL_MAP = {
 	 "--cc------cc------cc--------cc----cc--cc---cc-cc-",
 	 "-----cc--------cc--------cc-----cc-cc----cc--cc--",
 	 "----cc-----cc--------cc-------cc----cc--------cc-",
-	 "ggggggggggggggggggggggggggggggggggggggggggggggggg"},
+	 "................................................."},
 	{0}};
 
 short laneVelocities[NUM_MAP_TILES] = {

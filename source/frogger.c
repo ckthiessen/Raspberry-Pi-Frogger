@@ -45,17 +45,23 @@ void mapBoardToStage(bool debug)
 			case 'c':
 				color = 0xF800;
 				break;
-			case 'g':
-				color = 0x0420;
-				break;
 			case 'l':
 				color = 0x8B00;
+				break;
+			case 'r':
+				color = 0x9CF3;
+				break;
+			case 'h':
+				color = 0x0000;
+				break;
+			case 's':
+				color = 0x7FA9;
 				break;
 			case ',':
 				color = 0x34DE;
 				break;
 			case '.':
-				color = 0x0000;
+				color = 0x0420;
 				break;
 			default:
 				color = 0xFFFF;
@@ -112,7 +118,7 @@ void update(void)
 		}
 	}
 	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	checkCollision();
+	// checkCollision();
 }
 
 void pauseGame(void)
@@ -193,16 +199,14 @@ void *getUserInput(void *arg)
 
 void resetFrogPosition(void)
 {
-	game.scrollOffset = 30;
+	game.scrollOffset = 15;
 	game.action = -1;
 	game.frogLocation = FROG_START;
 }
 
 void initializeGame(void)
 {
-	game.scrollOffset = 30;
-	game.action = -1;
-	game.frogLocation = FROG_START;
+	resetFrogPosition();
 	game.elapsedTime = 0.0;
 	game.lives = 3;
 	game.map = INITIAL_MAP;
@@ -225,7 +229,6 @@ int main(int argc, char* argv[])
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 	initializeGame();
-	resetFrogPosition();
 	// generateStartingMap();
 	game.elapsedTime = 0.0;
 	while (true)
@@ -241,7 +244,7 @@ int main(int argc, char* argv[])
 		}
 		update();
 		mapBoardToStage(false);
-		updateFrogLocation();
+		// updateFrogLocation();
 		drawStageToFrameBuffer();
 		// printBoard();
 		// break;
