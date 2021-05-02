@@ -169,18 +169,11 @@ void update(void)
 	// checkCollision();
 }
 
-void displayMenu(short * menu, bool isMainMenu) {
-	int y, x;
-	if(isMainMenu) {
-		y = x = 0;
-	} else {
-		y = TILE_HEIGHT * 10;
-		x =  TILE_WIDTH * 10;
-	}
+void displayMenu(short * menu, int heightOffset, int widthOffset) {
 	int i = 0;
-	for (y = 0; y < GAME_HEIGHT; y++)
+	for (int y = heightOffset; y < GAME_HEIGHT - heightOffset; y++)
 	{
-		for (x = 0; x < GAME_WIDTH; x++)
+		for (int x = widthOffset; x < GAME_WIDTH - widthOffset; x++)
 		{
 			game.map.stage[((y * GAME_WIDTH) + x) % (GAME_HEIGHT * GAME_WIDTH)] = menu[i];
 			i++;
@@ -197,10 +190,11 @@ void pauseGame(bool isMainMenu)
 	if (isMainMenu) {
 		menu = mainMenuStartPtr;
 		currentOption = resume;
-		displayMenu(menu, true);
+		displayMenu(menu, 0, 0);
 	} else {
-		menu = pauseMenuQuitPtr;
-		displayMenu(menu, false);
+		currentOption = restart;
+		menu = pauseMenuRestartPtr;
+		displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 	}
 	game.action = NO_ACTION;
 	bool paused = true;
@@ -211,14 +205,14 @@ void pauseGame(bool isMainMenu)
 				game.action = -1;
 				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
 				currentOption = menu == mainMenuStartPtr ? resume : quit;
-				displayMenu(menu, true);
+				displayMenu(menu, 0, 0);
 			} else {
 				game.action = -1;
 				menu = menu == pauseMenuQuitPtr ? pauseMenuRestartPtr : pauseMenuQuitPtr;
-				currentOption = menu == pauseMenuQuitPtr ? quit : resume;
-				displayMenu(menu, false);
+				currentOption = menu == pauseMenuQuitPtr ?  quit : restart;
+				displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 			}
-			usleep(250 * 1000);
+			usleep(500 * 1000);
 		}
 		if (game.action == SELECT) {
 			switch (currentOption) {
@@ -236,7 +230,7 @@ void pauseGame(bool isMainMenu)
 		if (game.action == START && !isMainMenu)
 		{
 			paused = false;
-			usleep(250 * 1000);
+			usleep(500 * 1000);
 		}
 	}
 }
@@ -438,6 +432,7 @@ int main(int argc, char *argv[])
 
 	// mummap = "memory unmap"; frees the following mapping from memory
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
+	system("clear");
 
 	return 0;
 }

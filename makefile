@@ -18,7 +18,7 @@ CFLAGS += -Wall -Wextra -Wpedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-		  -Wjump-misses-init -Wlogical-op
+		  -Wjump-misses-init -Wlogical-op -Wno-overlength-strings
 
 
 # The names of all object files that must be generated. Deduced from the 
