@@ -57,6 +57,9 @@ void mapBoardToStage(bool debug)
 			case 's':
 				color = 0x7FA9;
 				break;
+			case ';':
+				color = 0xFA00;
+				break;
 			case ',':
 				color = 0x34DE;
 				break;
@@ -80,6 +83,8 @@ void checkCollision(void)
 	if (
 		obstacle == 'c' ||
 		obstacle == ',' ||
+		obstacle == 'h' ||
+		obstacle == 's' ||
 		obstacle == 'b')
 	{
 		resetFrogPosition();
@@ -99,14 +104,25 @@ void update(void)
 		{
 			char obstacle = game.map.board[row][col];
 			char background = '\0';
+			char newPos;
 			switch (obstacle)
 			{
 			case 'c':
 			case 'b':
 				background = '-';
 				break;
+			case 's':
+				background = '.';
+				newPos = boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES];
+				if(newPos == 'r' || newPos == 'h') { // Reverse snake direction when they hit a hole or rock
+					laneVelocities[row] = -laneVelocities[row];
+				}
+				break;
 			case 'l':
 				background = ',';
+				break;
+			case 'r':
+				background = ';';
 				break;
 			default:
 				break;
@@ -140,24 +156,32 @@ void moveFrog(int direction)
 	switch (game.action)
 	{
 	case UP:
-		game.frogLocation.row--;
-		if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
-		{
-			game.scrollOffset--;
+		if(game.frogLocation.row > 1) {
+			game.frogLocation.row--;
+			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
+			{
+				game.scrollOffset--;
+			}
 		}
 		break;
 	case DOWN:
-		game.frogLocation.row++;
-		if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
-		{
-			game.scrollOffset++;
+		if(game.frogLocation.row < NUM_MAP_TILES - 1) {
+			game.frogLocation.row++;
+			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
+			{
+				game.scrollOffset++;
+			}
 		}
 		break;
 	case LEFT:
-		game.frogLocation.col--;
+		if(game.frogLocation.col > HORIZONTAL_OFFSET) {
+			game.frogLocation.col--;
+		}
 		break;
 	case RIGHT:
-		game.frogLocation.col++;
+		if(game.frogLocation.col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET - 1) {
+			game.frogLocation.col++;
+		}
 		break;
 	}
 }
@@ -199,7 +223,7 @@ void *getUserInput(void *arg)
 
 void resetFrogPosition(void)
 {
-	game.scrollOffset = 15;
+	game.scrollOffset = 30;
 	game.action = -1;
 	game.frogLocation = FROG_START;
 }
@@ -214,7 +238,8 @@ void initializeGame(void)
 
 void updateFrogLocation(void)
 {
-	if(game.map.board[game.frogLocation.row][game.frogLocation.col] == 'l') {
+	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
+	if(obstacle == 'l' || obstacle == 'r') {
 		game.frogLocation.col += laneVelocities[game.frogLocation.row];
 	}
 	updateStage(game.frogLocation.row, game.frogLocation.col, 0x6660);
@@ -244,7 +269,7 @@ int main(int argc, char* argv[])
 		}
 		update();
 		mapBoardToStage(false);
-		// updateFrogLocation();
+		updateFrogLocation();
 		drawStageToFrameBuffer();
 		// printBoard();
 		// break;
