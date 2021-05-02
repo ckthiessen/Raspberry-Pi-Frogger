@@ -11,15 +11,37 @@
 #include "framebuffer.h"
 #include "controller.h"
 
+#include "../images/frog.h"
+
 struct fbs framebufferstruct;
+
+
+short int *frogPtr=(short int *) frog_img.pixel_data;
 
 void updateStage(int yOffset, int xOffset, int color)
 {
-	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
-	{
-		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+	int i = 0;
+
+	switch (color){
+
+	case 0x6660:
+		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 		{
-			game.map.stage[(y * GAME_WIDTH) + x] = color;
+			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+			{
+				game.map.stage[(y * GAME_WIDTH) + x] = frogPtr[i];
+				i++;
+			}
+		}
+		break;
+
+	default:
+		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
+		{
+			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+			{
+				game.map.stage[(y * GAME_WIDTH) + x] = color;
+			}
 		}
 	}
 }
