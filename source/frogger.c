@@ -182,7 +182,7 @@ void displayMenu(short * menu, bool isMainMenu) {
 	{
 		for (x = 0; x < GAME_WIDTH; x++)
 		{
-			game.map.stage[(y * GAME_WIDTH) + x] = menu[i];
+			game.map.stage[((y * GAME_WIDTH) + x) % (GAME_HEIGHT * GAME_WIDTH)] = menu[i];
 			i++;
 		}
 	}

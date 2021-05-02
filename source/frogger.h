@@ -36,7 +36,7 @@ Coordinate FROG_START = {49, 19};
 typedef struct
 {
 	char board[NUM_MAP_TILES][NUM_MAP_TILES];
-	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
+	unsigned short stage[GAME_WIDTH * GAME_HEIGHT + 1];
 } Map;
 
 enum options
