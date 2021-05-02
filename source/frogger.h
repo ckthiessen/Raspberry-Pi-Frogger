@@ -39,14 +39,31 @@ typedef struct
 	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
 } Map;
 
+enum powerUpTypes
+{
+	none = -1,	// No powerup
+	lifeUp,		// Add a life
+	timeUp,		// Increase time
+	movesUp,	// Increate num moves remaining
+	slowDown	// Slow all moving obstacles
+};
+
+typedef struct
+{
+	Coordinate powerUpLocation;
+	enum powerUpTypes type; 
+} PowerUp;
+
 struct Game
 {
-	short scrollOffset; // Offset used for scrolling
-	short action;
-	Coordinate frogLocation;
-	double elapsedTime;
-	int lives;
-	Map map;
+	short scrollOffset;	// Offset used for vertical scrolling
+	short action;		// Current player action
+	Coordinate frogLocation;	// Frog current location
+	double elapsedTime;			// Current elapsed time
+	double lastPowerUpTime;		// Last time power up was generated
+	PowerUp currentPowerUp;		// Power up to display
+	int lives;					// Remaining lives
+	Map map;					// Game map
 } game;
 
 Map INITIAL_MAP = {

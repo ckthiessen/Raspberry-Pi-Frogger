@@ -10,19 +10,18 @@
 #include "frogger.h"
 #include "framebuffer.h"
 #include "controller.h"
-
 #include "../images/frog.h"
 
 struct fbs framebufferstruct;
 
-
-short int *frogPtr=(short int *) frog_img.pixel_data;
+short int *frogPtr = (short int *)frog_img.pixel_data;
 
 void updateStage(int yOffset, int xOffset, int color)
 {
 	int i = 0;
 
-	switch (color){
+	switch (color)
+	{
 
 	case 0x6660:
 		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
@@ -113,7 +112,6 @@ void checkCollision(void)
 		game.lives--;
 		printf("Lives remaining: %d\n", game.lives);
 	}
-
 }
 
 void update(void)
@@ -136,7 +134,8 @@ void update(void)
 			case 's':
 				background = '.';
 				newPos = boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES];
-				if(newPos == 'r' || newPos == 'h') { // Reverse snake direction when they hit a hole or rock
+				if (newPos == 'r' || newPos == 'h')
+				{ // Reverse snake direction when they hit a hole or rock
 					laneVelocities[row] = -laneVelocities[row];
 				}
 				break;
@@ -149,7 +148,8 @@ void update(void)
 			default:
 				break;
 			}
-			if (background != '\0') {
+			if (background != '\0')
+			{
 				boardBuffer[row][col] = background;
 				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = obstacle;
 			}
@@ -178,7 +178,8 @@ void moveFrog(int direction)
 	switch (game.action)
 	{
 	case UP:
-		if(game.frogLocation.row > 1) {
+		if (game.frogLocation.row > 1)
+		{
 			game.frogLocation.row--;
 			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
 			{
@@ -187,7 +188,8 @@ void moveFrog(int direction)
 		}
 		break;
 	case DOWN:
-		if(game.frogLocation.row < NUM_MAP_TILES - 1) {
+		if (game.frogLocation.row < NUM_MAP_TILES - 1)
+		{
 			game.frogLocation.row++;
 			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
 			{
@@ -196,12 +198,14 @@ void moveFrog(int direction)
 		}
 		break;
 	case LEFT:
-		if(game.frogLocation.col > HORIZONTAL_OFFSET) {
+		if (game.frogLocation.col > HORIZONTAL_OFFSET)
+		{
 			game.frogLocation.col--;
 		}
 		break;
 	case RIGHT:
-		if(game.frogLocation.col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET - 1) {
+		if (game.frogLocation.col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET - 1)
+		{
 			game.frogLocation.col++;
 		}
 		break;
@@ -254,6 +258,8 @@ void initializeGame(void)
 {
 	resetFrogPosition();
 	game.elapsedTime = 0.0;
+	game.lastPowerUpTime = 0.0;
+	game.currentPowerUp.type = none;
 	game.lives = 3;
 	game.map = INITIAL_MAP;
 }
@@ -261,14 +267,79 @@ void initializeGame(void)
 void updateFrogLocation(void)
 {
 	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
-	if(obstacle == 'l' || obstacle == 'r') {
+	if (obstacle == 'l' || obstacle == 'r')
+	{
 		game.frogLocation.col += laneVelocities[game.frogLocation.row];
 	}
 	updateStage(game.frogLocation.row, game.frogLocation.col, 0x6660);
 }
 
+PowerUp generateRandomPowerUp(void)
+{
+	srand(time(NULL));
+	enum powerUpTypes type = rand() % 4;
+
+	Coordinate coord;
+	coord.col = (rand() % NUM_RENDERED_TILES) + HORIZONTAL_OFFSET;
+	coord.row = (rand() % NUM_RENDERED_TILES) + game.scrollOffset;
+
+	return (PowerUp){
+		.powerUpLocation = coord,
+		.type = type};
+}
+
+void displayPowerUp(void)
+{
+	int row = game.currentPowerUp.powerUpLocation.row;
+	int col = game.currentPowerUp.powerUpLocation.col;
+	updateStage(row, col, 0xF81D);
+}
+
+void applyPowerUp(void)
+{
+	switch (game.currentPowerUp.type)
+	{
+	case lifeUp:
+		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
+		game.lives++;
+		break;
+	case timeUp:
+		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
+		break;
+	case movesUp:
+		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
+		break;
+	case slowDown:
+		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
+		break;
+	default:
+		break;
+	}
+}
+
+void checkPowerUps(void)
+{
+	if ((game.lastPowerUpTime + 30.0) - game.elapsedTime < 0)
+	{
+		game.lastPowerUpTime = game.elapsedTime;
+		PowerUp newPowerup = generateRandomPowerUp();
+		game.currentPowerUp.powerUpLocation = newPowerup.powerUpLocation;
+		game.currentPowerUp.type = newPowerup.type;
+	}
+	if (game.frogLocation.col == game.currentPowerUp.powerUpLocation.col &&
+		game.frogLocation.row == game.currentPowerUp.powerUpLocation.row)
+	{
+		applyPowerUp();
+		game.currentPowerUp.type = none;
+	}
+	if (game.currentPowerUp.type != none)
+	{
+		displayPowerUp();
+	}
+}
+
 /* main function */
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	/* initialize + get FBS */
 	framebufferstruct = initFbInfo();
@@ -276,13 +347,11 @@ int main(int argc, char* argv[])
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 	initializeGame();
-	// generateStartingMap();
-	game.elapsedTime = 0.0;
 	while (true)
 	{
 		usleep((((float)SECONDS_PER_FRAME) * 1000) * 1000); // 30 Frames per second
-		// usleep(500 * 1000); // 30 Frames per second
 		game.elapsedTime += (float)SECONDS_PER_FRAME;
+
 		// printf("%f\n", game.elapsedTime);
 		if (game.action != -1)
 		{
@@ -292,9 +361,9 @@ int main(int argc, char* argv[])
 		update();
 		mapBoardToStage(false);
 		updateFrogLocation();
+		checkPowerUps();
 		drawStageToFrameBuffer();
 		// printBoard();
-		// break;
 	}
 
 	// mummap = "memory unmap"; frees the following mapping from memory
