@@ -7,6 +7,7 @@
 #define TILE_WIDTH 64
 #define NUM_RENDERED_TILES 20
 #define NUM_MAP_TILES 50
+#define ROW_OF_CASTLE 9
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 #define VERTICAL_OFFSET 3 // Offset vertical rendering by 3 to make room for game statistics
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS

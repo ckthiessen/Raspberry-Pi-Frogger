@@ -25,6 +25,8 @@ short int *mainMenuStartPtr = (short int *)main_menu_start.pixel_data;
 short int *mainMenuQuitPtr = (short int *)main_menu_quit.pixel_data;
 short int *pauseMenuQuitPtr = (short int *)pause_menu_quit.pixel_data;
 short int *pauseMenuRestartPtr = (short int *)pause_menu_restart.pixel_data;
+short int *winPromptPtr = (short int *)you_win_prompt.pixel_data;
+short int *losePromptPtr = (short int *)you_lose_prompt.pixel_data;
 
 void updateStage(int yOffset, int xOffset, int color)
 {
@@ -166,7 +168,7 @@ void update(void)
 		}
 	}
 	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	// checkCollision();
+	checkCollision();
 }
 
 void displayMenu(short * menu, int heightOffset, int widthOffset) {
@@ -228,6 +230,20 @@ void pauseGame(bool isMainMenu)
 			paused = false;
 		}
 		if (game.action == START && !isMainMenu)
+		{
+			paused = false;
+			usleep(500 * 1000);
+		}
+	}
+}
+
+void endGame(short * menu) {
+	game.action = NO_ACTION;
+	bool paused = true;
+	displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
+	while (paused)
+	{
+		if (game.action == START)
 		{
 			paused = false;
 			usleep(500 * 1000);
@@ -415,9 +431,14 @@ void checkPowerUps(void)
 }
 
 void checkEndCondition(void) {
-	// if (game.frogLocation.row == ROW_OF_CASTLE) {
-	// 	game.win = true;
-	// }
+	if (game.frogLocation.row == ROW_OF_CASTLE) {
+		game.win = true;
+		game.quit = true;
+	}
+	else if (game.lives <= 0 || game.moves <= 0 || game.timeRemaining <= 0) {
+		game.lose = true;
+		game.quit = true;
+	}
 }
 
 /* main function */
@@ -447,7 +468,14 @@ int main(int argc, char *argv[])
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();
-		// checkEndCondition();
+		checkEndCondition();
+	}
+
+	if(game.win) {
+		endGame(winPromptPtr);
+	}
+	else if(game.lose) {
+		endGame(losePromptPtr);
 	}
 
 	// mummap = "memory unmap"; frees the following mapping from memory
