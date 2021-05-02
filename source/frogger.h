@@ -8,8 +8,8 @@
 #define NUM_RENDERED_TILES 20
 #define NUM_MAP_TILES 50
 #define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
+#define VERTICAL_OFFSET 3 // Offset vertical rendering by 3 to make room for game statistics
 // #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
-#define SECONDS_PER_FRAME 1 / 5
  // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
@@ -17,7 +17,7 @@ void updateStage(int yOffset, int xOffset, int color);
 void mapBoardToStage(bool debug);
 void checkCollision(void);
 void update(void);
-// void pauseGame(s);
+void pauseGame(bool isMainMenu);
 void moveFrog(int direction);
 void doUserAction(void);
 void drawStageToFrameBuffer(void);
@@ -63,14 +63,19 @@ typedef struct
 
 struct Game
 {
-	short scrollOffset;	// Offset used for vertical scrolling
-	short action;		// Current player action
+	short scrollOffset;			// Offset used for vertical scrolling
+	short action;				// Current player action
 	Coordinate frogLocation;	// Frog current location
 	double elapsedTime;			// Current elapsed time
 	double lastPowerUpTime;		// Last time power up was generated
 	PowerUp currentPowerUp;		// Power up to display
+	double secondsPerFrame; 	// Current frame rate
 	int lives;					// Remaining lives
+	int moves;					// Remaining moves
+	double timeRemaining;		// Remaining time
 	Map map;					// Game map
+	bool win;					// Won game
+	bool lose;					// Lost game
 	bool quit;					// Quit game
 } game;
 

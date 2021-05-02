@@ -237,12 +237,14 @@ void pauseGame(bool isMainMenu)
 
 void moveFrog(int direction)
 {
+	bool moved = false;
 	switch (game.action)
 	{
 	case UP:
 		if (game.frogLocation.row > 1)
 		{
 			game.frogLocation.row--;
+			moved = true;
 			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
 			{
 				game.scrollOffset--;
@@ -253,8 +255,10 @@ void moveFrog(int direction)
 		if (game.frogLocation.row < NUM_MAP_TILES - 1)
 		{
 			game.frogLocation.row++;
+			moved = true;
 			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
 			{
+				
 				game.scrollOffset++;
 			}
 		}
@@ -262,16 +266,19 @@ void moveFrog(int direction)
 	case LEFT:
 		if (game.frogLocation.col > HORIZONTAL_OFFSET)
 		{
+			moved = true;
 			game.frogLocation.col--;
 		}
 		break;
 	case RIGHT:
 		if (game.frogLocation.col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET - 1)
 		{
+			moved = true;
 			game.frogLocation.col++;
 		}
 		break;
 	}
+	if (moved) { game.moves--; }
 }
 
 void doUserAction(void)
@@ -323,7 +330,10 @@ void initializeGame(void)
 	game.elapsedTime = 0.0;
 	game.lastPowerUpTime = 0.0;
 	game.currentPowerUp.type = none;
+	game.secondsPerFrame = 1.0 / 5.0;
+	game.timeRemaining = 60.0 * 5.0;	// Player starts with 5 minutes
 	game.lives = 3;
+	game.moves = 250;
 	game.map = INITIAL_MAP;
 }
 
@@ -364,15 +374,18 @@ void applyPowerUp(void)
 	{
 	case lifeUp:
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
-		game.lives++;
+		game.lives++;	// Add another life
 		break;
 	case timeUp:
+		game.timeRemaining += 60.0; // Add another minute of game time
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case movesUp:
+		game.moves += 50; // Add 50 moves
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case slowDown:
+		game.secondsPerFrame *= 1.20; // Slow down time 20%
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	default:
@@ -401,6 +414,12 @@ void checkPowerUps(void)
 	}
 }
 
+void checkEndCondition(void) {
+	// if (game.frogLocation.row == ROW_OF_CASTLE) {
+	// 	game.win = true;
+	// }
+}
+
 /* main function */
 int main(int argc, char *argv[])
 {
@@ -413,21 +432,22 @@ int main(int argc, char *argv[])
 	pauseGame(true);
 	while (!game.quit)
 	{
-		usleep((((float)SECONDS_PER_FRAME) * 1000) * 1000); // 30 Frames per second
-		game.elapsedTime += (float)SECONDS_PER_FRAME;
+		usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
+		game.elapsedTime += game.secondsPerFrame;
+		game.timeRemaining -= game.secondsPerFrame;
 
-		// printf("%f\n", game.elapsedTime);
 		if (game.action != -1)
 		{
 			doUserAction();
 			game.action = -1;
 		}
+
 		update();
 		mapBoardToStage(false);
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();
-		// printBoard();
+		// checkEndCondition();
 	}
 
 	// mummap = "memory unmap"; frees the following mapping from memory
