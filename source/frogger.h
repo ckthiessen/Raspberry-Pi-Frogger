@@ -17,7 +17,7 @@ void updateStage(int yOffset, int xOffset, int color);
 void mapBoardToStage(bool debug);
 void checkCollision(void);
 void update(void);
-void pauseGame(void);
+// void pauseGame(s);
 void moveFrog(int direction);
 void doUserAction(void);
 void drawStageToFrameBuffer(void);
@@ -38,6 +38,13 @@ typedef struct
 	char board[NUM_MAP_TILES][NUM_MAP_TILES];
 	unsigned short stage[GAME_WIDTH * GAME_HEIGHT];
 } Map;
+
+enum options
+{
+	resume,
+	quit,
+	restart
+};
 
 enum powerUpTypes
 {
@@ -64,6 +71,7 @@ struct Game
 	PowerUp currentPowerUp;		// Power up to display
 	int lives;					// Remaining lives
 	Map map;					// Game map
+	bool quit;					// Quit game
 } game;
 
 Map INITIAL_MAP = {

@@ -10,11 +10,21 @@
 #include "frogger.h"
 #include "framebuffer.h"
 #include "controller.h"
-#include "../images/frog.h"
+#include "images/frog.h"
+#include "images/menus/main_menu_start.h"
+#include "images/menus/main_menu_quit.h"
+#include "images/menus/pause_menu_quit.h"
+#include "images/menus/pause_menu_restart.h"
+#include "images/menus/you_lose_prompt.h"
+#include "images/menus/you_win_prompt.h"
 
 struct fbs framebufferstruct;
 
 short int *frogPtr = (short int *)frog_img.pixel_data;
+short int *mainMenuStartPtr = (short int *)main_menu_start.pixel_data;
+short int *mainMenuQuitPtr = (short int *)main_menu_quit.pixel_data;
+short int *pauseMenuQuitPtr = (short int *)pause_menu_quit.pixel_data;
+short int *pauseMenuRestartPtr = (short int *)pause_menu_restart.pixel_data;
 
 void updateStage(int yOffset, int xOffset, int color)
 {
@@ -159,13 +169,71 @@ void update(void)
 	// checkCollision();
 }
 
-void pauseGame(void)
+void displayMenu(short * menu, bool isMainMenu) {
+	int y, x;
+	if(isMainMenu) {
+		y = x = 0;
+	} else {
+		y = TILE_HEIGHT * 10;
+		x =  TILE_WIDTH * 10;
+	}
+	int i = 0;
+	for (y = 0; y < GAME_HEIGHT; y++)
+	{
+		for (x = 0; x < GAME_WIDTH; x++)
+		{
+			game.map.stage[(y * GAME_WIDTH) + x] = menu[i];
+			i++;
+		}
+	}
+	drawStageToFrameBuffer();
+}
+
+
+void pauseGame(bool isMainMenu)
 {
+	enum options currentOption;
+	short * menu;
+	if (isMainMenu) {
+		menu = mainMenuStartPtr;
+		currentOption = resume;
+		displayMenu(menu, true);
+	} else {
+		menu = pauseMenuQuitPtr;
+		displayMenu(menu, false);
+	}
 	game.action = NO_ACTION;
 	bool paused = true;
 	while (paused)
 	{
-		if (game.action == START)
+		if (game.action == LEFT || game.action == RIGHT) {
+			if (isMainMenu) {
+				game.action = -1;
+				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
+				currentOption = menu == mainMenuStartPtr ? resume : quit;
+				displayMenu(menu, true);
+			} else {
+				game.action = -1;
+				menu = menu == pauseMenuQuitPtr ? pauseMenuRestartPtr : pauseMenuQuitPtr;
+				currentOption = menu == pauseMenuQuitPtr ? quit : resume;
+				displayMenu(menu, false);
+			}
+			usleep(250 * 1000);
+		}
+		if (game.action == SELECT) {
+			switch (currentOption) {
+				case resume:
+					break;
+				case quit:
+					game.quit = true;
+					break;
+				case restart:
+					initializeGame();
+					break;
+			}
+			paused = false;
+		}
+		if (game.action == START && !isMainMenu)
 		{
 			paused = false;
 			usleep(250 * 1000);
@@ -216,7 +284,7 @@ void doUserAction(void)
 {
 	if (game.action == START)
 	{
-		pauseGame();
+		pauseGame(false);
 	}
 	else
 	{
@@ -239,7 +307,8 @@ void *getUserInput(void *arg)
 			buttonPress == RIGHT ||
 			buttonPress == DOWN ||
 			buttonPress == UP ||
-			buttonPress == START)
+			buttonPress == START ||
+			buttonPress == SELECT)
 		{
 			game.action = buttonPress;
 		}
@@ -347,7 +416,8 @@ int main(int argc, char *argv[])
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 	initializeGame();
-	while (true)
+	pauseGame(true);
+	while (!game.quit)
 	{
 		usleep((((float)SECONDS_PER_FRAME) * 1000) * 1000); // 30 Frames per second
 		game.elapsedTime += (float)SECONDS_PER_FRAME;
