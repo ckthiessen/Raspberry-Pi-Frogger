@@ -5,7 +5,7 @@ static const struct {
   unsigned int 	 height;
   unsigned int 	 bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */ 
   unsigned char	 pixel_data[64 * 36 * 2 + 1];
-} more_lives_img = {
+} more_time_img = {
   64, 36, 2,
   "\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"
   "\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"
