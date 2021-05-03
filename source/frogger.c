@@ -34,6 +34,8 @@
 #include "images/obstacles/snake_left_head.h"
 #include "images/obstacles/snake_right_head.h"
 #include "images/obstacles/water.h"
+#include "images/obstacles/desert.h"
+#include "images/obstacles/black_road.h"
 
 struct fbs framebufferstruct;
 
@@ -70,40 +72,55 @@ short int *pitPtr = (short int *)pit_img.pixel_data;
 short int *snakeLeftPtr = (short int *)snake_left.pixel_data;
 short int *snakeRightPtr = (short int *)snake_right.pixel_data;
 short int *waterPtr = (short int *)water_img.pixel_data;
+short int *desertPtr = (short int *)desert_img.pixel_data;
+short int *blackRoadPtr = (short int *)black_road_img.pixel_data;
 
 
-void updateStage(int yOffset, int xOffset, int color)
+// void updateStage(int yOffset, int xOffset, int color)
+void updateStage(int yOffset, int xOffset, short int *img_ptr)
 {
 	int i = 0;
 
-	switch (color)
+	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 	{
-
-	case 0x6660:
-		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
+		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 		{
-			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
-			{
-				int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
-				if(loc > 0)
-					game.map.stage[loc] = frogPtr[i];
-				i++;
-			}
-		}
-		break;
-
-	default:
-		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
-		{
-			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
-			{
-				int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
-				if(loc > 0) {
-					game.map.stage[loc] = color;
-				}
-			}
+			int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
+			if(loc > 0)
+				game.map.stage[loc] = img_ptr[i];
+			i++;
 		}
 	}
+
+
+	// switch (color)
+	// {
+
+	// case 0x6660:
+	// 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
+	// 	{
+	// 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+	// 		{
+	// 			int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
+	// 			if(loc > 0)
+	// 				game.map.stage[loc] = frogPtr[i];
+	// 			i++;
+	// 		}
+	// 	}
+	// 	break;
+
+	// default:
+	// 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
+	// 	{
+	// 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+	// 		{
+	// 			int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
+	// 			if(loc > 0) {
+	// 				game.map.stage[loc] = color;
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 void mapBoardToStage(bool debug)
@@ -112,47 +129,79 @@ void mapBoardToStage(bool debug)
 	{
 		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
+
 			char tile = game.map.board[row][col];
 			int color;
+			short int *ptr;
 			if (debug)
 				printf("%c", tile);
 			switch (tile)
 			{
+			// road
 			case '-':
-				color = 0x8410;
+				ptr = blackRoadPtr;
 				break;
+			// front of bus/semi
 			case 'b':
-				color = 0x001F;
+				ptr = busFrontPtr;
 				break;
+			// middle of bus/semi
+			case 'm':
+				ptr = busMidPtr;
+				break;
+			// back of bus/semi
+			case 'e':
+				ptr = busBackPtr;
+				break;
+			// front of car
 			case 'c':
-				color = 0xF800;
+				ptr = carFrontPtr;
 				break;
+			// back of car
+			case 'a':
+				ptr = carBackPtr;
+				break;
+			// log
 			case 'l':
-				color = 0x8B00;
+				ptr = logPtr;
 				break;
+			// rock for lava
 			case 'r':
-				color = 0x9CF3;
+				ptr = boulderPtr;
 				break;
+			// hole/pit for snakes and pits
 			case 'h':
-				color = 0x0000;
+				ptr = pitPtr;
 				break;
+			// left head of snake
 			case 's':
-				color = 0x7FA9;
+				ptr = snakeLeftPtr;
 				break;
+			// right head of snake
+			case 't':
+				ptr = snakeRightPtr;
+				break;
+			// desert background for snakes and pits
+			case 'd':
+				ptr = desertPtr;
+				break;
+			// lava
 			case ';':
-				color = 0xFA00;
+				ptr = lavaPtr;
 				break;
+			// water
 			case ',':
-				color = 0x34DE;
+				ptr = waterPtr;
 				break;
+			// safe zone
 			case '.':
-				color = 0x0420;
+				ptr = safePtr;
 				break;
 			default:
-				color = 0xFFFF;
+				ptr = blackRoadPtr;
 				break;
 			}
-			updateStage(row, col, color);
+			updateStage(row, col, ptr);
 		}
 		if (debug)
 			printf("\n");
@@ -408,7 +457,7 @@ void updateFrogLocation(void)
 	{
 		game.frogLocation.col += laneVelocities[game.frogLocation.row];
 	}
-	updateStage(game.frogLocation.row, game.frogLocation.col, 0x6660);
+	updateStage(game.frogLocation.row, game.frogLocation.col, frogPtr);
 }
 
 PowerUp generateRandomPowerUp(void)
@@ -429,7 +478,26 @@ void displayPowerUp(void)
 {
 	int row = game.currentPowerUp.powerUpLocation.row;
 	int col = game.currentPowerUp.powerUpLocation.col;
-	updateStage(row, col, 0xF81D);
+	// updateStage(row, col, frogPtr); //88888888888888888888888
+
+	switch (game.currentPowerUp.type)
+	{
+		case lifeUp:
+			updateStage(row, col, moreLivesPtr);
+			break;
+		case timeUp:
+			updateStage(row, col, moreTimePtr);
+			break;
+		case movesUp:
+			updateStage(row, col, moreStepsPtr);
+			break;
+		case slowDown:
+			updateStage(row, col, slowDownPtr);
+			break;
+		default:
+			updateStage(row, col, moreLivesPtr);
+			break;
+	}
 }
 
 void applyPowerUp(void)
