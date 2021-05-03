@@ -17,16 +17,60 @@
 #include "images/menus/pause_menu_restart.h"
 #include "images/menus/you_lose_prompt.h"
 #include "images/menus/you_win_prompt.h"
+#include "images/safe_zone.h"
+#include "images/life_packs/more_lives.h"
+#include "images/life_packs/more_time.h"
+#include "images/life_packs/more_steps.h"
+#include "images/life_packs/slow_down_obstacles.h"
+#include "images/obstacles/boulder.h"
+#include "images/obstacles/bus_back.h"
+#include "images/obstacles/bus_front.h"
+#include "images/obstacles/bus_mid.h"
+#include "images/obstacles/car_back.h"
+#include "images/obstacles/car_front.h"
+#include "images/obstacles/lava.h"
+#include "images/obstacles/log.h"
+#include "images/obstacles/pit.h"
+#include "images/obstacles/snake_left_head.h"
+#include "images/obstacles/snake_right_head.h"
+#include "images/obstacles/water.h"
 
 struct fbs framebufferstruct;
 
+// Frog Pointer
 short int *frogPtr = (short int *)frog_img.pixel_data;
+
+// Safe Zone Pointer
+short int *safePtr = (short int *)safe_zone_img.pixel_data;
+
+// Menu Pointers
 short int *mainMenuStartPtr = (short int *)main_menu_start.pixel_data;
 short int *mainMenuQuitPtr = (short int *)main_menu_quit.pixel_data;
 short int *pauseMenuQuitPtr = (short int *)pause_menu_quit.pixel_data;
 short int *pauseMenuRestartPtr = (short int *)pause_menu_restart.pixel_data;
 short int *winPromptPtr = (short int *)you_win_prompt.pixel_data;
 short int *losePromptPtr = (short int *)you_lose_prompt.pixel_data;
+
+// Life Pack Pointers
+short int *moreLivesPtr = (short int *)most_lives_img.pixel_data;
+short int *moreTimePtr = (short int *)more_time_img.pixel_data;
+short int *moreStepsPtr = (short int *)more_steps_img.pixel_data;
+short int *slowDownPtr = (short int *)slow_down_obstacles_img.pixel_data;
+
+// Obstacle Pointers
+short int *boulderPtr = (short int *)boulder_img.pixel_data;
+short int *busBackPtr = (short int *)bus_back_img.pixel_data;
+short int *busFrontPtr = (short int *)bus_front_img.pixel_data;
+short int *busMidPtr = (short int *)bus_mid_img.pixel_data;
+short int *carBackPtr = (short int *)car_back_img.pixel_data;
+short int *carFrontPtr = (short int *)car_front_img.pixel_data;
+short int *lavaPtr = (short int *)lava_img.pixel_data;
+short int *logPtr = (short int *)log_image.pixel_data;
+short int *pitPtr = (short int *)pit_img.pixel_data;
+short int *snakeLeftPtr = (short int *)snake_left.pixel_data;
+short int *snakeRightPtr = (short int *)snake_right.pixel_data;
+short int *waterPtr = (short int *)water_img.pixel_data;
+
 
 void updateStage(int yOffset, int xOffset, int color)
 {
