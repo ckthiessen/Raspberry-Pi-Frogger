@@ -34,6 +34,7 @@
 #include "images/obstacles/snake_left_head.h"
 #include "images/obstacles/snake_right_head.h"
 #include "images/obstacles/water.h"
+#include "images/obstacles/desert.h"
 
 struct fbs framebufferstruct;
 
@@ -70,6 +71,7 @@ short int *pitPtr = (short int *)pit_img.pixel_data;
 short int *snakeLeftPtr = (short int *)snake_left.pixel_data;
 short int *snakeRightPtr = (short int *)snake_right.pixel_data;
 short int *waterPtr = (short int *)water_img.pixel_data;
+short int *desertPtr = (short int *)desert_img.pixel_data;
 
 
 void updateStage(int yOffset, int xOffset, int color)
@@ -112,6 +114,7 @@ void mapBoardToStage(bool debug)
 	{
 		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
+
 			char tile = game.map.board[row][col];
 			int color;
 			if (debug)
