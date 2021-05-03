@@ -14,7 +14,8 @@
  // Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
-void updateStage(int yOffset, int xOffset, int color);
+// void updateStage(int yOffset, int xOffset, int color);
+void drawGameInfo(void);
 void mapBoardToStage(bool debug);
 void checkCollision(void);
 void update(void);

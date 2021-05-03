@@ -40,7 +40,9 @@ void updateStage(int yOffset, int xOffset, int color)
 		{
 			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 			{
-				game.map.stage[(y * GAME_WIDTH) + x] = frogPtr[i];
+				int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
+				if(loc > 0)
+					game.map.stage[loc] = frogPtr[i];
 				i++;
 			}
 		}
@@ -51,7 +53,10 @@ void updateStage(int yOffset, int xOffset, int color)
 		{
 			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 			{
-				game.map.stage[(y * GAME_WIDTH) + x] = color;
+				int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
+				if(loc > 0) {
+					game.map.stage[loc] = color;
+				}
 			}
 		}
 	}
@@ -122,7 +127,6 @@ void checkCollision(void)
 	{
 		resetFrogPosition();
 		game.lives--;
-		printf("Lives remaining: %d\n", game.lives);
 	}
 }
 
@@ -441,6 +445,16 @@ void checkEndCondition(void) {
 	}
 }
 
+void drawGameInfo(void) {
+	for (int y = TILE_HEIGHT * (NUM_RENDERED_TILES - 3); y < TILE_HEIGHT * (NUM_RENDERED_TILES); y++)
+	{
+		for (int x = 0; x < TILE_WIDTH * NUM_RENDERED_TILES; x++)
+		{
+			game.map.stage[((y * GAME_WIDTH) + x)] = 0x0000;
+		}
+	}
+}
+
 /* main function */
 int main(int argc, char *argv[])
 {
@@ -465,6 +479,7 @@ int main(int argc, char *argv[])
 
 		update();
 		mapBoardToStage(false);
+		drawGameInfo();
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();
