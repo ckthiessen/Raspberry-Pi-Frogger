@@ -75,8 +75,9 @@ short int *waterPtr = (short int *)water_img.pixel_data;
 short int *desertPtr = (short int *)desert_img.pixel_data;
 short int *blackRoadPtr = (short int *)black_road_img.pixel_data;
 
+// Castle Pointers
 
-// void updateStage(int yOffset, int xOffset, int color)
+
 void updateStage(int yOffset, int xOffset, short int *img_ptr)
 {
 	int i = 0;
@@ -85,42 +86,12 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr)
 	{
 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 		{
-			int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
 			if(loc > 0)
 				game.map.stage[loc] = img_ptr[i];
 			i++;
 		}
 	}
-
-
-	// switch (color)
-	// {
-
-	// case 0x6660:
-	// 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
-	// 	{
-	// 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
-	// 		{
-	// 			int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
-	// 			if(loc > 0)
-	// 				game.map.stage[loc] = frogPtr[i];
-	// 			i++;
-	// 		}
-	// 	}
-	// 	break;
-
-	// default:
-	// 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
-	// 	{
-	// 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
-	// 		{
-	// 			int loc = ((y * GAME_WIDTH) + x) - (((3 * TILE_HEIGHT) * GAME_WIDTH) + 20 * TILE_WIDTH);
-	// 			if(loc > 0) {
-	// 				game.map.stage[loc] = color;
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 void mapBoardToStage(bool debug)
@@ -129,9 +100,7 @@ void mapBoardToStage(bool debug)
 	{
 		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
 		{
-
 			char tile = game.map.board[row][col];
-			int color;
 			short int *ptr;
 			if (debug)
 				printf("%c", tile);
@@ -478,7 +447,7 @@ void displayPowerUp(void)
 {
 	int row = game.currentPowerUp.powerUpLocation.row;
 	int col = game.currentPowerUp.powerUpLocation.col;
-	// updateStage(row, col, frogPtr); //88888888888888888888888
+	// updateStage(row, col, frogPtr);
 
 	switch (game.currentPowerUp.type)
 	{
@@ -562,9 +531,14 @@ void drawGameInfo(void) {
 	{
 		for (int x = 0; x < TILE_WIDTH * NUM_RENDERED_TILES; x++)
 		{
-			game.map.stage[((y * GAME_WIDTH) + x)] = 0x0000;
+			// game.map.stage[((y * GAME_WIDTH) + x)] = 0xFFFF;
+			game.map.stage[((y * GAME_WIDTH) + x)] = frogPtr;
 		}
 	}
+}
+
+void updateGameInfo(void) {
+	
 }
 
 /* main function */
