@@ -200,6 +200,7 @@ void update(void)
 	{
 		for (int col = 0; col < NUM_MAP_TILES; col++)
 		{
+			char prev = '\0';
 			char obstacle = game.map.board[row][col];
 			char background = '\0';
 			char newPos;
