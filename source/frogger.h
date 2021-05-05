@@ -15,7 +15,7 @@
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 // void updateStage(int yOffset, int xOffset, int color);
-void drawGameInfo(void);
+// void drawGameInfo(void);
 void mapBoardToStage(bool debug);
 void checkCollision(void);
 void update(void);
@@ -79,6 +79,8 @@ struct Game
 	bool win;					// Won game
 	bool lose;					// Lost game
 	bool quit;					// Quit game
+	//-----------
+	int statBarCounter;			// Used to diplay the correct time output
 } game;
 
 Map INITIAL_MAP = {

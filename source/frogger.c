@@ -273,7 +273,7 @@ void update(void)
 		}
 	}
 	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	checkCollision();
+	// checkCollision();
 }
 
 void displayMenu(short * menu, int heightOffset, int widthOffset) {
@@ -565,19 +565,122 @@ void checkEndCondition(void) {
 	}
 }
 
-void drawGameInfo(void) {
-	for (int y = TILE_HEIGHT * (NUM_RENDERED_TILES - 3); y < TILE_HEIGHT * (NUM_RENDERED_TILES); y++)
+void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
+	int i = 0;
+
+	for (int y = TILE_HEIGHT * yOffset; y < TILE_HEIGHT * (yOffset + 1); y++)
 	{
-		for (int x = 0; x < TILE_WIDTH * NUM_RENDERED_TILES; x++)
+		for (int x = TILE_WIDTH * xOffset; x < TILE_WIDTH * (xOffset + 1); x++)
 		{
-			// game.map.stage[((y * GAME_WIDTH) + x)] = 0xFFFF;
-			game.map.stage[((y * GAME_WIDTH) + x)] = frogPtr;
+			game.map.stage[((y * GAME_WIDTH) + x)] = stat_ptr[i];
+			i++;
 		}
 	}
 }
 
+
 void updateGameInfo(void) {
-	
+	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
+	{
+		for (int col = 0; col < NUM_RENDERED_TILES; col++)
+		{
+			short int *ptr;
+			if(row == 17)
+			{
+				switch(col)
+				{
+					// score
+					case 2:
+						ptr = scorePtr;
+						break;
+					case 3:
+						ptr = zeroPtr;
+						break;
+					case 4:
+						ptr = zeroPtr;
+						break;
+					case 5:
+						ptr = zeroPtr;
+						break;
+					case 6:
+						ptr = zeroPtr;
+						break;
+
+					// time
+					case 9:
+						ptr = timePtr;
+						break;
+					case 10:
+						ptr = zeroPtr;
+						break;
+					case 11:
+						ptr = zeroPtr;
+						break;
+					case 12:
+						ptr = zeroPtr;
+						break;
+
+					// lives left
+					case 15:
+						ptr = livesPtr;
+						break;
+					case 16:
+						ptr = leftPtr;
+						break;
+					case 17:
+						ptr = threePtr;
+						break;
+					
+					default:
+						ptr = blackRoadPtr;
+						break;
+				}
+			}
+
+			else if(row == 19)
+			{
+				switch (col)
+				{
+					// moves left
+					case 4:
+						ptr = movesPtr;
+						break;
+					case 5:
+						ptr = leftPtr;
+						break;
+					case 6:
+						ptr = twoPtr;
+						break;
+					case 7:
+						ptr = fivePtr;
+						break;
+					case 8:
+						ptr = zeroPtr;
+						break;
+
+					// value-pack
+					case 13:
+						ptr = valuePtr;
+						break;
+					case 14:
+						ptr = packPtr;
+						break;
+					case 15:
+						ptr = naPtr;
+						break;
+					
+					default:
+						ptr = blackRoadPtr;
+						break;
+
+				}
+			}
+			else ptr = blackRoadPtr;
+
+			drawGameInfo(row, col, ptr);
+
+		}
+	}
 }
 
 /* main function */
@@ -596,6 +699,11 @@ int main(int argc, char *argv[])
 		game.elapsedTime += game.secondsPerFrame;
 		game.timeRemaining -= game.secondsPerFrame;
 
+		//--------------------
+		// depends on seconds per frame --> how many times while loop iterates per second (assuminng 5 right now)
+		game.statBarCounter++;
+		//--------------------
+
 		if (game.action != -1)
 		{
 			doUserAction();
@@ -604,7 +712,8 @@ int main(int argc, char *argv[])
 
 		update();
 		mapBoardToStage(false);
-		drawGameInfo();
+		// drawGameInfo();
+		updateGameInfo();
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();
