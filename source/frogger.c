@@ -36,6 +36,24 @@
 #include "images/obstacles/water.h"
 #include "images/obstacles/desert.h"
 #include "images/obstacles/black_road.h"
+#include "images/status_bar/0_img.h"
+#include "images/status_bar/1_img.h"
+#include "images/status_bar/2_img.h"
+#include "images/status_bar/3_img.h"
+#include "images/status_bar/4_img.h"
+#include "images/status_bar/5_img.h"
+#include "images/status_bar/6_img.h"
+#include "images/status_bar/7_img.h"
+#include "images/status_bar/8_img.h"
+#include "images/status_bar/9_img.h"
+#include "images/status_bar/left_img.h"
+#include "images/status_bar/lives_img.h"
+#include "images/status_bar/moves_img.h"
+#include "images/status_bar/NA_img.h"
+#include "images/status_bar/pack_img.h"
+#include "images/status_bar/score_img.h"
+#include "images/status_bar/time_img.h"
+#include "images/status_bar/value_img.h"
 
 struct fbs framebufferstruct;
 
@@ -76,6 +94,26 @@ short int *desertPtr = (short int *)desert_img.pixel_data;
 short int *blackRoadPtr = (short int *)black_road_img.pixel_data;
 
 // Castle Pointers
+
+// Status Bar Pointers
+short int *zeroPtr = (short int *)zero_img.pixel_data;
+short int *onePtr = (short int *)one_img.pixel_data;
+short int *twoPtr = (short int *)two_img.pixel_data;
+short int *threePtr = (short int *)three_img.pixel_data;
+short int *fourPtr = (short int *)four_img.pixel_data;
+short int *fivePtr = (short int *)five_img.pixel_data;
+short int *sixPtr = (short int *)six_img.pixel_data;
+short int *sevenPtr = (short int *)seven_img.pixel_data;
+short int *eightPtr = (short int *)eight_img.pixel_data;
+short int *ninePtr = (short int *)nine_img.pixel_data;
+short int *leftPtr = (short int *)left_img.pixel_data;
+short int *livesPtr = (short int *)lives_img.pixel_data;
+short int *movesPtr = (short int *)moves_img.pixel_data;
+short int *naPtr = (short int *)NA_img.pixel_data;
+short int *packPtr = (short int *)pack_img.pixel_data;
+short int *scorePtr = (short int *)score_img.pixel_data;
+short int *timePtr = (short int *)time_img.pixel_data;
+short int *valuePtr = (short int *)value_img.pixel_data;
 
 
 void updateStage(int yOffset, int xOffset, short int *img_ptr)
