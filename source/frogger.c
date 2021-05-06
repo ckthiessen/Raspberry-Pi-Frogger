@@ -456,6 +456,8 @@ void initializeGame(void)
 	game.lives = 3;
 	game.moves = 250;
 	game.map = INITIAL_MAP;
+	//-----------------------
+	game.statBarCounter = 0;
 }
 
 void updateFrogLocation(void)
@@ -580,11 +582,19 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 
 
 void updateGameInfo(void) {
+	// printf("test test\n");
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
 	{
 		for (int col = 0; col < NUM_RENDERED_TILES; col++)
 		{
+			// printf("col: %d\n", col);
+
 			short int *ptr;
+			// short int *timeOnesPtr;
+			// short int *timeTensPtr;
+
+			int ones;
+			int tens;
 			if(row == 17)
 			{
 				switch(col)
@@ -610,14 +620,146 @@ void updateGameInfo(void) {
 					case 9:
 						ptr = timePtr;
 						break;
+					// hundreds digits
 					case 10:
-						ptr = zeroPtr;
-						break;
+						if (game.timeRemaining > 299) {
+							ptr = threePtr;
+							break;
+						}
+						else if(game.timeRemaining > 199) {
+								printf("	test 9		");
+							ptr = twoPtr;
+							break;
+						}
+						else if(game.timeRemaining > 99) {
+							ptr = onePtr;
+							break;
+						}
+						else {
+							ptr = zeroPtr;
+							break;
+						}
+
+					// tens digit
 					case 11:
-						ptr = zeroPtr;
+						if (game.timeRemaining > 299){
+							ptr = zeroPtr;
+							tens = 0;
+							break;
+						}
+						if ((game.statBarCounter % 50) == 0){
+							if (tens == 0){
+								ptr = ninePtr;
+								tens = 9;
+								break;
+							}
+							else if(tens == 9) {
+								ptr = eightPtr;
+								tens = 8;
+								break;
+							}
+							else if(tens == 8) {
+								ptr = sevenPtr;
+								tens = 7;
+								break;
+							}
+							else if(tens == 7) {
+								ptr = sixPtr;
+								tens = 6;
+								break;
+							}
+							else if(tens == 6) {
+								ptr = fivePtr;
+								tens = 5;
+								break;
+							}
+							else if(tens == 5) {
+								ptr = fourPtr;
+								tens = 4;
+								break;
+							}
+							else if(tens == 4) {
+								ptr = threePtr;
+								tens = 3;
+								break;
+							}
+							else if(tens == 3) {
+								ptr = twoPtr;
+								tens = 2;
+								break;
+							}
+							else if(tens == 2) {
+								ptr = onePtr;
+								tens = 1;
+								break;
+							}
+							else if(tens == 1) {
+								ptr = zeroPtr;
+								tens = 0;
+								break;
+							}
+						}
 						break;
+
+					// ones digit
 					case 12:
-						ptr = zeroPtr;
+						if (game.timeRemaining > 299){
+							ptr = zeroPtr;
+							ones = 0;
+							break;
+						}
+						if ((game.statBarCounter % 5) == 0){
+							if (ones == 0){
+								ptr = ninePtr;
+								ones = 9;
+								break;
+							}
+							else if(ones == 9) {
+								ptr = eightPtr;
+								ones = 8;
+								break;
+							}
+							else if(ones == 8) {
+								ptr = sevenPtr;
+								ones = 7;
+								break;
+							}
+							else if(ones == 7) {
+								ptr = sixPtr;
+								ones = 6;
+								break;
+							}
+							else if(ones == 6) {
+								ptr = fivePtr;
+								ones = 5;
+								break;
+							}
+							else if(ones == 5) {
+								ptr = fourPtr;
+								ones = 4;
+								break;
+							}
+							else if(ones == 4) {
+								ptr = threePtr;
+								ones = 3;
+								break;
+							}
+							else if(ones == 3) {
+								ptr = twoPtr;
+								ones = 2;
+								break;
+							}
+							else if(ones == 2) {
+								ptr = onePtr;
+								ones = 1;
+								break;
+							}
+							else if(ones == 1) {
+								ptr = zeroPtr;
+								ones = 0;
+								break;
+							}
+						}
 						break;
 
 					// lives left
@@ -676,6 +818,16 @@ void updateGameInfo(void) {
 				}
 			}
 			else ptr = blackRoadPtr;
+
+			// if (row == 17 && col == 12) {
+			// 	drawGameInfo(row, col, timeOnesPtr);
+			// }
+			// else if (row == 17 && col == 11) {
+			// 	drawGameInfo(row, col, timeTensPtr);
+			// }
+			// else {
+			// 	drawGameInfo(row, col, ptr);
+			// }
 
 			drawGameInfo(row, col, ptr);
 
