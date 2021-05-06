@@ -245,13 +245,16 @@ void update(void)
 			switch (obstacle)
 			{
 			case 'c':
+			case 'a':
+			case 'm':
+			case 'e':
 			case 'b':
 				background = '-';
 				break;
 			case 's':
-				background = '.';
+				background = 'd';
 				newPos = boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES];
-				if (newPos == 'r' || newPos == 'h')
+				if (newPos == 'h')
 				{ // Reverse snake direction when they hit a hole or rock
 					laneVelocities[row] = -laneVelocities[row];
 				}
@@ -510,6 +513,8 @@ void displayPowerUp(void)
 	}
 }
 
+int ones;
+int tens;
 void applyPowerUp(void)
 {
 	switch (game.currentPowerUp.type)
@@ -520,6 +525,25 @@ void applyPowerUp(void)
 		break;
 	case timeUp:
 		game.timeRemaining += 60.0; // Add another minute of game time
+		//---------------------
+		if (game.statBarCounter > 300){
+			game.statBarCounter -= 300;
+
+			if (tens >= 0 && tens <= 3){
+				// if((game.statBarCounter % 50) == 0)
+				tens += 6;
+
+				// if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
+			}
+			else {
+				tens -= 4;
+			}
+
+			// tens = (6 % tens);
+			// ones = 0;
+		}
+		else game.statBarCounter = 0;
+		//---------------------
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case movesUp:
@@ -581,8 +605,6 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 }
 
 
-			int ones;
-			int tens;
 void updateGameInfo(void) {
 	// printf("test test\n");
 			short int *ptr;
@@ -619,7 +641,11 @@ void updateGameInfo(void) {
 						break;
 					// hundreds digits
 					case 10:
-						if (game.timeRemaining > 299) {
+						if (game.timeRemaining > 399) {
+							ptr = fourPtr;
+							break;
+						}
+						else if (game.timeRemaining > 299) {
 							ptr = threePtr;
 							break;
 						}
@@ -638,68 +664,69 @@ void updateGameInfo(void) {
 
 					// tens digit
 					case 11:
-						if (game.timeRemaining > 299){
+						if (game.timeRemaining > 299 && game.timeRemaining <= 300){
 							ptr = zeroPtr;
 							tens = 0;
 							break;
 						}
+						
 						// if ((game.statBarCounter % 50) == 0){
 							// printf("test tens counter: %d\n", game.statBarCounter);
 						if (tens == 0){
 							ptr = ninePtr;
-							if ((game.statBarCounter % 50) == 0) tens = 9;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
 							break;
 						}
 						else if(tens == 9) {
 							ptr = eightPtr;
-							if ((game.statBarCounter % 50) == 0) tens = 8;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 8;
 							break;
 						}
 						else if(tens == 8) {
 							ptr = sevenPtr;
-							if ((game.statBarCounter % 50) == 0) tens = 7;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 7;
 							break;
 						}
 						else if(tens == 7) {
 							ptr = sixPtr;
-							if ((game.statBarCounter % 50) == 0) tens = 6;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 6;
 							break;
 						}
 						else if(tens == 6) {
 							ptr = fivePtr;
-							if ((game.statBarCounter % 50) == 0) tens = 5;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 5;
 							break;
 						}
 						else if(tens == 5) {
 							ptr = fourPtr;
-							if ((game.statBarCounter % 50) == 0) tens = 4;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 4;
 							break;
 						}
 						else if(tens == 4) {
 							ptr = threePtr;
-							if ((game.statBarCounter % 50) == 0) tens = 3;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 3;
 							break;
 						}
 						else if(tens == 3) {
 							ptr = twoPtr;
-							if ((game.statBarCounter % 50) == 0) tens = 2;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 2;
 							break;
 						}
 						else if(tens == 2) {
 							ptr = onePtr;
-							if ((game.statBarCounter % 50) == 0) tens = 1;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 1;
 							break;
 						}
 						else if(tens == 1) {
 							ptr = zeroPtr;
-							if ((game.statBarCounter % 50) == 0) tens = 0;
+							if (((game.statBarCounter % 50) - 5) == 0) tens = 0;
 							break;
 						}
 						break;
 
 					// ones digit
 					case 12:
-						if (game.timeRemaining > 299){
+						if (game.timeRemaining > 299 && game.timeRemaining <= 300){
 							ptr = zeroPtr;
 							ones = 0;
 							break;
@@ -767,8 +794,34 @@ void updateGameInfo(void) {
 						ptr = leftPtr;
 						break;
 					case 17:
-						ptr = threePtr;
-						break;
+						if (game.lives == 6) {
+							ptr = sixPtr;
+							break;
+						}
+						else if (game.lives == 5) {
+							ptr = fivePtr;
+							break;
+						}
+						else if (game.lives == 4) {
+							ptr = fourPtr;
+							break;
+						}
+						else if (game.lives == 3) {
+							ptr = threePtr;
+							break;
+						}
+						else if (game.lives == 2) {
+							ptr = twoPtr;
+							break;
+						}
+						else if (game.lives == 1) {
+							ptr = onePtr;
+							break;
+						}
+						else{
+							ptr = zeroPtr;
+							break;
+						}
 					
 					default:
 						ptr = blackRoadPtr;
@@ -787,12 +840,15 @@ void updateGameInfo(void) {
 					case 5:
 						ptr = leftPtr;
 						break;
+					// hundreds
 					case 6:
 						ptr = twoPtr;
 						break;
+					// tens
 					case 7:
 						ptr = fivePtr;
 						break;
+					// ones
 					case 8:
 						ptr = zeroPtr;
 						break;
@@ -805,7 +861,29 @@ void updateGameInfo(void) {
 						ptr = packPtr;
 						break;
 					case 15:
-						ptr = naPtr;
+						switch (game.currentPowerUp.type)
+						{
+							// case none:
+							case -1:
+								ptr = naPtr;
+								break;
+							// case lifeUp:
+							case 0:
+								ptr = moreLivesPtr;
+								break;
+							// case timeUp:
+							case 1:
+								ptr = moreTimePtr;
+								break;
+							// case movesUp:
+							case 2:
+								ptr = moreStepsPtr;
+								break;
+							// case slowDown:
+							case 3:
+								ptr = slowDownPtr;
+								break;
+						}
 						break;
 					
 					default:
@@ -833,6 +911,10 @@ void updateGameInfo(void) {
 
 		}
 	}
+}
+
+void onesTensDisplay() {
+	
 }
 
 /* main function */
