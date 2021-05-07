@@ -54,6 +54,10 @@
 #include "images/status_bar/score_img.h"
 #include "images/status_bar/time_img.h"
 #include "images/status_bar/value_img.h"
+#include "images/castle/castle_wall.h"
+#include "images/castle/castle_door.h"
+#include "images/castle/castle_sky.h"
+#include "images/castle/castle_top.h"
 
 struct fbs framebufferstruct;
 
@@ -70,6 +74,8 @@ short int *pauseMenuQuitPtr = (short int *)pause_menu_quit.pixel_data;
 short int *pauseMenuRestartPtr = (short int *)pause_menu_restart.pixel_data;
 short int *winPromptPtr = (short int *)you_win_prompt.pixel_data;
 short int *losePromptPtr = (short int *)you_lose_prompt.pixel_data;
+
+
 
 // Life Pack Pointers
 short int *moreLivesPtr = (short int *)most_lives_img.pixel_data;
@@ -94,6 +100,10 @@ short int *desertPtr = (short int *)desert_img.pixel_data;
 short int *blackRoadPtr = (short int *)black_road_img.pixel_data;
 
 // Castle Pointers
+short int *castleWallPtr = (short int *)castle_wall_img.pixel_data;
+short int *castleDoorPtr = (short int *)castle_door_img.pixel_data;
+short int *castleTopPtr = (short int *)castle_top_img.pixel_data;
+short int *castleSkyPtr = (short int *)castle_sky_img.pixel_data;
 
 // Status Bar Pointers
 short int *zeroPtr = (short int *)zero_img.pixel_data;
@@ -203,6 +213,22 @@ void mapBoardToStage(bool debug)
 			// safe zone
 			case '.':
 				ptr = safePtr;
+				break;
+			// castle wall
+			case 'w':
+				ptr = castleWallPtr;
+				break;
+			// castle door
+			case 'o':
+				ptr = castleDoorPtr;
+				break;
+			// castle top
+			case 'p':
+				ptr = castleTopPtr;
+				break;
+			// castle sky
+			case '~':
+				ptr = castleSkyPtr;
 				break;
 			default:
 				ptr = blackRoadPtr;
