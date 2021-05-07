@@ -1,3 +1,14 @@
+// Authors: Cole Thiessen (30027689) & Isaac Lutzko (30026703)
+// CPSC359 Winter 2021 Project (Part 2) Raspberry Pi Video Game
+// Februar 2021
+// Description:
+
+// Link/Reference for Frogger Image: https://www.funstockretro.co.uk/news/arcade-hall-of-fame-frogger-konami/
+//
+// Link/Reference for Crazy Frog Image: https://www.thesun.co.uk/living/2974489/crazy-frog-just-turned-20-relive-his-hellish-magic-here/
+//
+// Link/Reference for Pepe Frog Image: https://line.17qq.com/articles/doddbhdz.html
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,12 +22,18 @@
 #include "framebuffer.h"
 #include "controller.h"
 #include "images/frog.h"
-#include "images/menus/main_menu_start.h"
-#include "images/menus/main_menu_quit.h"
+
+// #include "images/menus/main_menu_start.h"
+// #include "images/menus/main_menu_quit.h"
+#include "images/menus/main_menu_quit_game.h"
+#include "images/menus/main_menu_start_game.h"
+
 #include "images/menus/pause_menu_quit.h"
 #include "images/menus/pause_menu_restart.h"
 #include "images/menus/you_lose_prompt.h"
 #include "images/menus/you_win_prompt.h"
+
+
 #include "images/safe_zone.h"
 #include "images/life_packs/more_lives.h"
 #include "images/life_packs/more_time.h"
@@ -68,14 +85,12 @@ short int *frogPtr = (short int *)frog_img.pixel_data;
 short int *safePtr = (short int *)safe_zone_img.pixel_data;
 
 // Menu Pointers
-short int *mainMenuStartPtr = (short int *)main_menu_start.pixel_data;
-short int *mainMenuQuitPtr = (short int *)main_menu_quit.pixel_data;
-short int *pauseMenuQuitPtr = (short int *)pause_menu_quit.pixel_data;
-short int *pauseMenuRestartPtr = (short int *)pause_menu_restart.pixel_data;
-short int *winPromptPtr = (short int *)you_win_prompt.pixel_data;
-short int *losePromptPtr = (short int *)you_lose_prompt.pixel_data;
-
-
+short int *mainMenuStartPtr = (short int *)main_menu_start_img.pixel_data;
+short int *mainMenuQuitPtr = (short int *)main_menu_quit_img.pixel_data;
+short int *pauseMenuQuitPtr = (short int *)pause_menu_quit_img.pixel_data;
+short int *pauseMenuRestartPtr = (short int *)pause_menu_restart_img.pixel_data;
+short int *winPromptPtr = (short int *)you_win_img.pixel_data;
+short int *losePromptPtr = (short int *)you_lose_img.pixel_data;
 
 // Life Pack Pointers
 short int *moreLivesPtr = (short int *)most_lives_img.pixel_data;
@@ -302,7 +317,7 @@ void update(void)
 		}
 	}
 	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	// checkCollision();
+	checkCollision();
 }
 
 void displayMenu(short * menu, int heightOffset, int widthOffset) {
