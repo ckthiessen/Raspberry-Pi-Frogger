@@ -643,9 +643,58 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 	}
 }
 
+void timePt(char timeDigit, short int **time) {
+	switch (timeDigit)
+	{
+		case '0':
+			*time = zeroPtr;
+			break;
+		case '1':
+			*time = onePtr;
+			break;
+		case '2':
+			*time = twoPtr;
+			break;
+		case '3':
+			*time = threePtr;
+			break;
+		case '4':
+			*time = fourPtr;
+			break;
+		case '5':
+			*time = fivePtr;
+			break;
+		case '6':
+			*time = sixPtr;
+			break;
+		case '7':
+			*time = sevenPtr;
+			break;
+		case '8':
+			*time = eightPtr;
+			break;
+		case '9':
+			*time = ninePtr;
+			break;
+		default:
+			*time = zeroPtr;
+			break;
+	}
+}
 
 void updateGameInfo(void) {
 	// printf("test test\n");
+
+	char timeStr[50];
+	sprintf(timeStr, "%f", game.timeRemaining);
+
+	// char currentTimeArr[sizeof(game.timeRemaining)];
+	// memcpy(currentTimeArr, &(game.timeRemaining), sizeof(game.timeRemaining));
+
+	// for (int i = 0 ; i < sizeof(game.timeRemaining); i++){
+	// 	printf("digit: %c \n", currentTimeArr[i]);
+	// }
+
 	short int *ptr;
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
 	{
@@ -680,156 +729,164 @@ void updateGameInfo(void) {
 						break;
 					// hundreds digits
 					case 10:
-						if (game.timeRemaining > 399) {
-							ptr = fourPtr;
-							break;
-						}
-						else if (game.timeRemaining > 299) {
-							ptr = threePtr;
-							break;
-						}
-						else if(game.timeRemaining > 199) {
-							ptr = twoPtr;
-							break;
-						}
-						else if(game.timeRemaining > 99) {
-							ptr = onePtr;
-							break;
-						}
-						else {
-							ptr = zeroPtr;
-							break;
-						}
+
+						timePt(timeStr[0], &ptr);
+						break;
+
+						// if (game.timeRemaining > 399) {
+						// 	ptr = fourPtr;
+						// 	break;
+						// }
+						// else if (game.timeRemaining > 299) {
+						// 	ptr = threePtr;
+						// 	break;
+						// }
+						// else if(game.timeRemaining > 199) {
+						// 	ptr = twoPtr;
+						// 	break;
+						// }
+						// else if(game.timeRemaining > 99) {
+						// 	ptr = onePtr;
+						// 	break;
+						// }
+						// else {
+						// 	ptr = zeroPtr;
+						// 	break;
+						// }
 
 					// tens digit
 					case 11:
-						if (game.timeRemaining > 299 && game.timeRemaining <= 300){
-							ptr = zeroPtr;
-							tens = 0;
-							break;
-						}
+						timePt(timeStr[1], &ptr);
+						break;
+						// if (game.timeRemaining > 299 && game.timeRemaining <= 300){
+						// 	ptr = zeroPtr;
+						// 	tens = 0;
+						// 	break;
+						// }
 						
-						// if ((game.statBarCounter % 50) == 0){
-							// printf("test tens counter: %d\n", game.statBarCounter);
-						else if (tens == 0){
-							ptr = ninePtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
-							break;
-						}
-						else if(tens == 9) {
-							ptr = eightPtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 8;
-							break;
-						}
-						else if(tens == 8) {
-							ptr = sevenPtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 7;
-							break;
-						}
-						else if(tens == 7) {
-							ptr = sixPtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 6;
-							break;
-						}
-						else if(tens == 6) {
-							ptr = fivePtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 5;
-							break;
-						}
-						else if(tens == 5) {
-							ptr = fourPtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 4;
-							break;
-						}
-						else if(tens == 4) {
-							ptr = threePtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 3;
-							break;
-						}
-						else if(tens == 3) {
-							ptr = twoPtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 2;
-							break;
-						}
-						else if(tens == 2) {
-							ptr = onePtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 1;
-							break;
-						}
-						else if(tens == 1) {
-							ptr = zeroPtr;
-							if (((game.statBarCounter % 50) - 5) == 0) tens = 0;
-							break;
-						}
-						else {
-							ptr = zeroPtr;
-							break;
-						}
+						// // if ((game.statBarCounter % 50) == 0){
+						// 	// printf("test tens counter: %d\n", game.statBarCounter);
+						// else if (tens == 0){
+						// 	ptr = ninePtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
+						// 	break;
+						// }
+						// else if(tens == 9) {
+						// 	ptr = eightPtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 8;
+						// 	break;
+						// }
+						// else if(tens == 8) {
+						// 	ptr = sevenPtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 7;
+						// 	break;
+						// }
+						// else if(tens == 7) {
+						// 	ptr = sixPtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 6;
+						// 	break;
+						// }
+						// else if(tens == 6) {
+						// 	ptr = fivePtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 5;
+						// 	break;
+						// }
+						// else if(tens == 5) {
+						// 	ptr = fourPtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 4;
+						// 	break;
+						// }
+						// else if(tens == 4) {
+						// 	ptr = threePtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 3;
+						// 	break;
+						// }
+						// else if(tens == 3) {
+						// 	ptr = twoPtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 2;
+						// 	break;
+						// }
+						// else if(tens == 2) {
+						// 	ptr = onePtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 1;
+						// 	break;
+						// }
+						// else if(tens == 1) {
+						// 	ptr = zeroPtr;
+						// 	if (((game.statBarCounter % 50) - 5) == 0) tens = 0;
+						// 	break;
+						// }
+						// else {
+						// 	ptr = zeroPtr;
+						// 	break;
+						// }
 
 					// ones digit
 					case 12:
-						if (game.timeRemaining > 299 && game.timeRemaining <= 300){
-							ptr = zeroPtr;
-							ones = 0;
-							break;
-						}
-						// if ((game.statBarCounter % 5) == 0){
-							// printf("test ones counter: %d\n", game.statBarCounter);
-						else if (ones == 0){
-							// printf("test test\n");
-							ptr = ninePtr;
-							if ((game.statBarCounter % 5) == 0) ones = 9;
-							break;
-						}
-						else if(ones == 9) {
-							ptr = eightPtr;
-							if ((game.statBarCounter % 5) == 0) ones = 8;
-							break;
-						}
-						else if(ones == 8) {
-							ptr = sevenPtr;
-							if ((game.statBarCounter % 5) == 0) ones = 7;
-							break;
-						}
-						else if(ones == 7) {
-							ptr = sixPtr;
-							if ((game.statBarCounter % 5) == 0) ones = 6;
-							break;
-						}
-						else if(ones == 6) {
-							ptr = fivePtr;
-							if ((game.statBarCounter % 5) == 0) ones = 5;
-							break;
-						}
-						else if(ones == 5) {
-							ptr = fourPtr;
-							if ((game.statBarCounter % 5) == 0) ones = 4;
-							break;
-						}
-						else if(ones == 4) {
-							ptr = threePtr;
-							if ((game.statBarCounter % 5) == 0) ones = 3;
-							break;
-						}
-						else if(ones == 3) {
-							ptr = twoPtr;
-							if ((game.statBarCounter % 5) == 0) ones = 2;
-							break;
-						}
-						else if(ones == 2) {
-							ptr = onePtr;
-							if ((game.statBarCounter % 5) == 0) ones = 1;
-							break;
-						}
-						else if(ones == 1) {
-							ptr = zeroPtr;
-							if ((game.statBarCounter % 5) == 0) ones = 0;
-							break;
-						}
-						else {
-							ptr = zeroPtr;
-							break;
-						}
+						timePt(timeStr[2], &ptr);
+						break;
+						// if (game.timeRemaining > 299 && game.timeRemaining <= 300){
+						// 	ptr = zeroPtr;
+						// 	ones = 0;
+						// 	break;
+						// }
+						// // if ((game.statBarCounter % 5) == 0){
+						// 	// printf("test ones counter: %d\n", game.statBarCounter);
+						// else if (ones == 0){
+						// 	// printf("test test\n");
+						// 	ptr = ninePtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 9;
+						// 	break;
+						// }
+						// else if(ones == 9) {
+						// 	ptr = eightPtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 8;
+						// 	break;
+						// }
+						// else if(ones == 8) {
+						// 	ptr = sevenPtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 7;
+						// 	break;
+						// }
+						// else if(ones == 7) {
+						// 	ptr = sixPtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 6;
+						// 	break;
+						// }
+						// else if(ones == 6) {
+						// 	ptr = fivePtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 5;
+						// 	break;
+						// }
+						// else if(ones == 5) {
+						// 	ptr = fourPtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 4;
+						// 	break;
+						// }
+						// else if(ones == 4) {
+						// 	ptr = threePtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 3;
+						// 	break;
+						// }
+						// else if(ones == 3) {
+						// 	ptr = twoPtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 2;
+						// 	break;
+						// }
+						// else if(ones == 2) {
+						// 	ptr = onePtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 1;
+						// 	break;
+						// }
+						// else if(ones == 1) {
+						// 	ptr = zeroPtr;
+						// 	if ((game.statBarCounter % 5) == 0) ones = 0;
+						// 	break;
+						// }
+						// else {
+						// 	ptr = zeroPtr;
+						// 	break;
+						// }
 
 					// lives left
 					case 15:
@@ -928,6 +985,8 @@ void updateGameInfo(void) {
 							case 3:
 								ptr = slowDownPtr;
 								break;
+							default:
+								ptr = naPtr;
 						}
 						break;
 					
@@ -958,9 +1017,6 @@ void updateGameInfo(void) {
 	}
 }
 
-void onesTensDisplay() {
-	
-}
 
 /* main function */
 int main(int argc, char *argv[])

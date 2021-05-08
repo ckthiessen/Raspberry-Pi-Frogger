@@ -16,6 +16,8 @@
 
 // void updateStage(int yOffset, int xOffset, int color);
 // void drawGameInfo(void);
+void timePt(char timeDigit, short int **time);
+
 void mapBoardToStage(bool debug);
 void checkCollision(void);
 void update(void);
