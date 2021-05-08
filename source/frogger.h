@@ -83,7 +83,9 @@ struct Game
 	bool lose;					// Lost game
 	bool quit;					// Quit game
 	//-----------
-	int statBarCounter;			// Used to diplay the correct time output
+	// int statBarCounter;			// Used to diplay the correct time output
+	int score;
+	int movesMade;
 } game;
 
 Map INITIAL_MAP = {

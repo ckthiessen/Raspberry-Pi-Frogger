@@ -449,7 +449,19 @@ void moveFrog(int direction)
 		}
 		break;
 	}
-	if (moved) { game.moves--; }
+	if (moved) { 
+		game.moves--; 
+		game.movesMade++;
+		if (game.movesMade <= 50) {
+			game.score += 3;
+		}
+		else if (game.movesMade <= 100) {
+			game.score += 2;
+		}
+		else if (game.movesMade <= 150) {
+			game.score += 2;
+		}
+	}
 }
 
 void doUserAction(void)
@@ -507,7 +519,8 @@ void initializeGame(void)
 	game.moves = 250;
 	game.map = INITIAL_MAP;
 	//-----------------------
-	game.statBarCounter = 0;
+	game.score = 0;
+	game.movesMade = 0;
 }
 
 void updateFrogLocation(void)
@@ -572,23 +585,6 @@ void applyPowerUp(void)
 		break;
 	case timeUp:
 		game.timeRemaining += 60.0; // Add another minute of game time
-		// //---------------------
-		// if (game.statBarCounter > 300){
-		// 	game.statBarCounter -= 300;
-
-		// 	if (tens >= 0 && tens <= 3){
-		// 		// if((game.statBarCounter % 50) == 0)
-		// 		tens += 6;
-
-		// 		// if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
-		// 	}
-		// 	else {
-		// 		tens -= 4;
-		// 	}
-
-		// }
-		// else game.statBarCounter = 0;
-		// //---------------------
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case movesUp:
@@ -617,6 +613,7 @@ void checkPowerUps(void)
 		game.frogLocation.row == game.currentPowerUp.powerUpLocation.row)
 	{
 		applyPowerUp();
+		game.score += 50;
 		game.currentPowerUp.type = none;
 	}
 	if (game.currentPowerUp.type != none)
@@ -648,45 +645,6 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 		}
 	}
 }
-
-// void timePt(char timeDigit, short int **time) {
-// 	switch (timeDigit)
-// 	{
-// 		case '0':
-// 			*time = zeroPtr;
-// 			break;
-// 		case '1':
-// 			*time = onePtr;
-// 			break;
-// 		case '2':
-// 			*time = twoPtr;
-// 			break;
-// 		case '3':
-// 			*time = threePtr;
-// 			break;
-// 		case '4':
-// 			*time = fourPtr;
-// 			break;
-// 		case '5':
-// 			*time = fivePtr;
-// 			break;
-// 		case '6':
-// 			*time = sixPtr;
-// 			break;
-// 		case '7':
-// 			*time = sevenPtr;
-// 			break;
-// 		case '8':
-// 			*time = eightPtr;
-// 			break;
-// 		case '9':
-// 			*time = ninePtr;
-// 			break;
-// 		default:
-// 			*time = zeroPtr;
-// 			break;
-// 	}
-// }
 
 void digitPtr(char passedDigit, short int **digits) {
 	switch (passedDigit)
@@ -751,6 +709,23 @@ void updateGameInfo(void) {
 	char livesStr[3];
 	sprintf(livesStr, "%d", game.lives);
 
+	// game.score int converted to string for displaying score
+	char scoreStr[4];
+	sprintf(scoreStr, "%d", game.score);
+
+	if(game.score < 1000) {
+		memmove(scoreStr+1, scoreStr, 3);
+		scoreStr[0] = '0';
+		if(game.score < 100) {
+			memmove(scoreStr+1, scoreStr, 3);
+			scoreStr[0] = '0';
+			if(game.score < 10) {
+				memmove(scoreStr+1, scoreStr, 3);
+				scoreStr[0] = '0';
+			}
+		}
+	}
+
 
 	short int *ptr;
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
@@ -768,16 +743,20 @@ void updateGameInfo(void) {
 						ptr = scorePtr;
 						break;
 					case 3:
-						ptr = zeroPtr;
+						digitPtr(scoreStr[0], &ptr);
+						// ptr = zeroPtr;
 						break;
 					case 4:
-						ptr = zeroPtr;
+						// ptr = zeroPtr;
+						digitPtr(scoreStr[1], &ptr);
 						break;
 					case 5:
-						ptr = zeroPtr;
+						// ptr = zeroPtr;
+						digitPtr(scoreStr[2], &ptr);
 						break;
 					case 6:
-						ptr = zeroPtr;
+						// ptr = zeroPtr;
+						digitPtr(scoreStr[3], &ptr);
 						break;
 
 					// time
@@ -807,35 +786,7 @@ void updateGameInfo(void) {
 					case 17:
 						digitPtr(livesStr[0], &ptr);
 						break;
-						// if (game.lives == 6) {
-						// 	ptr = sixPtr;
-						// 	break;
-						// }
-						// else if (game.lives == 5) {
-						// 	ptr = fivePtr;
-						// 	break;
-						// }
-						// else if (game.lives == 4) {
-						// 	ptr = fourPtr;
-						// 	break;
-						// }
-						// else if (game.lives == 3) {
-						// 	ptr = threePtr;
-						// 	break;
-						// }
-						// else if (game.lives == 2) {
-						// 	ptr = twoPtr;
-						// 	break;
-						// }
-						// else if (game.lives == 1) {
-						// 	ptr = onePtr;
-						// 	break;
-						// }
-						// else{
-						// 	ptr = zeroPtr;
-						// 	break;
-						// }
-					
+	
 					default:
 						ptr = blackRoadPtr;
 						break;
@@ -855,21 +806,15 @@ void updateGameInfo(void) {
 						break;
 					// hundreds
 					case 6:
-						// timePt(movesStr[0], &ptr);
 						digitPtr(movesStr[0], &ptr);
-						// ptr = twoPtr;
 						break;
 					// tens
 					case 7:
-						// timePt(movesStr[1], &ptr);
 						digitPtr(movesStr[1], &ptr);
-						// ptr = fivePtr;
 						break;
 					// ones
 					case 8:
-						// timePt(movesStr[2], &ptr);
 						digitPtr(movesStr[2], &ptr);
-						// ptr = zeroPtr;
 						break;
 
 					// value-pack
@@ -934,6 +879,12 @@ void updateGameInfo(void) {
 	}
 }
 
+void calculateScore(void) {
+	game.score += ((400 - game.movesMade) * 5);
+	game.score += ((500 + game.timeRemaining) * 5);
+	game.score += (200 * game.lives);
+}
+
 
 /* main function */
 int main(int argc, char *argv[])
@@ -951,11 +902,6 @@ int main(int argc, char *argv[])
 		game.elapsedTime += game.secondsPerFrame;
 		game.timeRemaining -= game.secondsPerFrame;
 
-		//--------------------
-		// depends on seconds per frame --> how many times while loop iterates per second (assuminng 5 right now)
-		// game.statBarCounter++;
-		//--------------------
-
 		if (game.action != -1)
 		{
 			doUserAction();
@@ -964,7 +910,6 @@ int main(int argc, char *argv[])
 
 		update();
 		mapBoardToStage(false);
-		// drawGameInfo();
 		updateGameInfo();
 		updateFrogLocation();
 		checkPowerUps();
