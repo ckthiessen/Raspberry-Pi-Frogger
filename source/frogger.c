@@ -8,6 +8,12 @@
 // Link/Reference for Crazy Frog Image: https://www.thesun.co.uk/living/2974489/crazy-frog-just-turned-20-relive-his-hellish-magic-here/
 //
 // Link/Reference for Pepe Frog Image: https://line.17qq.com/articles/doddbhdz.html
+//
+// link/references for figuring how to display stat bar
+//
+//
+// used for game.moves:
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -643,80 +649,80 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 	}
 }
 
-void timePt(char timeDigit, short int **time) {
-	switch (timeDigit)
-	{
-		case '0':
-			*time = zeroPtr;
-			break;
-		case '1':
-			*time = onePtr;
-			break;
-		case '2':
-			*time = twoPtr;
-			break;
-		case '3':
-			*time = threePtr;
-			break;
-		case '4':
-			*time = fourPtr;
-			break;
-		case '5':
-			*time = fivePtr;
-			break;
-		case '6':
-			*time = sixPtr;
-			break;
-		case '7':
-			*time = sevenPtr;
-			break;
-		case '8':
-			*time = eightPtr;
-			break;
-		case '9':
-			*time = ninePtr;
-			break;
-		default:
-			*time = zeroPtr;
-			break;
-	}
-}
+// void timePt(char timeDigit, short int **time) {
+// 	switch (timeDigit)
+// 	{
+// 		case '0':
+// 			*time = zeroPtr;
+// 			break;
+// 		case '1':
+// 			*time = onePtr;
+// 			break;
+// 		case '2':
+// 			*time = twoPtr;
+// 			break;
+// 		case '3':
+// 			*time = threePtr;
+// 			break;
+// 		case '4':
+// 			*time = fourPtr;
+// 			break;
+// 		case '5':
+// 			*time = fivePtr;
+// 			break;
+// 		case '6':
+// 			*time = sixPtr;
+// 			break;
+// 		case '7':
+// 			*time = sevenPtr;
+// 			break;
+// 		case '8':
+// 			*time = eightPtr;
+// 			break;
+// 		case '9':
+// 			*time = ninePtr;
+// 			break;
+// 		default:
+// 			*time = zeroPtr;
+// 			break;
+// 	}
+// }
 
-void movesPt(char movesDigit, short int **moveLeft) {
-	switch (movesDigit)
+void digitPtr(char passedDigit, short int **digits) {
+	switch (passedDigit)
 	{
 		case '0':
-			*moveLeft = zeroPtr;
+			*digits = zeroPtr;
 			break;
 		case '1':
-			*moveLeft = onePtr;
+			*digits = onePtr;
 			break;
 		case '2':
-			*moveLeft = twoPtr;
+			*digits = twoPtr;
 			break;
 		case '3':
-			*moveLeft = threePtr;
+			*digits = threePtr;
 			break;
 		case '4':
-			*moveLeft = fourPtr;
+			*digits = fourPtr;
 			break;
 		case '5':
-			*moveLeft = fivePtr;
+			*digits = fivePtr;
 			break;
 		case '6':
-			*moveLeft = sixPtr;
+			*digits = sixPtr;
 			break;
 		case '7':
-			*moveLeft = sevenPtr;
+			*digits = sevenPtr;
 			break;
 		case '8':
-			*moveLeft = eightPtr;
+			*digits = eightPtr;
 			break;
 		case '9':
-			*moveLeft = ninePtr;
+			*digits = ninePtr;
 			break;
 		default:
-			*moveLeft = zeroPtr;
+			*digits = zeroPtr;
 			break;
 	}
 }
@@ -740,7 +746,11 @@ void updateGameInfo(void) {
 			movesStr[0] = '0';
 		}
 	}
-	
+
+	// game.lives int converted to string for displaying number of lives left
+	char livesStr[3];
+	sprintf(livesStr, "%d", game.lives);
+
 
 	short int *ptr;
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
@@ -776,15 +786,15 @@ void updateGameInfo(void) {
 						break;
 					// hundreds digits
 					case 10:
-						timePt(timeStr[0], &ptr);
+						digitPtr(timeStr[0], &ptr);
 						break;
 					// tens digit
 					case 11:
-						timePt(timeStr[1], &ptr);
+						digitPtr(timeStr[1], &ptr);
 						break;
 					// ones digit
 					case 12:
-						timePt(timeStr[2], &ptr);
+						digitPtr(timeStr[2], &ptr);
 						break;
 
 					// lives left
@@ -795,34 +805,36 @@ void updateGameInfo(void) {
 						ptr = leftPtr;
 						break;
 					case 17:
-						if (game.lives == 6) {
-							ptr = sixPtr;
-							break;
-						}
-						else if (game.lives == 5) {
-							ptr = fivePtr;
-							break;
-						}
-						else if (game.lives == 4) {
-							ptr = fourPtr;
-							break;
-						}
-						else if (game.lives == 3) {
-							ptr = threePtr;
-							break;
-						}
-						else if (game.lives == 2) {
-							ptr = twoPtr;
-							break;
-						}
-						else if (game.lives == 1) {
-							ptr = onePtr;
-							break;
-						}
-						else{
-							ptr = zeroPtr;
-							break;
-						}
+						digitPtr(livesStr[0], &ptr);
+						break;
+						// if (game.lives == 6) {
+						// 	ptr = sixPtr;
+						// 	break;
+						// }
+						// else if (game.lives == 5) {
+						// 	ptr = fivePtr;
+						// 	break;
+						// }
+						// else if (game.lives == 4) {
+						// 	ptr = fourPtr;
+						// 	break;
+						// }
+						// else if (game.lives == 3) {
+						// 	ptr = threePtr;
+						// 	break;
+						// }
+						// else if (game.lives == 2) {
+						// 	ptr = twoPtr;
+						// 	break;
+						// }
+						// else if (game.lives == 1) {
+						// 	ptr = onePtr;
+						// 	break;
+						// }
+						// else{
+						// 	ptr = zeroPtr;
+						// 	break;
+						// }
 					
 					default:
 						ptr = blackRoadPtr;
@@ -843,17 +855,20 @@ void updateGameInfo(void) {
 						break;
 					// hundreds
 					case 6:
-						timePt(movesStr[0], &ptr);
+						// timePt(movesStr[0], &ptr);
+						digitPtr(movesStr[0], &ptr);
 						// ptr = twoPtr;
 						break;
 					// tens
 					case 7:
-						timePt(movesStr[1], &ptr);
+						// timePt(movesStr[1], &ptr);
+						digitPtr(movesStr[1], &ptr);
 						// ptr = fivePtr;
 						break;
 					// ones
 					case 8:
-						timePt(movesStr[2], &ptr);
+						// timePt(movesStr[2], &ptr);
+						digitPtr(movesStr[2], &ptr);
 						// ptr = zeroPtr;
 						break;
 
