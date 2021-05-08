@@ -317,7 +317,7 @@ void update(void)
 		}
 	}
 	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	checkCollision();
+	// checkCollision();
 }
 
 void displayMenu(short * menu, int heightOffset, int widthOffset) {
@@ -566,25 +566,23 @@ void applyPowerUp(void)
 		break;
 	case timeUp:
 		game.timeRemaining += 60.0; // Add another minute of game time
-		//---------------------
-		if (game.statBarCounter > 300){
-			game.statBarCounter -= 300;
+		// //---------------------
+		// if (game.statBarCounter > 300){
+		// 	game.statBarCounter -= 300;
 
-			if (tens >= 0 && tens <= 3){
-				// if((game.statBarCounter % 50) == 0)
-				tens += 6;
+		// 	if (tens >= 0 && tens <= 3){
+		// 		// if((game.statBarCounter % 50) == 0)
+		// 		tens += 6;
 
-				// if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
-			}
-			else {
-				tens -= 4;
-			}
+		// 		// if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
+		// 	}
+		// 	else {
+		// 		tens -= 4;
+		// 	}
 
-			// tens = (6 % tens);
-			// ones = 0;
-		}
-		else game.statBarCounter = 0;
-		//---------------------
+		// }
+		// else game.statBarCounter = 0;
+		// //---------------------
 		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case movesUp:
@@ -648,7 +646,7 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 
 void updateGameInfo(void) {
 	// printf("test test\n");
-			short int *ptr;
+	short int *ptr;
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
 	{
 		for (int col = 0; col < NUM_RENDERED_TILES; col++)
@@ -713,7 +711,7 @@ void updateGameInfo(void) {
 						
 						// if ((game.statBarCounter % 50) == 0){
 							// printf("test tens counter: %d\n", game.statBarCounter);
-						if (tens == 0){
+						else if (tens == 0){
 							ptr = ninePtr;
 							if (((game.statBarCounter % 50) - 5) == 0) tens = 9;
 							break;
@@ -763,7 +761,10 @@ void updateGameInfo(void) {
 							if (((game.statBarCounter % 50) - 5) == 0) tens = 0;
 							break;
 						}
-						break;
+						else {
+							ptr = zeroPtr;
+							break;
+						}
 
 					// ones digit
 					case 12:
@@ -774,7 +775,7 @@ void updateGameInfo(void) {
 						}
 						// if ((game.statBarCounter % 5) == 0){
 							// printf("test ones counter: %d\n", game.statBarCounter);
-						if (ones == 0){
+						else if (ones == 0){
 							// printf("test test\n");
 							ptr = ninePtr;
 							if ((game.statBarCounter % 5) == 0) ones = 9;
@@ -825,7 +826,10 @@ void updateGameInfo(void) {
 							if ((game.statBarCounter % 5) == 0) ones = 0;
 							break;
 						}
-						break;
+						else {
+							ptr = zeroPtr;
+							break;
+						}
 
 					// lives left
 					case 15:
