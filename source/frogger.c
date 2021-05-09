@@ -36,8 +36,8 @@
 
 #include "images/menus/pause_menu_quit.h"
 #include "images/menus/pause_menu_restart.h"
-#include "images/menus/you_lose_prompt.h"
-#include "images/menus/you_win_prompt.h"
+#include "images/menus/you_lose_prompt_w_score.h"
+#include "images/menus/you_win_prompt_w_score.h"
 
 
 #include "images/safe_zone.h"
@@ -326,6 +326,46 @@ void update(void)
 	// checkCollision();
 }
 
+void calculateScore(void) {
+	if (game.lives > 0) {
+		game.score += ((400 - game.movesMade) * 5);
+		game.score += ((500 + game.timeRemaining) * 5);
+		game.score += (200 * game.lives);
+	}
+	
+
+	sprintf(game.scoreStr, "%d", game.score);
+
+	if(game.score < 1000) {
+		memmove(game.scoreStr+1, game.scoreStr, 3);
+		game.scoreStr[0] = '0';
+		if(game.score < 100) {
+			memmove(game.scoreStr+1, game.scoreStr, 3);
+			game.scoreStr[0] = '0';
+			if(game.score < 10) {
+				memmove(game.scoreStr+1, game.scoreStr, 3);
+				game.scoreStr[0] = '0';
+			}
+		}
+	}
+
+	short int *calcScorePtr;
+
+	digitPtr(game.scoreStr[0], &calcScorePtr);
+	drawGameInfo(13, 10, calcScorePtr);
+
+	digitPtr(game.scoreStr[1], &calcScorePtr);
+	drawGameInfo(13, 11, calcScorePtr);
+
+	digitPtr(game.scoreStr[2], &calcScorePtr);
+	drawGameInfo(13, 12, calcScorePtr);
+
+	digitPtr(game.scoreStr[3], &calcScorePtr);
+	drawGameInfo(13, 13, calcScorePtr);
+
+}
+
+
 void displayMenu(short * menu, int heightOffset, int widthOffset) {
 	int i = 0;
 	for (int y = heightOffset; y < GAME_HEIGHT - heightOffset; y++)
@@ -336,6 +376,9 @@ void displayMenu(short * menu, int heightOffset, int widthOffset) {
 			i++;
 		}
 	}
+
+	if (heightOffset == (TILE_HEIGHT*5) && widthOffset == (TILE_WIDTH*5)) calculateScore();
+
 	drawStageToFrameBuffer();
 }
 
@@ -646,6 +689,7 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 	}
 }
 
+
 void digitPtr(char passedDigit, short int **digits) {
 	switch (passedDigit)
 	{
@@ -686,8 +730,6 @@ void digitPtr(char passedDigit, short int **digits) {
 }
 
 void updateGameInfo(void) {
-	// printf("test test\n");
-
 	// game.timeRemaining double converted for string for displaying time
 	char timeStr[50];
 	sprintf(timeStr, "%f", game.timeRemaining);
@@ -710,18 +752,18 @@ void updateGameInfo(void) {
 	sprintf(livesStr, "%d", game.lives);
 
 	// game.score int converted to string for displaying score
-	char scoreStr[4];
-	sprintf(scoreStr, "%d", game.score);
+	// char scoreStr[4];
+	sprintf(game.scoreStr, "%d", game.score);
 
 	if(game.score < 1000) {
-		memmove(scoreStr+1, scoreStr, 3);
-		scoreStr[0] = '0';
+		memmove(game.scoreStr+1, game.scoreStr, 3);
+		game.scoreStr[0] = '0';
 		if(game.score < 100) {
-			memmove(scoreStr+1, scoreStr, 3);
-			scoreStr[0] = '0';
+			memmove(game.scoreStr+1, game.scoreStr, 3);
+			game.scoreStr[0] = '0';
 			if(game.score < 10) {
-				memmove(scoreStr+1, scoreStr, 3);
-				scoreStr[0] = '0';
+				memmove(game.scoreStr+1, game.scoreStr, 3);
+				game.scoreStr[0] = '0';
 			}
 		}
 	}
@@ -732,8 +774,6 @@ void updateGameInfo(void) {
 	{
 		for (int col = 0; col < NUM_RENDERED_TILES; col++)
 		{
-			// printf("col: %d\n", col);
-
 			if(row == 17)
 			{
 				switch(col)
@@ -743,20 +783,16 @@ void updateGameInfo(void) {
 						ptr = scorePtr;
 						break;
 					case 3:
-						digitPtr(scoreStr[0], &ptr);
-						// ptr = zeroPtr;
+						digitPtr(game.scoreStr[0], &ptr);
 						break;
 					case 4:
-						// ptr = zeroPtr;
-						digitPtr(scoreStr[1], &ptr);
+						digitPtr(game.scoreStr[1], &ptr);
 						break;
 					case 5:
-						// ptr = zeroPtr;
-						digitPtr(scoreStr[2], &ptr);
+						digitPtr(game.scoreStr[2], &ptr);
 						break;
 					case 6:
-						// ptr = zeroPtr;
-						digitPtr(scoreStr[3], &ptr);
+						digitPtr(game.scoreStr[3], &ptr);
 						break;
 
 					// time
@@ -860,29 +896,9 @@ void updateGameInfo(void) {
 			}
 			else ptr = blackRoadPtr;
 
-			// if (row == 17 && col == 12 && ((game.statBarCounter % 5) == 0)) {
-			// 	// drawGameInfo(row, col, timeOnesPtr);
-			// 	printf("ones: %d\n", ones);
-			// }
-			// else if (row == 17 && col == 11 && ((game.statBarCounter % 50) == 0)) {
-			// 	// drawGameInfo(row, col, timeTensPtr);
-			// 	printf("tens: %d\n", tens);
-			// }
-			// else {
-			// 	// drawGameInfo(row, col, ptr);
-			// }
-			// // printf("what is counter: %d\n", game.statBarCounter);
-
 			drawGameInfo(row, col, ptr);
-
 		}
 	}
-}
-
-void calculateScore(void) {
-	game.score += ((400 - game.movesMade) * 5);
-	game.score += ((500 + game.timeRemaining) * 5);
-	game.score += (200 * game.lives);
 }
 
 
