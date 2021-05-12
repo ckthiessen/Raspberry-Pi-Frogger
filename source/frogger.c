@@ -377,7 +377,7 @@ void displayMenu(short * menu, int heightOffset, int widthOffset) {
 		}
 	}
 
-	if (heightOffset == (TILE_HEIGHT*5) && widthOffset == (TILE_WIDTH*5)) calculateScore();
+	if (game.win == true || game.lose == true) calculateScore();
 
 	drawStageToFrameBuffer();
 }
@@ -557,7 +557,7 @@ void initializeGame(void)
 	game.lastPowerUpTime = 0.0;
 	game.currentPowerUp.type = none;
 	game.secondsPerFrame = 1.0 / 5.0;
-	game.timeRemaining = 60.0 * 5.0;	// Player starts with 5 minutes
+	game.timeRemaining = 60.0 * 3.0;	// Player starts with 5 minutes
 	game.lives = 3;
 	game.moves = 250;
 	game.map = INITIAL_MAP;
@@ -676,6 +676,9 @@ void checkEndCondition(void) {
 	}
 }
 
+
+//--------------------------------------------
+
 void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 	int i = 0;
 
@@ -733,6 +736,11 @@ void updateGameInfo(void) {
 	// game.timeRemaining double converted for string for displaying time
 	char timeStr[50];
 	sprintf(timeStr, "%f", game.timeRemaining);
+
+	if(game.timeRemaining < 100) {
+		memmove(timeStr+1, timeStr, 4);
+		timeStr[0] = '0';
+	}
 
 	// game.moves int converted to string for displaying number of moves left
 	char movesStr[5];
