@@ -147,6 +147,7 @@ short int *timePtr = (short int *)time_img.pixel_data;
 short int *valuePtr = (short int *)value_img.pixel_data;
 
 
+
 void updateStage(int yOffset, int xOffset, short int *img_ptr)
 {
 	int i = 0;
@@ -265,12 +266,24 @@ void mapBoardToStage(bool debug)
 void checkCollision(void)
 {
 	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
+	// Car = 'c' and 'a'
+	// Water = ','
+	// Hole/Pit = 'h'
+	// Snake = 's'
+	// Bus = 'b' and 'm' and 'e'
+	// Lava = ';'
+	// Wall of Castle = 'w'
 	if (
 		obstacle == 'c' ||
+		obstacle == 'a' ||
 		obstacle == ',' ||
 		obstacle == 'h' ||
 		obstacle == 's' ||
-		obstacle == 'b')
+		obstacle == 'b' ||
+		obstacle == 'm' ||
+		obstacle == 'e' ||
+		obstacle == ';' ||
+		obstacle == 'w')
 	{
 		resetFrogPosition();
 		game.lives--;
@@ -904,6 +917,9 @@ void updateGameInfo(void) {
 			}
 			else ptr = blackRoadPtr;
 
+			// printf("row: %d", row);
+			// printf("col: %d", col);
+
 			drawGameInfo(row, col, ptr);
 		}
 	}
@@ -934,7 +950,7 @@ int main(int argc, char *argv[])
 
 		update();
 		mapBoardToStage(false);
-		updateGameInfo();
+		// updateGameInfo();
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();

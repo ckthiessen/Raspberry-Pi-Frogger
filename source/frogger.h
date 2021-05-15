@@ -116,7 +116,7 @@ Map INITIAL_MAP = {
 	 ".......hhhhdhdhdhhdhhhdhhhhhhh...................",
 	 ".......hhhdstdddhhddstdddhhhhh...................",
 	 ".......hhhhddhddhhhdddddhhhhhh...................",
-	 ".......hhhhdhhdhhhdstdddddhhhd..................",
+	 ".......hhhhdhhdhhhdstdddddhhhd...................",
 	 ".......hhhdstdddddhdddhhddddhh...................",
 	 ".......hhhddddstdddhhdddstddhh...................",
 	 ".......hhhdhhdhhhhdstdddddddhh...................",
