@@ -330,7 +330,7 @@ void update(void)
 			}
 			if (background != '\0')
 			{
-				boardBuffer[row][col] = background;
+				boardBuffer[row][col] = background; //*******
 				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = obstacle;
 			}
 		}
@@ -788,8 +788,7 @@ void updateGameInfo(void) {
 			}
 		}
 	}
-
-
+	
 	short int *ptr;
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
 	{
@@ -950,7 +949,7 @@ int main(int argc, char *argv[])
 
 		update();
 		mapBoardToStage(false);
-		// updateGameInfo();
+		updateGameInfo();
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();
