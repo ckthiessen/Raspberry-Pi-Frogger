@@ -15,7 +15,12 @@
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 // void updateStage(int yOffset, int xOffset, int color);
-void drawGameInfo(void);
+void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr);
+// void timePt(char timeDigit, short int **time);
+// void movesPt(char movesDigit, short int **moveLeft);
+void digitPtr(char passedDigit, short int **digits);
+
+
 void mapBoardToStage(bool debug);
 void checkCollision(void);
 void update(void);
@@ -27,6 +32,7 @@ void *getUserInput(void *);
 void resetFrogPosition(void);
 void updateFrogLocation(void);
 void initializeGame(void);
+void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
 
 typedef struct
 {
@@ -79,19 +85,24 @@ struct Game
 	bool win;					// Won game
 	bool lose;					// Lost game
 	bool quit;					// Quit game
+	//-----------
+	// int statBarCounter;			// Used to diplay the correct time output
+	int score;
+	int movesMade;
+	char scoreStr[4];
 } game;
 
 Map INITIAL_MAP = {
-	{".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
-	 ".................................................",
+	{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+	 "ppppppppppppppppppppppppppppppppppppppppppppppppp",
+	 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+	 "wwowwowwowwowwowwowwowwowwowwowwowwowwowwowwowwow",
 	 ";;;;;rr;;;;;;;;;;rrrr;;;;;rrr;;;;rr;;;;rr;;;rrrrr",
 	 ";;;;;;rrrr;;;;;;;;;;;;;;rrrr;;;rrrr;;;;rrrr;;rrrr",
 	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
@@ -105,7 +116,7 @@ Map INITIAL_MAP = {
 	 ".......hhhhdhdhdhhdhhhdhhhhhhh...................",
 	 ".......hhhdstdddhhddstdddhhhhh...................",
 	 ".......hhhhddhddhhhdddddhhhhhh...................",
-	 ".......hhhhdhhdhhhdstdddddhhhd..................",
+	 ".......hhhhdhhdhhhdstdddddhhhd...................",
 	 ".......hhhdstdddddhdddhhddddhh...................",
 	 ".......hhhddddstdddhhdddstddhh...................",
 	 ".......hhhdhhdhhhhdstdddddddhh...................",
