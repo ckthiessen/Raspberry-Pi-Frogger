@@ -924,6 +924,45 @@ void updateGameInfo(void) {
 	}
 }
 
+struct Obst { 
+	// int buff[TILE_HEIGHT * TILE_WIDTH];
+	short * img;
+	short lane;
+	int colPos;
+} obst = {
+	(short *) water_img.pixel_data,
+	48, 
+	-1 * TILE_WIDTH
+};
+
+void drawObs(void) {
+	// obst.img = (short *) water_img.pixel_data;
+	// obst.lane = 48;
+	// obst.colPos = -1 * TILE_WIDTH;
+	// int px = 0;
+	// for(int i = 0; i < TILE_HEIGHT; i++) {
+	// 	for(int j = 0; j < TILE_WIDTH; j++) {
+	// 		obst.buff[i] = 
+	// 	}
+	// }
+
+	int i = 0;
+	obst.colPos += 3;
+	for (int y = TILE_HEIGHT * (obst.lane - game.scrollOffset); y < TILE_HEIGHT * (obst.lane -game.scrollOffset + 1); y++)
+	{
+		for (int x = obst.colPos; x < obst.colPos + TILE_WIDTH; x++)
+		{
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+			if(y > 0 && x > 0) {
+				// printf("y: %d\n", y);
+				// printf("x: %d\n", x);
+				game.map.stage[loc] = obst.img[i];
+			}
+			i++;
+		}
+	}
+}
+
 
 /* main function */
 int main(int argc, char *argv[])
@@ -937,7 +976,7 @@ int main(int argc, char *argv[])
 	pauseGame(true);
 	while (!game.quit)
 	{
-		usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
+		usleep(((game.secondsPerFrame) * 100) * 1000); // 30 Frames per second
 		game.elapsedTime += game.secondsPerFrame;
 		game.timeRemaining -= game.secondsPerFrame;
 
@@ -950,6 +989,7 @@ int main(int argc, char *argv[])
 		update();
 		mapBoardToStage(false);
 		updateGameInfo();
+		drawObs();
 		updateFrogLocation();
 		checkPowerUps();
 		drawStageToFrameBuffer();
