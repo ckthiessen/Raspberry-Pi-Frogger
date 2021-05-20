@@ -9,9 +9,10 @@
 #define NUM_MAP_TILES 50
 #define ROW_OF_CASTLE 9
 #define HORIZONTAL_OFFSET 0 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
-#define VERTICAL_OFFSET 3 // Offset vertical rendering by 3 to make room for game statistics
-// #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
- // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
+#define RENDER_EDGE (GAME_WIDTH + TILE_WIDTH)
+#define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
+// Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 // void updateStage(int yOffset, int xOffset, int color);
@@ -19,7 +20,6 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr);
 // void timePt(char timeDigit, short int **time);
 // void movesPt(char movesDigit, short int **moveLeft);
 void digitPtr(char passedDigit, short int **digits);
-
 
 void mapBoardToStage(bool debug);
 void checkCollision(void);
@@ -56,41 +56,69 @@ enum options
 
 enum powerUpTypes
 {
-	none = -1,	// No powerup
-	lifeUp,		// Add a life
-	timeUp,		// Increase time
-	movesUp,	// Increate num moves remaining
-	slowDown	// Slow all moving obstacles
+	none = -1, // No powerup
+	lifeUp,	   // Add a life
+	timeUp,	   // Increase time
+	movesUp,   // Increate num moves remaining
+	slowDown   // Slow all moving obstacles
 };
 
 typedef struct
 {
 	Coordinate powerUpLocation;
-	enum powerUpTypes type; 
+	enum powerUpTypes type;
 } PowerUp;
+
+
+enum obstacleType
+{
+	car,
+	bus,
+	wood,
+	rock,
+	snake
+};
+
+typedef struct
+{
+	// int buff[TILE_HEIGHT * TILE_WIDTH];
+	enum obstacleType type;
+	short lane;
+	int colPos;
+	short * imgs[2];
+	int numImgs;
+} Obstacle;
 
 struct Game
 {
-	short scrollOffset;			// Offset used for vertical scrolling
-	short action;				// Current player action
-	Coordinate frogLocation;	// Frog current location
-	double elapsedTime;			// Current elapsed time
-	double lastPowerUpTime;		// Last time power up was generated
-	PowerUp currentPowerUp;		// Power up to display
-	double secondsPerFrame; 	// Current frame rate
-	int lives;					// Remaining lives
-	int moves;					// Remaining moves
-	double timeRemaining;		// Remaining time
-	Map map;					// Game map
-	bool win;					// Won game
-	bool lose;					// Lost game
-	bool quit;					// Quit game
+	short scrollOffset;		 // Offset used for vertical scrolling
+	short action;			 // Current player action
+	Coordinate frogLocation; // Frog current location
+	double elapsedTime;		 // Current elapsed time
+	double lastPowerUpTime;	 // Last time power up was generated
+	PowerUp currentPowerUp;	 // Power up to display
+	double secondsPerFrame;	 // Current frame rate
+	int lives;				 // Remaining lives
+	int moves;				 // Remaining moves
+	double timeRemaining;	 // Remaining time
+	Map map;				 // Game map
+	bool win;				 // Won game
+	bool lose;				 // Lost game
+	bool quit;				 // Quit game
 	//-----------
 	// int statBarCounter;			// Used to diplay the correct time output
 	int score;
 	int movesMade;
 	char scoreStr[4];
+	Obstacle obstacles[4];
+	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];
 } game;
+
+// obst = {
+// 	(short *) water_img.pixel_data,
+// 	48,
+// 	-1 * TILE_WIDTH
+// };
 
 Map INITIAL_MAP = {
 	{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
@@ -133,14 +161,14 @@ Map INITIAL_MAP = {
 	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
 	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
 	 ".................................................",
-	 "--ac------ac------ac--------ac--------ac------ac-",
-	 "-----ac--------ac--------ac-----ac-------ac------",
-	 "----ac-----ac--------ac-------ac----ac--------ac-",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
 	 "--bmme------------bmme---------bmme------bmme----",
-	 "-----ac----------ac--------ac----ac----cc------ac",
+	 "-------------------------------------------------",
 	 "------bmme--------------bmme---bmme----bmme--bmme",
-	 "--ac------ac------ac--------ac----ac----------ac-",
-	 "-----ac--------ac--------ac--------ac----ac------",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
 	 "-------------------------------------------------",
 	 "................................................."},
 	{0}};
@@ -193,8 +221,8 @@ short laneVelocities[NUM_MAP_TILES] = {
 	2,
 	1,
 	-1,
-	2,
-	1,
+	12,
+	6,
 	0,
 };
 
