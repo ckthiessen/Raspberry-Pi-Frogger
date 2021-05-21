@@ -8,6 +8,7 @@
 #define NUM_RENDERED_TILES 20
 #define NUM_MAP_TILES 50
 #define ROW_OF_CASTLE 9
+#define NUM_OBSTACLES 22
 #define HORIZONTAL_OFFSET 0 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 #define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
 #define RENDER_EDGE (GAME_WIDTH + TILE_WIDTH)
@@ -87,6 +88,7 @@ typedef struct
 	int colPos;
 	short ** imgs;
 	int numImgs;
+	int velocity;
 } Obstacle;
 
 struct Game
@@ -110,7 +112,7 @@ struct Game
 	int score;
 	int movesMade;
 	char scoreStr[4];
-	Obstacle obstacles[6];
+	Obstacle obstacles[NUM_OBSTACLES];
 	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];
 } game;
 
@@ -121,6 +123,7 @@ struct Game
 // };
 
 Map INITIAL_MAP = {
+	// Make holes have safe spots 2-3 wide
 	{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
 	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
 	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
@@ -151,22 +154,22 @@ Map INITIAL_MAP = {
 	 ".......hhhddstdhhhhhhdstddddhh...................",
 	 ".......hhhhddddhhddstdddhhhdhh...................",
 	 ".................................................",
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
 	 ".................................................",
 	 "-------------------------------------------------",
 	 "-------------------------------------------------",
 	 "-------------------------------------------------",
-	 "--bmme------------bmme---------bmme------bmme----",
 	 "-------------------------------------------------",
-	 "------bmme--------------bmme---bmme----bmme--bmme",
+	 ".................................................",
+	 "-------------------------------------------------",
 	 "-------------------------------------------------",
 	 "-------------------------------------------------",
 	 "-------------------------------------------------",

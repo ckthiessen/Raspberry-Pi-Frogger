@@ -262,22 +262,25 @@ void mapBoardToStage(bool debug)
 void checkCollision(void)
 {
 	bool hit = false;
-	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset + 1); y++)
+	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
-		for (int x = (TILE_WIDTH + 1) * (game.frogLocation.col - HORIZONTAL_OFFSET); x < (TILE_WIDTH + 1) * (game.frogLocation.col - HORIZONTAL_OFFSET + 1); x++)
+		for (int x = (TILE_WIDTH + 1) * (game.frogLocation.col - HORIZONTAL_OFFSET); x < (TILE_WIDTH) * (game.frogLocation.col - HORIZONTAL_OFFSET + 1); x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-			if(game.collisionBuffer[loc] == 1) {
+			if (game.collisionBuffer[loc] == 1)
+			{
 				hit = true;
 				resetFrogPosition();
 				game.lives--;
 				break;
 			}
 		}
-		if(hit) { break; }
+		if (hit)
+		{
+			break;
+		}
 	}
-	
-	
+
 	// if (
 	// 	obstacle == 'c' ||
 	// 	obstacle == 'a' ||
@@ -584,9 +587,6 @@ void resetFrogPosition(void)
 	game.action = -1;
 	game.frogLocation = FROG_START;
 }
-
-
-
 
 void updateFrogLocation(void)
 {
@@ -943,77 +943,116 @@ void updateGameInfo(void)
 	}
 }
 
-Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos)
+Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int velocity)
 {
-	srand(time(NULL));
 	int numImgs;
-	short ** imgs;
+	short **imgs;
 	// Remember to free mem
-	switch (type) {
-		case car: 
-			numImgs = 2;
-			imgs = malloc(numImgs * sizeof(short *));
-			imgs[0] = carBackPtr;
-			imgs[1] = carFrontPtr;
-			break;
-		case bus:
-			printf("HERE");
-			numImgs = 4;
-			imgs = malloc(numImgs * sizeof(short *));
-			imgs[0] = busFrontPtr;
-			imgs[1] = busMidPtr;
-			imgs[2] = busMidPtr;
-			imgs[3] = busBackPtr;
-			break;
-		case wood:
-			break;
-		case rock:
-			break;
-		case snake:
-			break;
-	}
-	return (Obstacle)
+	switch (type)
 	{
+	case car:
+		numImgs = 2;
+		imgs = malloc(numImgs * sizeof(short *));
+		imgs[0] = carBackPtr;
+		imgs[1] = carFrontPtr;
+		break;
+	case bus:
+		numImgs = 4;
+		imgs = malloc(numImgs * sizeof(short *));
+		imgs[0] = busFrontPtr;
+		imgs[1] = busMidPtr;
+		imgs[2] = busMidPtr;
+		imgs[3] = busBackPtr;
+		break;
+	case wood:
+		break;
+	case rock:
+		break;
+	case snake:
+		break;
+	}
+	return (Obstacle){
 		.type = type,
 		.lane = lane,
 		// .colPos = ((rand() % 20) * 2) * TILE_WIDTH,
 		.colPos = colPos,
 		.imgs = imgs,
-		.numImgs = numImgs
-	};
+		.numImgs = numImgs,
+		.velocity = velocity};
 }
+
+// void initializeLane(void) {
+
+// 	for (int i = 0; i < numObstacles; i++)
+// 	{
+// 		/* code */
+// 	}
+
+// }
 
 void initializeObstacles(void)
 {
+	// Refactor
+	srand(time(NULL));
 	int startPos = 0;
 	for (int i = 0; i < 4; i++)
 	{
-		startPos += i * TILE_WIDTH * 3;
-		game.obstacles[i] = obstacleFactory(car, 48, startPos % GAME_WIDTH);
+		startPos += TILE_WIDTH * (rand() % 3 + 2);
+		game.obstacles[i] = obstacleFactory(car, 48, startPos % GAME_WIDTH, 9);
 	}
 
 	startPos = 0;
 	for (int i = 4; i < 6; i++)
 	{
-		startPos += i * TILE_WIDTH * 5;
-		game.obstacles[i] = obstacleFactory(bus, 47, startPos % GAME_WIDTH);
+		startPos += TILE_WIDTH * (rand() % 6 + 4);
+		game.obstacles[i] = obstacleFactory(bus, 47, startPos % GAME_WIDTH, -4);
 	}
-	for (size_t i = 0; i < 6; i++)
+
+	startPos = 0;
+	for (int i = 6; i < 10; i++)
 	{
-		printf("%d\n", game.obstacles->numImgs);
+		startPos += TILE_WIDTH * (rand() % 4 + 2);
+		game.obstacles[i] = obstacleFactory(car, 46, startPos % GAME_WIDTH, 6);
 	}
-	
-	
+
+	startPos = 0;
+	for (int i = 10; i < 14; i++)
+	{
+		startPos += TILE_WIDTH * (rand() % 4 + 2);
+		game.obstacles[i] = obstacleFactory(car, 45, startPos % GAME_WIDTH, 8);
+	}
+
+	startPos = 0;
+	for (int i = 14; i < 16; i++)
+	{
+		startPos += TILE_WIDTH * (rand() % 6 + 4);
+		game.obstacles[i] = obstacleFactory(bus, 43, startPos % GAME_WIDTH, -4);
+	}
+
+	startPos = 0;
+	for (int i = 16; i < 20; i++)
+	{
+		startPos += TILE_WIDTH * (rand() % 4 + 2);
+		game.obstacles[i] = obstacleFactory(car, 42, startPos % GAME_WIDTH, 10);
+	}
+
+	startPos = 0;
+	for (int i = 20; i < 22; i++)
+	{
+		startPos += TILE_WIDTH * (rand() % 6 + 4);
+		game.obstacles[i] = obstacleFactory(bus, 41, startPos % GAME_WIDTH, -6);
+	}
+
 }
 
 void drawObs(void)
 {
 	// TODO: ONLY RENDER IF IN VIEWPORT
-	for (int obstNo = 0; obstNo < 6; obstNo++)
+	for (int obstNo = 0; obstNo < NUM_OBSTACLES; obstNo++)
 	{
-		game.obstacles[obstNo].colPos += (9 + (GAME_WIDTH + TILE_WIDTH)) % (GAME_WIDTH + TILE_WIDTH);
+		game.obstacles[obstNo].colPos =
+			(game.obstacles[obstNo].colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
 		Obstacle obst = game.obstacles[obstNo];
-		// obst.colPos = ((obst.colPos + 9) + (GAME_WIDTH + TILE_WIDTH)) % (GAME_WIDTH + TILE_WIDTH);
 		for (int imgNo = 0; imgNo < obst.numImgs; imgNo++)
 		{
 			int i = 0;
@@ -1052,19 +1091,20 @@ void initializeGame(void)
 	game.movesMade = 0;
 }
 
-void clearCollisionBuffer(void) {
-	for (int i = 0; i < GAME_HEIGHT; i++)
-	{
-		for (int j = 0; j < GAME_WIDTH; j++)
-		{
-			if(game.collisionBuffer[(i * GAME_WIDTH) + j] == 1) {
-				// printf("x: %d\n", i);
-				// printf("y: %d\n", j);
-			}
-		}
-		
-	}
-	
+void clearCollisionBuffer(void)
+{
+	// for (int i = 0; i < GAME_HEIGHT; i++)
+	// {
+	// 	for (int j = 0; j < GAME_WIDTH; j++)
+	// 	{
+	// 		if(game.collisionBuffer[(i * GAME_WIDTH) + j] == 1) {
+	// 			// printf("x: %d\n", i);
+	// 			// printf("y: %d\n", j);
+	// 		}
+	// 	}
+
+	// }
+
 	memset(game.collisionBuffer, 0, (GAME_WIDTH * GAME_HEIGHT) * sizeof(short));
 }
 
