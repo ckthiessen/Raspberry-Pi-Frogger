@@ -261,19 +261,20 @@ void mapBoardToStage(bool debug)
 
 void checkCollision(void)
 {
-
+	bool hit = false;
 	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
 		for (int x = (TILE_WIDTH + 1) * (game.frogLocation.col - HORIZONTAL_OFFSET); x < (TILE_WIDTH + 1) * (game.frogLocation.col - HORIZONTAL_OFFSET + 1); x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
 			if(game.collisionBuffer[loc] == 1) {
+				hit = true;
 				resetFrogPosition();
 				game.lives--;
 				break;
 			}
 		}
-		
+		if(hit) { break; }
 	}
 	
 	
@@ -584,45 +585,8 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
-Obstacle obstacleFactory(void)
-{
-	return (Obstacle)
-	{
-		.type = car,
-		.lane = 48,
-		.colPos = ((rand() % 20) * 2) * TILE_WIDTH,
-		.imgs[0] = carBackPtr,
-		.imgs[1] = carFrontPtr,
-		.numImgs = 2
-	};
-}
 
-void initializeObstacles(void)
-{
-	srand(time(NULL));
 
-	for (int i = 0; i < 4; i++)
-	{
-		game.obstacles[i] = obstacleFactory();
-	}
-}
-
-void initializeGame(void)
-{
-	resetFrogPosition();
-	initializeObstacles();
-	game.elapsedTime = 0.0;
-	game.lastPowerUpTime = 0.0;
-	game.currentPowerUp.type = none;
-	game.secondsPerFrame = 1.0 / 30.0;
-	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
-	game.lives = 3;
-	game.moves = 250;
-	game.map = INITIAL_MAP;
-	//-----------------------
-	game.score = 0;
-	game.movesMade = 0;
-}
 
 void updateFrogLocation(void)
 {
@@ -979,10 +943,73 @@ void updateGameInfo(void)
 	}
 }
 
+Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos)
+{
+	srand(time(NULL));
+	int numImgs;
+	short ** imgs;
+	// Remember to free mem
+	switch (type) {
+		case car: 
+			numImgs = 2;
+			imgs = malloc(numImgs * sizeof(short *));
+			imgs[0] = carBackPtr;
+			imgs[1] = carFrontPtr;
+			break;
+		case bus:
+			printf("HERE");
+			numImgs = 4;
+			imgs = malloc(numImgs * sizeof(short *));
+			imgs[0] = busFrontPtr;
+			imgs[1] = busMidPtr;
+			imgs[2] = busMidPtr;
+			imgs[3] = busBackPtr;
+			break;
+		case wood:
+			break;
+		case rock:
+			break;
+		case snake:
+			break;
+	}
+	return (Obstacle)
+	{
+		.type = type,
+		.lane = lane,
+		// .colPos = ((rand() % 20) * 2) * TILE_WIDTH,
+		.colPos = colPos,
+		.imgs = imgs,
+		.numImgs = numImgs
+	};
+}
+
+void initializeObstacles(void)
+{
+	int startPos = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		startPos += i * TILE_WIDTH * 3;
+		game.obstacles[i] = obstacleFactory(car, 48, startPos % GAME_WIDTH);
+	}
+
+	startPos = 0;
+	for (int i = 4; i < 6; i++)
+	{
+		startPos += i * TILE_WIDTH * 5;
+		game.obstacles[i] = obstacleFactory(bus, 47, startPos % GAME_WIDTH);
+	}
+	for (size_t i = 0; i < 6; i++)
+	{
+		printf("%d\n", game.obstacles->numImgs);
+	}
+	
+	
+}
+
 void drawObs(void)
 {
 	// TODO: ONLY RENDER IF IN VIEWPORT
-	for (int obstNo = 0; obstNo < 4; obstNo++)
+	for (int obstNo = 0; obstNo < 6; obstNo++)
 	{
 		game.obstacles[obstNo].colPos += (9 + (GAME_WIDTH + TILE_WIDTH)) % (GAME_WIDTH + TILE_WIDTH);
 		Obstacle obst = game.obstacles[obstNo];
@@ -1006,6 +1033,23 @@ void drawObs(void)
 			}
 		}
 	}
+}
+
+void initializeGame(void)
+{
+	resetFrogPosition();
+	initializeObstacles();
+	game.elapsedTime = 0.0;
+	game.lastPowerUpTime = 0.0;
+	game.currentPowerUp.type = none;
+	game.secondsPerFrame = SECONDS_PER_FRAME;
+	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
+	game.lives = 3;
+	game.moves = 250;
+	game.map = INITIAL_MAP;
+	//-----------------------
+	game.score = 0;
+	game.movesMade = 0;
 }
 
 void clearCollisionBuffer(void) {

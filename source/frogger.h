@@ -85,7 +85,7 @@ typedef struct
 	enum obstacleType type;
 	short lane;
 	int colPos;
-	short * imgs[2];
+	short ** imgs;
 	int numImgs;
 } Obstacle;
 
@@ -110,7 +110,7 @@ struct Game
 	int score;
 	int movesMade;
 	char scoreStr[4];
-	Obstacle obstacles[4];
+	Obstacle obstacles[6];
 	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];
 } game;
 
