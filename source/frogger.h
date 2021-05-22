@@ -40,7 +40,7 @@ typedef struct
 	unsigned short row, col;
 } Coordinate;
 
-Coordinate FROG_START = {49, 19};
+Coordinate FROG_START = {49, 9};
 
 typedef struct
 {

@@ -504,10 +504,10 @@ void moveFrog(int direction)
 		{
 			game.frogLocation.row++;
 			moved = true;
-			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
+			if (game.frogLocation.row >= 10)
 			{
 
-				game.scrollOffset++;
+				game.scrollOffset = game.scrollOffset + 1 < 30 ? game.scrollOffset + 1 : 30;
 			}
 		}
 		break;
@@ -1022,7 +1022,7 @@ void initializeObstacles(void)
 	initializeLane(wood, 2, 35, 4);
 }
 
-bool obstacleInViewPort(int lane) {
+bool obstacleInView(int lane) {
 	if(lane < game.frogLocation.row + game.scrollOffset || 
 	   lane > game.frogLocation.row - game.scrollOffset) {
 		   return true;
@@ -1030,7 +1030,7 @@ bool obstacleInViewPort(int lane) {
 	   return false;
 }
 
-void drawObs(void)
+void drawObstacles(void)
 {
 	// TODO: ONLY RENDER IF IN VIEWPORT
 	for (int obstNo = 0; obstNo < NUM_OBSTACLES; obstNo++)
@@ -1038,7 +1038,7 @@ void drawObs(void)
 		game.obstacles[obstNo].colPos =
 			(game.obstacles[obstNo].colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
 		Obstacle obst = game.obstacles[obstNo];
-		if(obstacleInViewPort(obst.lane))
+		if(obstacleInView(obst.lane))
 		{
 			// Only render if obstacle is in view
 			for (int imgNo = 0; imgNo < obst.numImgs; imgNo++)
@@ -1124,10 +1124,10 @@ int main(int argc, char *argv[])
 		update();
 		mapBoardToStage(false);
 		updateGameInfo();
-		drawObs();
+		drawObstacles();
 		updateFrogLocation();
 		checkPowerUps();
-		checkCollision();
+		// checkCollision();
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}
