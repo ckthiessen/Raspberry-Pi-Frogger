@@ -8,7 +8,7 @@
 #define NUM_RENDERED_TILES 20
 #define NUM_MAP_TILES 50
 #define ROW_OF_CASTLE 9
-#define NUM_OBSTACLES 37
+#define NUM_OBSTACLES 38
 #define HORIZONTAL_OFFSET 0 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 #define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
 #define RENDER_EDGE (GAME_WIDTH + TILE_WIDTH)
@@ -37,10 +37,12 @@ void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
 
 typedef struct
 {
-	unsigned short row, col;
+	short row;
+	int col;
 } Coordinate;
 
-Coordinate FROG_START = {49, 9};
+// Coordinate FROG_START = {49, 9 * TILE_WIDTH};
+Coordinate FROG_START = {49, 9 };
 
 typedef struct
 {
@@ -117,11 +119,6 @@ struct Game
 	int obstaclesInitialized;
 } game;
 
-// obst = {
-// 	(short *) water_img.pixel_data,
-// 	48,
-// 	-1 * TILE_WIDTH
-// };
 
 Map INITIAL_MAP = {
 	// Make holes have safe spots 2-3 wide

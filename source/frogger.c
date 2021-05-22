@@ -588,6 +588,26 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
+// void drawFrogToBuffer(void)
+// {
+// 	// Only render if obstacle is in view
+// 	for (int y = TILE_HEIGHT * ( - game.scrollOffset); y < TILE_HEIGHT * (obst.lane - game.scrollOffset + 1); y++)
+// 	{
+// 		int imgOffset = imgNo * TILE_WIDTH;
+// 		for (int x = obst.colPos + imgOffset; x < (obst.colPos + TILE_WIDTH) + imgOffset; x++)
+// 		{
+// 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+// 			if (y > 0 && x > 0)
+// 			{
+// 				game.collisionBuffer[loc] = 1;
+// 				game.map.stage[loc] = obst.imgs[imgNo][i];
+// 			}
+// 			i++;
+// 		}
+// 	}
+// }
+
+
 void updateFrogLocation(void)
 {
 	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
@@ -966,7 +986,7 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		imgs[3] = busBackPtr;
 		break;
 	case wood:
-		numImgs = (rand() % 3) + 2; // Log is random number between 2 and 4 long
+		numImgs = (rand() % 3) + 2; // Log is random number between 2 and 4 tiles long
 		imgs = malloc(numImgs * sizeof(short *));
 		for (int i = 0; i < numImgs; i++)
 		{
@@ -974,14 +994,23 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		}
 		break;
 	case rock:
+		numImgs = (rand() % 3) + 2; //  Random number of rocks between 2 and 4 tiles
+		imgs = malloc(numImgs * sizeof(short *));
+		for (int i = 0; i < numImgs; i++)
+		{
+			imgs[i] = boulderPtr;
+		}
 		break;
 	case snake:
+		numImgs = 2;
+		imgs = malloc(numImgs * sizeof(short *));
+		imgs[0] = snakeLeftPtr;
+		imgs[1] = snakeRightPtr;
 		break;
 	}
 	return (Obstacle){
 		.type = type,
 		.lane = lane,
-		// .colPos = ((rand() % 20) * 2) * TILE_WIDTH,
 		.colPos = colPos,
 		.imgs = imgs,
 		.numImgs = numImgs,
@@ -993,7 +1022,6 @@ void initializeLane(enum obstacleType type, int numObstacles, int lane, int velo
 	srand(time(NULL));
 	int startPos = 0;
 	int i = game.obstaclesInitialized;
-	printf("%d\n", i);
 	for (; i < game.obstaclesInitialized + numObstacles; i++)
 	{
 		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
@@ -1020,14 +1048,18 @@ void initializeObstacles(void)
 	initializeLane(wood, 3, 37, 10);
 	initializeLane(wood, 3, 36, -6);
 	initializeLane(wood, 2, 35, 4);
+
+	initializeLane(snake, 1, 34, 14);
 }
 
-bool obstacleInView(int lane) {
-	if(lane < game.frogLocation.row + game.scrollOffset || 
-	   lane > game.frogLocation.row - game.scrollOffset) {
-		   return true;
-	   }
-	   return false;
+bool obstacleInView(int lane)
+{
+	if (lane < game.frogLocation.row + game.scrollOffset ||
+		lane > game.frogLocation.row - game.scrollOffset)
+	{
+		return true;
+	}
+	return false;
 }
 
 void drawObstacles(void)
@@ -1035,10 +1067,14 @@ void drawObstacles(void)
 	// TODO: ONLY RENDER IF IN VIEWPORT
 	for (int obstNo = 0; obstNo < NUM_OBSTACLES; obstNo++)
 	{
-		game.obstacles[obstNo].colPos =
-			(game.obstacles[obstNo].colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
 		Obstacle obst = game.obstacles[obstNo];
-		if(obstacleInView(obst.lane))
+		if(obst.type == snake && ((obst.colPos + game.obstacles[obstNo].velocity + (TILE_WIDTH * obst.numImgs) > GAME_WIDTH) || obst.colPos + game.obstacles[obstNo].velocity < 0)) {
+			// Reverse direction of snake when it reaches end of screen
+			game.obstacles[obstNo].velocity *= -1;  
+		}
+		obst.colPos = (obst.colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
+
+		if (obstacleInView(obst.lane))
 		{
 			// Only render if obstacle is in view
 			for (int imgNo = 0; imgNo < obst.numImgs; imgNo++)
@@ -1060,6 +1096,8 @@ void drawObstacles(void)
 				}
 			}
 		}
+		game.obstacles[obstNo].colPos = obst.colPos;
+		// (game.obstacles[obstNo].colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
 	}
 }
 
