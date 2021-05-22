@@ -8,7 +8,7 @@
 #define NUM_RENDERED_TILES 20
 #define NUM_MAP_TILES 50
 #define ROW_OF_CASTLE 9
-#define NUM_OBSTACLES 22
+#define NUM_OBSTACLES 23
 #define HORIZONTAL_OFFSET 0 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 #define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
 #define RENDER_EDGE (GAME_WIDTH + TILE_WIDTH)
@@ -114,6 +114,7 @@ struct Game
 	char scoreStr[4];
 	Obstacle obstacles[NUM_OBSTACLES];
 	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];
+	int obstaclesInitialized;
 } game;
 
 // obst = {

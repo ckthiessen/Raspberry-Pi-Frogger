@@ -990,59 +990,32 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 
 // }
 
-void initializeObstacles(void)
-{
-	// Refactor
+
+void initializeLane(enum obstacleType type, int numObstacles, int lane, int velocity) {
 	srand(time(NULL));
 	int startPos = 0;
-	for (int i = 0; i < 4; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 3 + 2);
-		game.obstacles[i] = obstacleFactory(car, 48, startPos % GAME_WIDTH, 9);
+	int i = game.obstaclesInitialized;
+	printf("%d\n", i);
+	for(; i < game.obstaclesInitialized + numObstacles; i++) {
+		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
+		startPos += (TILE_WIDTH * obst.numImgs * ((rand() % 5) + 1)) % GAME_WIDTH;
+		obst.colPos = startPos; 
+		game.obstacles[i] = obst;
 	}
+	game.obstaclesInitialized = i;
+}
 
-	startPos = 0;
-	for (int i = 4; i < 6; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 6 + 4);
-		game.obstacles[i] = obstacleFactory(bus, 47, startPos % GAME_WIDTH, -4);
-	}
-
-	startPos = 0;
-	for (int i = 6; i < 10; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 4 + 2);
-		game.obstacles[i] = obstacleFactory(car, 46, startPos % GAME_WIDTH, 6);
-	}
-
-	startPos = 0;
-	for (int i = 10; i < 14; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 4 + 2);
-		game.obstacles[i] = obstacleFactory(car, 45, startPos % GAME_WIDTH, 8);
-	}
-
-	startPos = 0;
-	for (int i = 14; i < 16; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 6 + 4);
-		game.obstacles[i] = obstacleFactory(bus, 43, startPos % GAME_WIDTH, -4);
-	}
-
-	startPos = 0;
-	for (int i = 16; i < 20; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 4 + 2);
-		game.obstacles[i] = obstacleFactory(car, 42, startPos % GAME_WIDTH, 10);
-	}
-
-	startPos = 0;
-	for (int i = 20; i < 22; i++)
-	{
-		startPos += TILE_WIDTH * (rand() % 6 + 4);
-		game.obstacles[i] = obstacleFactory(bus, 41, startPos % GAME_WIDTH, -6);
-	}
-
+void initializeObstacles(void)
+{
+	// Remember to add to NUM_OBSTACLES if adding obstacles
+	initializeLane(car, 4, 48, 9);
+	initializeLane(bus, 2, 47, -4);
+	initializeLane(car, 4, 46, 6);
+	initializeLane(car, 3, 45, 12);
+	initializeLane(bus, 2, 43, -4);
+	initializeLane(car, 4, 42, 10);
+	initializeLane(bus, 2, 41, -6);
+	initializeLane(bus, 2, 41, -8);
 }
 
 void drawObs(void)
@@ -1086,6 +1059,7 @@ void initializeGame(void)
 	game.lives = 3;
 	game.moves = 250;
 	game.map = INITIAL_MAP;
+	game.obstaclesInitialized = 0;
 	//-----------------------
 	game.score = 0;
 	game.movesMade = 0;
