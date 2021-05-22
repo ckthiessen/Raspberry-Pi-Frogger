@@ -1059,8 +1059,7 @@ void initializeObstacles(void)
 
 bool obstacleInView(int lane)
 {
-	if (lane < game.frogLocation.row + game.scrollOffset ||
-		lane > game.frogLocation.row - game.scrollOffset)
+	if (lane > game.scrollOffset && lane < NUM_RENDERED_TILES + game.scrollOffset)
 	{
 		return true;
 	}
@@ -1091,10 +1090,14 @@ void drawObstacles(void)
 					for (int x = obst.colPos + imgOffset; x < (obst.colPos + TILE_WIDTH) + imgOffset; x++)
 					{
 						int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-						if (y > 0 && x > 0)
+						if (loc > 0)
 						{
 							game.collisionBuffer[loc] = 1;
 							game.map.stage[loc] = obst.imgs[imgNo][i];
+						} else {
+							printf("%d\n", x);
+							printf("%d\n", y);
+
 						}
 						i++;
 					}

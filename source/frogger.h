@@ -34,6 +34,7 @@ void resetFrogPosition(void);
 void updateFrogLocation(void);
 void initializeGame(void);
 void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
+int getRandomBetweenRange(int, int);
 
 typedef struct
 {
