@@ -250,6 +250,8 @@ int sampleController(void)
     // Get gpio pointer
     gpioPtr = getGPIOPtr();
 
+    printf("gpio ptr = %d\n", (int )gpioPtr);
+
     // Initialize the SNES controller
     init_GPIO();
 

@@ -10,6 +10,8 @@ unsigned int *getGPIOPtr(void)
 {
 	int fdgpio = open("/dev/gpiomem", O_RDWR);
 	
+	printf("fdgpio HERE: %d\n", fdgpio);
+
 	if (fdgpio <0) {
 		printf("unable to open");
 	}

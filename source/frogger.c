@@ -56,6 +56,7 @@
 #include "images/obstacles/pit.h"
 #include "images/obstacles/snake_left_head.h"
 #include "images/obstacles/snake_right_head.h"
+#include "images/obstacles/snake_mid.h"
 #include "images/obstacles/water.h"
 #include "images/obstacles/desert.h"
 #include "images/obstacles/black_road.h"
@@ -116,6 +117,7 @@ short int *logPtr = (short int *)log_image.pixel_data;
 short int *pitPtr = (short int *)pit_img.pixel_data;
 short int *snakeLeftPtr = (short int *)snake_left.pixel_data;
 short int *snakeRightPtr = (short int *)snake_right.pixel_data;
+short int *snakeMidPtr = (short int *)snake_mid_img.pixel_data;
 short int *waterPtr = (short int *)water_img.pixel_data;
 short int *desertPtr = (short int *)desert_img.pixel_data;
 short int *blackRoadPtr = (short int *)black_road_img.pixel_data;
@@ -688,7 +690,6 @@ void checkEndCondition(void) {
 		game.quit = true;
 	}
 }
-
 
 //--------------------------------------------
 
