@@ -576,6 +576,8 @@ void *getUserInput(void *arg)
 			buttonPress == SELECT)
 		{
 			game.action = buttonPress;
+			// If start pressed, sleep for half a second to not immediately unpause
+			if(buttonPress == START) { usleep(250*1000); }
 		}
 	}
 	return NULL;
@@ -620,8 +622,7 @@ void updateFrogLocation(void)
 
 PowerUp generateRandomPowerUp(void)
 {
-	srand(time(NULL));
-	enum powerUpTypes type = rand() % 4;
+	enum powerUpTypes type = getRandomBetweenRange(0, 4);
 
 	Coordinate coord;
 	coord.col = (rand() % NUM_RENDERED_TILES) + HORIZONTAL_OFFSET;
@@ -629,7 +630,8 @@ PowerUp generateRandomPowerUp(void)
 
 	return (PowerUp){
 		.powerUpLocation = coord,
-		.type = type};
+		.type = type
+	};
 }
 
 void displayPowerUp(void)
@@ -965,7 +967,6 @@ void updateGameInfo(void)
 
 Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int velocity)
 {
-	srand(time(NULL));
 	int numImgs;
 	short **imgs;
 	// Remember to free mem
@@ -986,7 +987,7 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		imgs[3] = busBackPtr;
 		break;
 	case wood:
-		numImgs = (rand() % 3) + 2; // Log is random number between 2 and 4 tiles long
+		numImgs = getRandomBetweenRange(2, 4); // Log is random number between 2 and 4 tiles long
 		imgs = malloc(numImgs * sizeof(short *));
 		for (int i = 0; i < numImgs; i++)
 		{
@@ -994,7 +995,7 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		}
 		break;
 	case rock:
-		numImgs = (rand() % 3) + 2; //  Random number of rocks between 2 and 4 tiles
+		numImgs = getRandomBetweenRange(2, 4); //  Random number of rocks between 2 and 4 tiles
 		imgs = malloc(numImgs * sizeof(short *));
 		for (int i = 0; i < numImgs; i++)
 		{
@@ -1017,15 +1018,19 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		.velocity = velocity};
 }
 
+int getRandomBetweenRange(int low, int high) {
+	return (rand() % (high)) + low;
+}
+
 void initializeLane(enum obstacleType type, int numObstacles, int lane, int velocity)
 {
-	srand(time(NULL));
 	int startPos = 0;
 	int i = game.obstaclesInitialized;
 	for (; i < game.obstaclesInitialized + numObstacles; i++)
 	{
 		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
-		startPos += (TILE_WIDTH * obst.numImgs * ((rand() % 5) + 1)) % GAME_WIDTH;
+		// int direction = velocity > 0 ? 1 : -1;
+		startPos += (TILE_WIDTH * obst.numImgs * getRandomBetweenRange(1, 3)) % GAME_WIDTH;
 		obst.colPos = startPos;
 		game.obstacles[i] = obst;
 	}
@@ -1141,6 +1146,7 @@ int main(int argc, char *argv[])
 {
 	/* initialize + get FBS */
 	framebufferstruct = initFbInfo();
+	srand(time(NULL));
 
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
