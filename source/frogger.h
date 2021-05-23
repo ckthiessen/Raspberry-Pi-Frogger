@@ -6,6 +6,7 @@
 #define TILE_HEIGHT 36
 #define TILE_WIDTH 64
 #define NUM_RENDERED_TILES 20
+#define POWERUP_TIME_INTERVAL 1
 #define NUM_MAP_TILES 50
 #define ROW_OF_CASTLE 9
 #define NUM_OBSTACLES 80
@@ -35,6 +36,7 @@ void updateFrogLocation(void);
 void initializeGame(void);
 void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
 int getRandomBetweenRange(int, int);
+void applyPowerUp(void);
 
 typedef struct
 {

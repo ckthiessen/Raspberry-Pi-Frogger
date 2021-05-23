@@ -152,7 +152,8 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-			if (loc > 0) {
+			if (loc > 0)
+			{
 				game.collisionBuffer[loc] = type;
 				game.map.stage[loc] = img_ptr[i];
 			}
@@ -169,7 +170,7 @@ void drawBackground(void)
 		{
 			char tile = game.map.board[row][col];
 			short int *ptr;
-			enum CollisionType type; 
+			enum CollisionType type;
 			switch (tile)
 			{
 			// road
@@ -234,21 +235,28 @@ void drawBackground(void)
 
 void checkCollision(void)
 {
-	bool hit = false;
+	bool collision = false;
 	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
 		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-			if (game.collisionBuffer[loc] == 1)
+			// if (game.collisionBuffer[loc] == death)
+			// {
+			// 	collision = true;
+			// 	resetFrogPosition();
+			// 	game.lives--;
+			// 	break;
+			// }
+			if (game.collisionBuffer[loc] == powerUp)
 			{
-				hit = true;
-				resetFrogPosition();
-				game.lives--;
-				break;
+				collision = true;
+				applyPowerUp();
+				game.score += 50;
+				game.currentPowerUp.type = none;
 			}
 		}
-		if (hit)
+		if (collision)
 		{
 			break;
 		}
@@ -511,26 +519,31 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
-void drawFrog(void)
+void drawTile(short *img, int yOffset, int xOffset)
 {
 	int i = 0;
-	for (int y = TILE_HEIGHT * (game.frogLocation.row - game.scrollOffset); y < TILE_HEIGHT * (game.frogLocation.row - game.scrollOffset + 1); y++)
+	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 	{
-		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
+		for (int x = xOffset; x < xOffset + TILE_WIDTH; x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
 			if (loc > 0)
 			{
-				game.map.stage[loc] = frogPtr[i];
+				game.map.stage[loc] = img[i];
 			}
 			i++;
 		}
 	}
 }
 
+void drawFrog(void)
+{
+	drawTile(frogPtr, game.frogLocation.row, game.frogLocation.col);
+}
+
 void updateFrogLocation(void)
 {
-	// Could improve efficiency by skipping to logs 
+	// Could improve efficiency by skipping to logs
 	// instead of iterating over all obstacles but this is easier for development
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
@@ -539,16 +552,16 @@ void updateFrogLocation(void)
 		{
 			// If we are on the same lane as a log or rock
 			// and the frog is between the start of a log and the end of a log
-			// Add its velocity to the frogs velocity 
+			// Add its velocity to the frogs velocity
 			if (obst.lane == game.frogLocation.row &&
 				(game.frogLocation.col > obst.colPos - 1 &&
 				 game.frogLocation.col < obst.colPos + (obst.numImgs * TILE_WIDTH)))
-				 {
-					 // Still a little bugged but mostly working
-					 // Isaac test out the log carry and see if you can fix it
-					 game.frogLocation.col = ((game.frogLocation.col + obst.velocity) + GAME_WIDTH) % GAME_WIDTH;
-					 break;
-				 }
+			{
+				// Still a little bugged but mostly working
+				// Isaac test out the log carry and see if you can fix it
+				game.frogLocation.col = ((game.frogLocation.col + obst.velocity) + GAME_WIDTH) % GAME_WIDTH;
+				break;
+			}
 		}
 	}
 	drawFrog();
@@ -560,7 +573,9 @@ PowerUp generateRandomPowerUp(void)
 
 	Coordinate coord;
 	coord.col = (rand() % NUM_RENDERED_TILES) + HORIZONTAL_OFFSET;
-	coord.row = (rand() % NUM_RENDERED_TILES) + game.scrollOffset;
+
+	// Always render powerup on screen
+	coord.row = min(max(0, (rand() % NUM_RENDERED_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_MAP_TILES - 1);
 
 	return (PowerUp){
 		.powerUpLocation = coord,
@@ -572,7 +587,7 @@ void displayPowerUp(void)
 	int row = game.currentPowerUp.powerUpLocation.row;
 	int col = game.currentPowerUp.powerUpLocation.col;
 
-	short * img; 
+	short *img;
 	switch (game.currentPowerUp.type)
 	{
 	case lifeUp:
@@ -591,7 +606,21 @@ void displayPowerUp(void)
 		break;
 	}
 	updateStage(row, col, img, powerUp);
+}
 
+void slowAllObstacles(void)
+{
+	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
+	{
+		if(game.obstacles[obstNum].velocity < -4 || game.obstacles[obstNum].velocity > 4)
+		{
+			game.obstacles[obstNum].velocity = game.obstacles[obstNum].velocity > 0
+												? game.obstacles[obstNum].velocity - 2
+												: game.obstacles[obstNum].velocity + 2;
+		}
+
+	}
+	
 }
 
 int ones;
@@ -601,20 +630,16 @@ void applyPowerUp(void)
 	switch (game.currentPowerUp.type)
 	{
 	case lifeUp:
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		game.lives++; // Add another life
 		break;
 	case timeUp:
 		game.timeRemaining += 60.0; // Add another minute of game time
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case movesUp:
 		game.moves += 50; // Add 50 moves
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case slowDown:
-		game.secondsPerFrame *= 1.20; // Slow down time 20%
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
+		slowAllObstacles(); // Slow all obstacles velocity
 		break;
 	default:
 		break;
@@ -623,20 +648,14 @@ void applyPowerUp(void)
 
 void checkPowerUps(void)
 {
-	if ((game.lastPowerUpTime + 30.0) - game.elapsedTime < 0)
+	if ((game.lastPowerUpTime + POWERUP_TIME_INTERVAL) - game.elapsedTime < 0)
 	{
 		game.lastPowerUpTime = game.elapsedTime;
 		PowerUp newPowerup = generateRandomPowerUp();
 		game.currentPowerUp.powerUpLocation = newPowerup.powerUpLocation;
 		game.currentPowerUp.type = newPowerup.type;
 	}
-	if (game.frogLocation.col == game.currentPowerUp.powerUpLocation.col &&
-		game.frogLocation.row == game.currentPowerUp.powerUpLocation.row)
-	{
-		applyPowerUp();
-		game.score += 50;
-		game.currentPowerUp.type = none;
-	}
+
 	if (game.currentPowerUp.type != none)
 	{
 		displayPowerUp();
@@ -900,7 +919,7 @@ Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int veloc
 {
 	int numImgs;
 	short **imgs;
-	enum CollisionType collisionType; 
+	enum CollisionType collisionType;
 	// Remember to free mem
 	switch (type)
 	{
@@ -953,8 +972,7 @@ Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int veloc
 		.imgs = imgs,
 		.numImgs = numImgs,
 		.velocity = velocity,
-		.collisionType = collisionType
-		};
+		.collisionType = collisionType};
 }
 
 int getRandomBetweenRange(int low, int high)
@@ -1027,7 +1045,6 @@ bool obstacleInView(int lane)
 
 void drawObstacles(void)
 {
-	// TODO: ONLY RENDER IF IN VIEWPORT
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
 		Obstacle obst = game.obstacles[obstNum];
@@ -1128,7 +1145,7 @@ int main(int argc, char *argv[])
 		drawObstacles();
 		updateFrogLocation();
 		checkPowerUps();
-		// checkCollision();
+		checkCollision();
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}
