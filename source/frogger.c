@@ -14,7 +14,6 @@
 //
 // used for game.moves:
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +37,6 @@
 #include "images/menus/pause_menu_restart.h"
 #include "images/menus/you_lose_prompt_w_score.h"
 #include "images/menus/you_win_prompt_w_score.h"
-
 
 #include "images/safe_zone.h"
 #include "images/life_packs/more_lives.h"
@@ -148,217 +146,147 @@ short int *scorePtr = (short int *)score_img.pixel_data;
 short int *timePtr = (short int *)time_img.pixel_data;
 short int *valuePtr = (short int *)value_img.pixel_data;
 
-
-
-void updateStage(int yOffset, int xOffset, short int *img_ptr)
+void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionType type)
 {
 	int i = 0;
-
 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 	{
 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-			if(loc > 0)
+			if (loc > 0)
+			{
+				game.collisionBuffer[loc] = type;
 				game.map.stage[loc] = img_ptr[i];
+			}
 			i++;
 		}
 	}
 }
 
-void mapBoardToStage(bool debug)
+void drawBackground(void)
 {
 	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
-		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
+		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES; col++)
 		{
 			char tile = game.map.board[row][col];
 			short int *ptr;
-			if (debug)
-				printf("%c", tile);
+			enum CollisionType type;
 			switch (tile)
 			{
 			// road
 			case '-':
+				type = safe;
 				ptr = blackRoadPtr;
 				break;
-			// front of bus/semi
-			case 'b':
-				ptr = busFrontPtr;
-				break;
-			// middle of bus/semi
-			case 'm':
-				ptr = busMidPtr;
-				break;
-			// back of bus/semi
-			case 'e':
-				ptr = busBackPtr;
-				break;
-			// front of car
-			case 'c':
-				ptr = carFrontPtr;
-				break;
-			// back of car
-			case 'a':
-				ptr = carBackPtr;
-				break;
-			// log
-			case 'l':
-				ptr = logPtr;
-				break;
-			// rock for lava
-			case 'r':
-				ptr = boulderPtr;
-				break;
 			// hole/pit for snakes and pits
-			case 'h':
+			case 'o':
+				type = death;
 				ptr = pitPtr;
 				break;
-			// left head of snake
-			case 's':
-				ptr = snakeLeftPtr;
-				break;
-			// right head of snake
-			case 't':
-				ptr = snakeRightPtr;
-				break;
 			// desert background for snakes and pits
-			case 'd':
+			case '|':
+				type = safe;
 				ptr = desertPtr;
 				break;
 			// lava
 			case ';':
+				type = death;
 				ptr = lavaPtr;
 				break;
 			// water
 			case ',':
+				type = death;
 				ptr = waterPtr;
 				break;
 			// safe zone
 			case '.':
+				type = safe;
 				ptr = safePtr;
 				break;
 			// castle wall
 			case 'w':
+				type = safe;
 				ptr = castleWallPtr;
 				break;
 			// castle door
-			case 'o':
+			case 'd':
+				type = safe;
 				ptr = castleDoorPtr;
 				break;
 			// castle top
 			case 'p':
+				type = safe;
 				ptr = castleTopPtr;
 				break;
 			// castle sky
 			case '~':
+				type = safe;
 				ptr = castleSkyPtr;
 				break;
 			default:
+				type = safe;
 				ptr = blackRoadPtr;
 				break;
 			}
-			updateStage(row, col, ptr);
+			updateStage(row, col, ptr, type);
 		}
-		if (debug)
-			printf("\n");
 	}
 }
 
 void checkCollision(void)
 {
-	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
-	// Car = 'c' and 'a'
-	// Water = ','
-	// Hole/Pit = 'h'
-	// Snake = 's'
-	// Bus = 'b' and 'm' and 'e'
-	// Lava = ';'
-	// Wall of Castle = 'w'
-	if (
-		obstacle == 'c' ||
-		obstacle == 'a' ||
-		obstacle == ',' ||
-		obstacle == 'h' ||
-		obstacle == 's' ||
-		obstacle == 'b' ||
-		obstacle == 'm' ||
-		obstacle == 'e' ||
-		obstacle == ';' ||
-		obstacle == 'w')
+	bool collision = false;
+	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
-		resetFrogPosition();
-		game.lives--;
-	}
-}
-
-void update(void)
-{
-	char boardBuffer[NUM_MAP_TILES][NUM_MAP_TILES];
-	memcpy(boardBuffer, game.map.board, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	for (int row = 0; row < NUM_MAP_TILES; row++)
-	{
-		for (int col = 0; col < NUM_MAP_TILES; col++)
+		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
-			char prev = '\0';
-			char obstacle = game.map.board[row][col];
-			char background = '\0';
-			char newPos;
-			switch (obstacle)
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+			// if (game.collisionBuffer[loc] == death)
+			// {
+			// 	collision = true;
+			// 	resetFrogPosition();
+			// 	game.lives--;
+			// 	break;
+			// }
+			if (game.collisionBuffer[loc] == powerUp)
 			{
-			case 'c':
-			case 'a':
-			case 'm':
-			case 'e':
-			case 'b':
-				background = '-';
-				break;
-			case 's':
-				background = 'd';
-				newPos = boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES];
-				if (newPos == 'h')
-				{ // Reverse snake direction when they hit a hole or rock
-					laneVelocities[row] = -laneVelocities[row];
-				}
-				break;
-			case 'l':
-				background = ',';
-				break;
-			case 'r':
-				background = ';';
-				break;
-			default:
-				break;
-			}
-			if (background != '\0')
-			{
-				boardBuffer[row][col] = background; //*******
-				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = obstacle;
+				collision = true;
+				applyPowerUp();
+				game.score += 50;
+				game.currentPowerUp.type = none;
 			}
 		}
+		if (collision)
+		{
+			break;
+		}
 	}
-	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	// checkCollision();
 }
 
-void calculateScore(void) {
-	if (game.lives > 0) {
+void calculateScore(void)
+{
+	if (game.lives > 0)
+	{
 		game.score += ((400 - game.movesMade) * 5);
 		game.score += ((500 + game.timeRemaining) * 5);
 		game.score += (200 * game.lives);
 	}
-	
 
 	sprintf(game.scoreStr, "%d", game.score);
 
-	if(game.score < 1000) {
-		memmove(game.scoreStr+1, game.scoreStr, 3);
+	if (game.score < 1000)
+	{
+		memmove(game.scoreStr + 1, game.scoreStr, 3);
 		game.scoreStr[0] = '0';
-		if(game.score < 100) {
-			memmove(game.scoreStr+1, game.scoreStr, 3);
+		if (game.score < 100)
+		{
+			memmove(game.scoreStr + 1, game.scoreStr, 3);
 			game.scoreStr[0] = '0';
-			if(game.score < 10) {
-				memmove(game.scoreStr+1, game.scoreStr, 3);
+			if (game.score < 10)
+			{
+				memmove(game.scoreStr + 1, game.scoreStr, 3);
 				game.scoreStr[0] = '0';
 			}
 		}
@@ -377,11 +305,10 @@ void calculateScore(void) {
 
 	digitPtr(game.scoreStr[3], &calcScorePtr);
 	drawGameInfo(13, 13, calcScorePtr);
-
 }
 
-
-void displayMenu(short * menu, int heightOffset, int widthOffset) {
+void displayMenu(short *menu, int heightOffset, int widthOffset)
+{
 	int i = 0;
 	for (int y = heightOffset; y < GAME_HEIGHT - heightOffset; y++)
 	{
@@ -392,21 +319,24 @@ void displayMenu(short * menu, int heightOffset, int widthOffset) {
 		}
 	}
 
-	if (game.win == true || game.lose == true) calculateScore();
+	if (game.win == true || game.lose == true)
+		calculateScore();
 
 	drawStageToFrameBuffer();
 }
 
-
 void pauseGame(bool isMainMenu)
 {
 	enum options currentOption;
-	short * menu;
-	if (isMainMenu) {
+	short *menu;
+	if (isMainMenu)
+	{
 		menu = mainMenuStartPtr;
 		currentOption = resume;
 		displayMenu(menu, 0, 0);
-	} else {
+	}
+	else
+	{
 		currentOption = restart;
 		menu = pauseMenuRestartPtr;
 		displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
@@ -415,30 +345,36 @@ void pauseGame(bool isMainMenu)
 	bool paused = true;
 	while (paused)
 	{
-		if (game.action == LEFT || game.action == RIGHT) {
-			if (isMainMenu) {
+		if (game.action == LEFT || game.action == RIGHT)
+		{
+			if (isMainMenu)
+			{
 				game.action = -1;
 				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
 				currentOption = menu == mainMenuStartPtr ? resume : quit;
 				displayMenu(menu, 0, 0);
-			} else {
+			}
+			else
+			{
 				game.action = -1;
 				menu = menu == pauseMenuQuitPtr ? pauseMenuRestartPtr : pauseMenuQuitPtr;
-				currentOption = menu == pauseMenuQuitPtr ?  quit : restart;
+				currentOption = menu == pauseMenuQuitPtr ? quit : restart;
 				displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 			}
 			usleep(500 * 1000);
 		}
-		if (game.action == SELECT) {
-			switch (currentOption) {
-				case resume:
-					break;
-				case quit:
-					game.quit = true;
-					break;
-				case restart:
-					initializeGame();
-					break;
+		if (game.action == SELECT)
+		{
+			switch (currentOption)
+			{
+			case resume:
+				break;
+			case quit:
+				game.quit = true;
+				break;
+			case restart:
+				initializeGame();
+				break;
 			}
 			paused = false;
 		}
@@ -450,7 +386,8 @@ void pauseGame(bool isMainMenu)
 	}
 }
 
-void endGame(short * menu) {
+void endGame(short *menu)
+{
 	game.action = NO_ACTION;
 	bool paused = true;
 	displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
@@ -462,6 +399,16 @@ void endGame(short * menu) {
 			usleep(500 * 1000);
 		}
 	}
+}
+
+int max(int a, int b)
+{
+	return a > b ? a : b;
+}
+
+int min(int a, int b)
+{
+	return a < b ? a : b;
 }
 
 void moveFrog(int direction)
@@ -485,38 +432,42 @@ void moveFrog(int direction)
 		{
 			game.frogLocation.row++;
 			moved = true;
-			if (game.frogLocation.row < 40 && game.frogLocation.row >= 10)
+			if (game.frogLocation.row >= 10)
 			{
-				
-				game.scrollOffset++;
+
+				game.scrollOffset = min(game.scrollOffset + 1, 30);
 			}
 		}
 		break;
 	case LEFT:
-		if (game.frogLocation.col > HORIZONTAL_OFFSET)
+		if (game.frogLocation.col > 0)
 		{
 			moved = true;
-			game.frogLocation.col--;
+			game.frogLocation.col = max(game.frogLocation.col - TILE_WIDTH, 0);
 		}
 		break;
 	case RIGHT:
-		if (game.frogLocation.col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET - 1)
+		if (game.frogLocation.col < GAME_WIDTH)
 		{
 			moved = true;
-			game.frogLocation.col++;
+			game.frogLocation.col = min(game.frogLocation.col + TILE_WIDTH, GAME_WIDTH);
 		}
 		break;
 	}
-	if (moved) { 
-		game.moves--; 
+	if (moved)
+	{
+		game.moves--;
 		game.movesMade++;
-		if (game.movesMade <= 50) {
+		if (game.movesMade <= 50)
+		{
 			game.score += 3;
 		}
-		else if (game.movesMade <= 100) {
+		else if (game.movesMade <= 100)
+		{
 			game.score += 2;
 		}
-		else if (game.movesMade <= 150) {
+		else if (game.movesMade <= 150)
+		{
 			game.score += 2;
 		}
 	}
@@ -553,6 +504,11 @@ void *getUserInput(void *arg)
 			buttonPress == SELECT)
 		{
 			game.action = buttonPress;
+			// If start pressed, sleep for half a second to not immediately unpause
+			if (buttonPress == START)
+			{
+				usleep(250 * 1000);
+			}
 		}
 	}
 	return NULL;
@@ -565,40 +521,63 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
-void initializeGame(void)
+void drawTile(short *img, int yOffset, int xOffset)
 {
-	resetFrogPosition();
-	game.elapsedTime = 0.0;
-	game.lastPowerUpTime = 0.0;
-	game.currentPowerUp.type = none;
-	game.secondsPerFrame = 1.0 / 5.0;
-	game.timeRemaining = 60.0 * 3.0;	// Player starts with 5 minutes
-	game.lives = 3;
-	game.moves = 250;
-	game.map = INITIAL_MAP;
-	//-----------------------
-	game.score = 0;
-	game.movesMade = 0;
+	int i = 0;
+	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
+	{
+		for (int x = xOffset; x < xOffset + TILE_WIDTH; x++)
+		{
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+			if (loc > 0)
+			{
+				game.map.stage[loc] = img[i];
+			}
+			i++;
+		}
+	}
+}
+
+void drawFrog(void)
+{
+	drawTile(frogPtr, game.frogLocation.row, game.frogLocation.col);
 }
 
 void updateFrogLocation(void)
 {
-	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
-	if (obstacle == 'l' || obstacle == 'r')
+	// Could improve efficiency by skipping to logs
+	// instead of iterating over all obstacles but this is easier for development
+	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
-		game.frogLocation.col += laneVelocities[game.frogLocation.row];
+		Obstacle obst = game.obstacles[obstNum];
+		if (obst.type == wood || obst.type == rock)
+		{
+			// If we are on the same lane as a log or rock
+			// and the frog is between the start of a log and the end of a log
+			// Add its velocity to the frogs velocity
+			if (obst.lane == game.frogLocation.row &&
+				(game.frogLocation.col > obst.colPos - 1 &&
+				 game.frogLocation.col < obst.colPos + (obst.numImgs * TILE_WIDTH)))
+			{
+				// Still a little bugged but mostly working
+				// Isaac test out the log carry and see if you can fix it
+				game.frogLocation.col = ((game.frogLocation.col + obst.velocity) + GAME_WIDTH) % GAME_WIDTH;
+				break;
+			}
+		}
 	}
-	updateStage(game.frogLocation.row, game.frogLocation.col, frogPtr);
+	drawFrog();
 }
 
 PowerUp generateRandomPowerUp(void)
 {
-	srand(time(NULL));
-	enum powerUpTypes type = rand() % 4;
+	enum powerUpTypes type = getRandomBetweenRange(0, 4);
 
 	Coordinate coord;
 	coord.col = (rand() % NUM_RENDERED_TILES) + HORIZONTAL_OFFSET;
-	coord.row = (rand() % NUM_RENDERED_TILES) + game.scrollOffset;
+
+	// Always render powerup on screen
+	coord.row = min(max(0, (rand() % NUM_RENDERED_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_MAP_TILES - 1);
 
 	return (PowerUp){
 		.powerUpLocation = coord,
@@ -609,26 +588,41 @@ void displayPowerUp(void)
 {
 	int row = game.currentPowerUp.powerUpLocation.row;
 	int col = game.currentPowerUp.powerUpLocation.col;
-	// updateStage(row, col, frogPtr);
 
+	short *img;
 	switch (game.currentPowerUp.type)
 	{
-		case lifeUp:
-			updateStage(row, col, moreLivesPtr);
-			break;
-		case timeUp:
-			updateStage(row, col, moreTimePtr);
-			break;
-		case movesUp:
-			updateStage(row, col, moreStepsPtr);
-			break;
-		case slowDown:
-			updateStage(row, col, slowDownPtr);
-			break;
-		default:
-			updateStage(row, col, moreLivesPtr);
-			break;
+	case lifeUp:
+		img = moreLivesPtr;
+		break;
+	case timeUp:
+		img = moreTimePtr;
+		break;
+	case movesUp:
+		img = moreStepsPtr;
+		break;
+	case slowDown:
+		img = slowDownPtr;
+		break;
+	default:
+		break;
 	}
+	updateStage(row, col, img, powerUp);
+}
+
+void slowAllObstacles(void)
+{
+	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
+	{
+		if(game.obstacles[obstNum].velocity < -4 || game.obstacles[obstNum].velocity > 4)
+		{
+			game.obstacles[obstNum].velocity = game.obstacles[obstNum].velocity > 0
+												? game.obstacles[obstNum].velocity - 2
+												: game.obstacles[obstNum].velocity + 2;
+		}
+
+	}
+	
 }
 
 int ones;
@@ -638,20 +632,16 @@ void applyPowerUp(void)
 	switch (game.currentPowerUp.type)
 	{
 	case lifeUp:
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
-		game.lives++;	// Add another life
+		game.lives++; // Add another life
 		break;
 	case timeUp:
 		game.timeRemaining += 60.0; // Add another minute of game time
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case movesUp:
 		game.moves += 50; // Add 50 moves
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
 		break;
 	case slowDown:
-		game.secondsPerFrame *= 1.20; // Slow down time 20%
-		printf("Hit Powerup: %d\n", game.currentPowerUp.type);
+		slowAllObstacles(); // Slow all obstacles velocity
 		break;
 	default:
 		break;
@@ -660,32 +650,29 @@ void applyPowerUp(void)
 
 void checkPowerUps(void)
 {
-	if ((game.lastPowerUpTime + 30.0) - game.elapsedTime < 0)
+	if ((game.lastPowerUpTime + POWERUP_TIME_INTERVAL) - game.elapsedTime < 0)
 	{
 		game.lastPowerUpTime = game.elapsedTime;
 		PowerUp newPowerup = generateRandomPowerUp();
 		game.currentPowerUp.powerUpLocation = newPowerup.powerUpLocation;
 		game.currentPowerUp.type = newPowerup.type;
 	}
-	if (game.frogLocation.col == game.currentPowerUp.powerUpLocation.col &&
-		game.frogLocation.row == game.currentPowerUp.powerUpLocation.row)
-	{
-		applyPowerUp();
-		game.score += 50;
-		game.currentPowerUp.type = none;
-	}
+
 	if (game.currentPowerUp.type != none)
 	{
 		displayPowerUp();
 	}
 }
 
-void checkEndCondition(void) {
-	if (game.frogLocation.row == ROW_OF_CASTLE) {
+void checkEndCondition(void)
+{
+	if (game.frogLocation.row == ROW_OF_CASTLE)
+	{
 		game.win = true;
 		game.quit = true;
 	}
-	else if (game.lives <= 0 || game.moves <= 0 || game.timeRemaining <= 0) {
+	else if (game.lives <= 0 || game.moves <= 0 || game.timeRemaining <= 0)
+	{
 		game.lose = true;
 		game.quit = true;
 	}
@@ -693,7 +680,8 @@ void checkEndCondition(void) {
 
 //--------------------------------------------
 
-void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
+void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr)
+{
 	int i = 0;
 
 	for (int y = TILE_HEIGHT * yOffset; y < TILE_HEIGHT * (yOffset + 1); y++)
@@ -706,53 +694,55 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr) {
 	}
 }
 
-
-void digitPtr(char passedDigit, short int **digits) {
+void digitPtr(char passedDigit, short int **digits)
+{
 	switch (passedDigit)
 	{
-		case '0':
-			*digits = zeroPtr;
-			break;
-		case '1':
-			*digits = onePtr;
-			break;
-		case '2':
-			*digits = twoPtr;
-			break;
-		case '3':
-			*digits = threePtr;
-			break;
-		case '4':
-			*digits = fourPtr;
-			break;
-		case '5':
-			*digits = fivePtr;
-			break;
-		case '6':
-			*digits = sixPtr;
-			break;
-		case '7':
-			*digits = sevenPtr;
-			break;
-		case '8':
-			*digits = eightPtr;
-			break;
-		case '9':
-			*digits = ninePtr;
-			break;
-		default:
-			*digits = zeroPtr;
-			break;
+	case '0':
+		*digits = zeroPtr;
+		break;
+	case '1':
+		*digits = onePtr;
+		break;
+	case '2':
+		*digits = twoPtr;
+		break;
+	case '3':
+		*digits = threePtr;
+		break;
+	case '4':
+		*digits = fourPtr;
+		break;
+	case '5':
+		*digits = fivePtr;
+		break;
+	case '6':
+		*digits = sixPtr;
+		break;
+	case '7':
+		*digits = sevenPtr;
+		break;
+	case '8':
+		*digits = eightPtr;
+		break;
+	case '9':
+		*digits = ninePtr;
+		break;
+	default:
+		*digits = zeroPtr;
+		break;
 	}
 }
 
-void updateGameInfo(void) {
+void updateGameInfo(void)
+{
 	// game.timeRemaining double converted for string for displaying time
 	char timeStr[50];
 	sprintf(timeStr, "%f", game.timeRemaining);
 
-	if(game.timeRemaining < 100) {
-		memmove(timeStr+1, timeStr, 4);
+	if (game.timeRemaining < 100)
+	{
+		memmove(timeStr + 1, timeStr, 4);
 		timeStr[0] = '0';
 	}
 
@@ -760,11 +750,13 @@ void updateGameInfo(void) {
 	char movesStr[5];
 	sprintf(movesStr, "%d", game.moves);
 
-	if(game.moves < 100) {
-		memmove(movesStr+1, movesStr, 4);
+	if (game.moves < 100)
+	{
+		memmove(movesStr + 1, movesStr, 4);
 		movesStr[0] = '0';
-		if(game.moves < 10) {
-			memmove(movesStr+1, movesStr, 4);
+		if (game.moves < 10)
+		{
+			memmove(movesStr + 1, movesStr, 4);
 			movesStr[0] = '0';
 		}
 	}
@@ -777,160 +769,361 @@ void updateGameInfo(void) {
 	// char scoreStr[4];
 	sprintf(game.scoreStr, "%d", game.score);
 
-	if(game.score < 1000) {
-		memmove(game.scoreStr+1, game.scoreStr, 3);
+	if (game.score < 1000)
+	{
+		memmove(game.scoreStr + 1, game.scoreStr, 3);
 		game.scoreStr[0] = '0';
-		if(game.score < 100) {
-			memmove(game.scoreStr+1, game.scoreStr, 3);
+		if (game.score < 100)
+		{
+			memmove(game.scoreStr + 1, game.scoreStr, 3);
 			game.scoreStr[0] = '0';
-			if(game.score < 10) {
-				memmove(game.scoreStr+1, game.scoreStr, 3);
+			if (game.score < 10)
+			{
+				memmove(game.scoreStr + 1, game.scoreStr, 3);
 				game.scoreStr[0] = '0';
 			}
 		}
 	}
-	
+
 	short int *ptr;
 	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
 	{
 		for (int col = 0; col < NUM_RENDERED_TILES; col++)
 		{
-			if(row == 17)
-			{
-				switch(col)
-				{
-					// score
-					case 2:
-						ptr = scorePtr;
-						break;
-					case 3:
-						digitPtr(game.scoreStr[0], &ptr);
-						break;
-					case 4:
-						digitPtr(game.scoreStr[1], &ptr);
-						break;
-					case 5:
-						digitPtr(game.scoreStr[2], &ptr);
-						break;
-					case 6:
-						digitPtr(game.scoreStr[3], &ptr);
-						break;
-
-					// time
-					case 9:
-						ptr = timePtr;
-						break;
-					// hundreds digits
-					case 10:
-						digitPtr(timeStr[0], &ptr);
-						break;
-					// tens digit
-					case 11:
-						digitPtr(timeStr[1], &ptr);
-						break;
-					// ones digit
-					case 12:
-						digitPtr(timeStr[2], &ptr);
-						break;
-
-					// lives left
-					case 15:
-						ptr = livesPtr;
-						break;
-					case 16:
-						ptr = leftPtr;
-						break;
-					case 17:
-						digitPtr(livesStr[0], &ptr);
-						break;
-	
-					default:
-						ptr = blackRoadPtr;
-						break;
-				}
-			}
-
-			else if(row == 19)
+			if (row == 17)
 			{
 				switch (col)
 				{
-					// moves left
-					case 4:
-						ptr = movesPtr;
-						break;
-					case 5:
-						ptr = leftPtr;
-						break;
-					// hundreds
-					case 6:
-						digitPtr(movesStr[0], &ptr);
-						break;
-					// tens
-					case 7:
-						digitPtr(movesStr[1], &ptr);
-						break;
-					// ones
-					case 8:
-						digitPtr(movesStr[2], &ptr);
-						break;
+				// score
+				case 2:
+					ptr = scorePtr;
+					break;
+				case 3:
+					digitPtr(game.scoreStr[0], &ptr);
+					break;
+				case 4:
+					digitPtr(game.scoreStr[1], &ptr);
+					break;
+				case 5:
+					digitPtr(game.scoreStr[2], &ptr);
+					break;
+				case 6:
+					digitPtr(game.scoreStr[3], &ptr);
+					break;
 
-					// value-pack
-					case 13:
-						ptr = valuePtr;
-						break;
-					case 14:
-						ptr = packPtr;
-						break;
-					case 15:
-						switch (game.currentPowerUp.type)
-						{
-							// case none:
-							case -1:
-								ptr = naPtr;
-								break;
-							// case lifeUp:
-							case 0:
-								ptr = moreLivesPtr;
-								break;
-							// case timeUp:
-							case 1:
-								ptr = moreTimePtr;
-								break;
-							// case movesUp:
-							case 2:
-								ptr = moreStepsPtr;
-								break;
-							// case slowDown:
-							case 3:
-								ptr = slowDownPtr;
-								break;
-							default:
-								ptr = naPtr;
-						}
-						break;
-					
-					default:
-						ptr = blackRoadPtr;
-						break;
+				// time
+				case 9:
+					ptr = timePtr;
+					break;
+				// hundreds digits
+				case 10:
+					digitPtr(timeStr[0], &ptr);
+					break;
+				// tens digit
+				case 11:
+					digitPtr(timeStr[1], &ptr);
+					break;
+				// ones digit
+				case 12:
+					digitPtr(timeStr[2], &ptr);
+					break;
 
+				// lives left
+				case 15:
+					ptr = livesPtr;
+					break;
+				case 16:
+					ptr = leftPtr;
+					break;
+				case 17:
+					digitPtr(livesStr[0], &ptr);
+					break;
+
+				default:
+					ptr = blackRoadPtr;
+					break;
 				}
 			}
-			else ptr = blackRoadPtr;
 
-			// printf("row: %d", row);
-			// printf("col: %d", col);
+			else if (row == 19)
+			{
+				switch (col)
+				{
+				// moves left
+				case 4:
+					ptr = movesPtr;
+					break;
+				case 5:
+					ptr = leftPtr;
+					break;
+				// hundreds
+				case 6:
+					digitPtr(movesStr[0], &ptr);
+					break;
+				// tens
+				case 7:
+					digitPtr(movesStr[1], &ptr);
+					break;
+				// ones
+				case 8:
+					digitPtr(movesStr[2], &ptr);
+					break;
+
+				// value-pack
+				case 13:
+					ptr = valuePtr;
+					break;
+				case 14:
+					ptr = packPtr;
+					break;
+				case 15:
+					switch (game.currentPowerUp.type)
+					{
+					// case none:
+					case -1:
+						ptr = naPtr;
+						break;
+					// case lifeUp:
+					case 0:
+						ptr = moreLivesPtr;
+						break;
+					// case timeUp:
+					case 1:
+						ptr = moreTimePtr;
+						break;
+					// case movesUp:
+					case 2:
+						ptr = moreStepsPtr;
+						break;
+					// case slowDown:
+					case 3:
+						ptr = slowDownPtr;
+						break;
+					default:
+						ptr = naPtr;
+					}
+					break;
+
+				default:
+					ptr = blackRoadPtr;
+					break;
+				}
+			}
+			else
+				ptr = blackRoadPtr;
 
 			drawGameInfo(row, col, ptr);
 		}
 	}
 }
 
+Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int velocity)
+{
+	int numImgs;
+	short **imgs;
+	enum CollisionType collisionType;
+	// Remember to free mem
+	switch (type)
+	{
+	case car:
+		numImgs = 2;
+		imgs = malloc(numImgs * sizeof(short *));
+		imgs[0] = carBackPtr;
+		imgs[1] = carFrontPtr;
+		collisionType = death;
+		break;
+	case bus:
+		numImgs = 4;
+		imgs = malloc(numImgs * sizeof(short *));
+		imgs[0] = busFrontPtr;
+		imgs[1] = busMidPtr;
+		imgs[2] = busMidPtr;
+		imgs[3] = busBackPtr;
+		collisionType = death;
+		break;
+	case wood:
+		numImgs = getRandomBetweenRange(2, 4); // Log is random number between 2 and 4 tiles long
+		imgs = malloc(numImgs * sizeof(short *));
+		for (int i = 0; i < numImgs; i++)
+		{
+			imgs[i] = logPtr;
+		}
+		collisionType = safe;
+		break;
+	case rock:
+		numImgs = getRandomBetweenRange(2, 4); //  Random number of rocks between 2 and 4 tiles
+		imgs = malloc(numImgs * sizeof(short *));
+		for (int i = 0; i < numImgs; i++)
+		{
+			imgs[i] = boulderPtr;
+		}
+		collisionType = safe;
+		break;
+	case snake:
+		numImgs = 2;
+		imgs = malloc(numImgs * sizeof(short *));
+		imgs[0] = snakeLeftPtr;
+		imgs[1] = snakeRightPtr;
+		collisionType = death;
+		break;
+	}
+	return (Obstacle){
+		.type = type,
+		.lane = lane,
+		.colPos = colPos,
+		.imgs = imgs,
+		.numImgs = numImgs,
+		.velocity = velocity,
+		.collisionType = collisionType};
+}
+
+int getRandomBetweenRange(int low, int high)
+{
+	return (rand() % (high)) + low;
+}
+
+void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velocity)
+{
+	int startPos = 0;
+	int i = game.obstaclesInitialized;
+	for (; i < game.obstaclesInitialized + numObstacles; i++)
+	{
+		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
+		startPos += (TILE_WIDTH * obst.numImgs * getRandomBetweenRange(1, 3)) % GAME_WIDTH;
+		obst.colPos = startPos;
+		game.obstacles[i] = obst;
+	}
+	game.obstaclesInitialized = i;
+}
+
+void initializeObstacles(void)
+{
+	// Remember to add to NUM_OBSTACLES if adding obstacles
+	initializeLane(car, 4, 48, 9);
+	initializeLane(bus, 2, 47, -4);
+	initializeLane(car, 4, 46, 6);
+	initializeLane(car, 3, 45, 12);
+	initializeLane(bus, 2, 43, -4);
+	initializeLane(car, 4, 42, 10);
+	initializeLane(bus, 2, 41, -6);
+	initializeLane(bus, 2, 40, -8);
+
+	initializeLane(wood, 3, 38, 6);
+	initializeLane(wood, 3, 37, 10);
+	initializeLane(wood, 3, 36, -6);
+	initializeLane(wood, 2, 35, 5);
+	initializeLane(wood, 3, 34, 7);
+	initializeLane(wood, 3, 33, 4);
+	initializeLane(wood, 2, 32, -5);
+	initializeLane(wood, 3, 31, -8);
+	initializeLane(wood, 3, 30, 5);
+
+	initializeLane(snake, 1, 28, 14);
+	initializeLane(snake, 1, 26, 12);
+	initializeLane(snake, 1, 25, 10);
+	initializeLane(snake, 1, 23, 11);
+	initializeLane(snake, 1, 21, 12);
+	initializeLane(snake, 1, 20, 16);
+
+	initializeLane(rock, 3, 18, -6);
+	initializeLane(rock, 3, 17, 10);
+	initializeLane(rock, 3, 16, 6);
+	initializeLane(rock, 2, 15, -5);
+	initializeLane(rock, 3, 14, -7);
+	initializeLane(rock, 3, 13, 4);
+	initializeLane(rock, 3, 12, -5);
+	initializeLane(rock, 3, 11, -8);
+	initializeLane(rock, 3, 10, 5);
+}
+
+bool obstacleInView(int lane)
+{
+	if (lane > game.scrollOffset && lane < NUM_RENDERED_TILES + game.scrollOffset)
+	{
+		return true;
+	}
+	return false;
+}
+
+void drawObstacles(void)
+{
+	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
+	{
+		Obstacle obst = game.obstacles[obstNum];
+		if (obst.type == snake && ((obst.colPos + game.obstacles[obstNum].velocity + (TILE_WIDTH * obst.numImgs) > GAME_WIDTH) || obst.colPos + game.obstacles[obstNum].velocity < 0))
+		{
+			// Reverse direction of snake when it reaches end of screen
+			game.obstacles[obstNum].velocity *= -1;
+		}
+		obst.colPos = (obst.colPos + game.obstacles[obstNum].velocity + GAME_WIDTH) % GAME_WIDTH;
+
+		if (obstacleInView(obst.lane))
+		{
+			// Only render if obstacle is in view
+			for (int imgNo = 0; imgNo < obst.numImgs; imgNo++)
+			{
+				int i = 0;
+				for (int y = TILE_HEIGHT * (obst.lane - game.scrollOffset); y < TILE_HEIGHT * (obst.lane - game.scrollOffset + 1); y++)
+				{
+					int imgOffset = imgNo * TILE_WIDTH;
+					for (int x = obst.colPos + imgOffset; x < (obst.colPos + TILE_WIDTH) + imgOffset; x++)
+					{
+						int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+						if (loc > 0)
+						{
+							game.collisionBuffer[loc] = obst.collisionType;
+							game.map.stage[loc] = obst.imgs[imgNo][i];
+						}
+						i++;
+					}
+				}
+			}
+		}
+		game.obstacles[obstNum].colPos = obst.colPos;
+	}
+}
+
+void initializeGame(void)
+{
+	resetFrogPosition();
+	initializeObstacles();
+	game.elapsedTime = 0.0;
+	game.lastPowerUpTime = 0.0;
+	game.currentPowerUp.type = none;
+	game.secondsPerFrame = 1 / 120.0;
+	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
+	game.lives = 3;
+	game.moves = 250;
+	game.map = INITIAL_MAP;
+	game.obstaclesInitialized = 0;
+	//-----------------------
+	game.score = 0;
+	game.movesMade = 0;
+}
+
+void clearCollisionBuffer(void)
+{
+	// for (int i = 0; i < GAME_HEIGHT; i++)
+	// {
+	// 	for (int j = 0; j < GAME_WIDTH; j++)
+	// 	{
+	// 		if(game.collisionBuffer[(i * GAME_WIDTH) + j] == 1) {
+	// 			// printf("x: %d\n", i);
+	// 			// printf("y: %d\n", j);
+	// 		}
+	// 	}
+
+	// }
+
+	memset(game.collisionBuffer, 0, (GAME_WIDTH * GAME_HEIGHT) * sizeof(short));
+}
 
 /* main function */
 int main(int argc, char *argv[])
 {
 	/* initialize + get FBS */
 	framebufferstruct = initFbInfo();
+	srand(time(NULL));
 
 	pthread_t controllerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
@@ -938,7 +1131,7 @@ int main(int argc, char *argv[])
 	pauseGame(true);
 	while (!game.quit)
 	{
-		usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
+		// usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
 		game.elapsedTime += game.secondsPerFrame;
 		game.timeRemaining -= game.secondsPerFrame;
 
@@ -948,19 +1141,23 @@ int main(int argc, char *argv[])
 			game.action = -1;
 		}
 
-		update();
-		mapBoardToStage(false);
+		clearCollisionBuffer();
+		drawBackground();
 		updateGameInfo();
+		drawObstacles();
 		updateFrogLocation();
 		checkPowerUps();
+		checkCollision();
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}
 
-	if(game.win) {
+	if (game.win)
+	{
 		endGame(winPromptPtr);
 	}
-	else if(game.lose) {
+	else if (game.lose)
+	{
 		endGame(losePromptPtr);
 	}
 

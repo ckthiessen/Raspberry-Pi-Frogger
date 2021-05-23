@@ -6,12 +6,15 @@
 #define TILE_HEIGHT 36
 #define TILE_WIDTH 64
 #define NUM_RENDERED_TILES 20
+#define POWERUP_TIME_INTERVAL 1
 #define NUM_MAP_TILES 50
 #define ROW_OF_CASTLE 9
-#define HORIZONTAL_OFFSET 9 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
-#define VERTICAL_OFFSET 3 // Offset vertical rendering by 3 to make room for game statistics
-// #define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
- // Time to render a frame such that we have 10 FPS (FOR TESTING)
+#define NUM_OBSTACLES 80
+#define HORIZONTAL_OFFSET 0 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
+#define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
+#define RENDER_EDGE (GAME_WIDTH + TILE_WIDTH)
+#define SECONDS_PER_FRAME 1/30 // Time to render a frame such that we have 30 FPS
+// Time to render a frame such that we have 10 FPS (FOR TESTING)
 // #define SECONDS_PER_FRAME 1 // Time to render a frame such that we have 1 FPS (FOR TESTING)
 
 // void updateStage(int yOffset, int xOffset, int color);
@@ -20,8 +23,7 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr);
 // void movesPt(char movesDigit, short int **moveLeft);
 void digitPtr(char passedDigit, short int **digits);
 
-
-void mapBoardToStage(bool debug);
+void drawBackground(void);
 void checkCollision(void);
 void update(void);
 void pauseGame(bool isMainMenu);
@@ -33,13 +35,16 @@ void resetFrogPosition(void);
 void updateFrogLocation(void);
 void initializeGame(void);
 void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
+int getRandomBetweenRange(int, int);
+void applyPowerUp(void);
 
 typedef struct
 {
-	unsigned short row, col;
+	short row;
+	int col;
 } Coordinate;
 
-Coordinate FROG_START = {49, 19};
+Coordinate FROG_START = {49, 9 * TILE_WIDTH };
 
 typedef struct
 {
@@ -56,43 +61,77 @@ enum options
 
 enum powerUpTypes
 {
-	none = -1,	// No powerup
-	lifeUp,		// Add a life
-	timeUp,		// Increase time
-	movesUp,	// Increate num moves remaining
-	slowDown	// Slow all moving obstacles
+	none = -1, // No powerup
+	lifeUp,	   // Add a life
+	timeUp,	   // Increase time
+	movesUp,   // Increate num moves remaining
+	slowDown   // Slow all moving obstacles
 };
 
 typedef struct
 {
 	Coordinate powerUpLocation;
-	enum powerUpTypes type; 
+	enum powerUpTypes type;
 } PowerUp;
+
+
+enum ObstacleType
+{
+	car,
+	bus,
+	wood,
+	rock,
+	snake
+};
+
+enum CollisionType 
+{
+	safe = 0,
+	death = 1,
+	powerUp = 2
+};
+
+typedef struct
+{
+	// int buff[TILE_HEIGHT * TILE_WIDTH];
+	enum ObstacleType type;
+	short lane;
+	int colPos;
+	short ** imgs;
+	int numImgs;
+	int velocity;
+	enum CollisionType collisionType;
+} Obstacle;
 
 struct Game
 {
-	short scrollOffset;			// Offset used for vertical scrolling
-	short action;				// Current player action
-	Coordinate frogLocation;	// Frog current location
-	double elapsedTime;			// Current elapsed time
-	double lastPowerUpTime;		// Last time power up was generated
-	PowerUp currentPowerUp;		// Power up to display
-	double secondsPerFrame; 	// Current frame rate
-	int lives;					// Remaining lives
-	int moves;					// Remaining moves
-	double timeRemaining;		// Remaining time
-	Map map;					// Game map
-	bool win;					// Won game
-	bool lose;					// Lost game
-	bool quit;					// Quit game
+	short scrollOffset;		 // Offset used for vertical scrolling
+	short action;			 // Current player action
+	Coordinate frogLocation; // Frog current location
+	double elapsedTime;		 // Current elapsed time
+	double lastPowerUpTime;	 // Last time power up was generated
+	PowerUp currentPowerUp;	 // Power up to display
+	double secondsPerFrame;	 // Current frame rate
+	int lives;				 // Remaining lives
+	int moves;				 // Remaining moves
+	double timeRemaining;	 // Remaining time
+	Map map;				 // Game map
+	bool win;				 // Won game
+	bool lose;				 // Lost game
+	bool quit;				 // Quit game
 	//-----------
 	// int statBarCounter;			// Used to diplay the correct time output
 	int score;
 	int movesMade;
 	char scoreStr[4];
+	Obstacle obstacles[NUM_OBSTACLES];
+	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];
+	int obstaclesInitialized;
 } game;
 
+
 Map INITIAL_MAP = {
+	// Make holes have safe spots 2-3 wide
 	{"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
 	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
 	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
@@ -102,100 +141,48 @@ Map INITIAL_MAP = {
 	 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
 	 "ppppppppppppppppppppppppppppppppppppppppppppppppp",
 	 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-	 "wwowwowwowwowwowwowwowwowwowwowwowwowwowwowwowwow",
-	 ";;;;;rr;;;;;;;;;;rrrr;;;;;rrr;;;;rr;;;;rr;;;rrrrr",
-	 ";;;;;;rrrr;;;;;;;;;;;;;;rrrr;;;rrrr;;;;rrrr;;rrrr",
-	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
-	 ";;;;;rrrr;;;;;;rrrr;;;;;;rrr;;;;rrrr;;;;rrr;;rrr;",
-	 ";;;;;rr;;;;;;;;;;rrrr;;;;;rrr;;;;rr;;;;rr;;;rrrrr",
-	 ";;;;;;rrrr;;;;;;;;;;;;;;rrrr;;;rrrr;;;;rrrr;;rrrr",
-	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
-	 ";;;;;rrrr;;;;;;rrrr;;;;;;rrr;;;;rrrr;;;;rrr;;rrr;",
-	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
+	 "wwdwwdwwdwwdwwdwwdwwdwwdwwdwwdwwdwwdwwdwwdwwdwwdw",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
 	 ".................................................",
-	 ".......hhhhdhdhdhhdhhhdhhhhhhh...................",
-	 ".......hhhdstdddhhddstdddhhhhh...................",
-	 ".......hhhhddhddhhhdddddhhhhhh...................",
-	 ".......hhhhdhhdhhhdstdddddhhhd...................",
-	 ".......hhhdstdddddhdddhhddddhh...................",
-	 ".......hhhddddstdddhhdddstddhh...................",
-	 ".......hhhdhhdhhhhdstdddddddhh...................",
-	 ".......hhhddstdhhhhhhdstddddhh...................",
-	 ".......hhhhddddhhddstdddhhhdhh...................",
+	 "|||||||||||||||||||||||||||||||||||||||||||||||||",
+	 "|||||||||||||||||||||||||||||||||||||||||||||||||",
+	 "|||o|||ooo|||o|||ooo|||||||||||||||||||||||||||||",
+	 "|||||||||||||||||||||||||||||||||||||||||||||||||",
+	 "|||oo|||ooo|||ooooo||||||||||||||||||||||||||||||",
+	 "|||||||||||||||||||||||||||||||||||||||||||||||||",
+	 "|||||||||||||||||||||||||||||||||||||||||||||||||",
+	 "oo|||ooo|||ooo|||ooo|||||||||||||||||||||||||||||",
+	 "|||||||||||||||||||||||||||||||||||||||||||||||||",
 	 ".................................................",
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
-	 ",,,,,ll,,,,,,,,,,llll,,,,,lll,,,,ll,,,,ll,,,lllll",
-	 ",,,,,,llll,,,,,,,,,,,,,,llll,,,llll,,,,llll,,llll",
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
-	 ",,,,,llll,,,,,,llll,,,,,,lll,,,,llll,,,,lll,,lll,",
-	 ",,llll,,,,lll,,,,lll,,,,,,,,lll,,llll,ll,,,lllll,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
 	 ".................................................",
-	 "--ac------ac------ac--------ac--------ac------ac-",
-	 "-----ac--------ac--------ac-----ac-------ac------",
-	 "----ac-----ac--------ac-------ac----ac--------ac-",
-	 "--bmme------------bmme---------bmme------bmme----",
-	 "-----ac----------ac--------ac----ac----cc------ac",
-	 "------bmme--------------bmme---bmme----bmme--bmme",
-	 "--ac------ac------ac--------ac----ac----------ac-",
-	 "-----ac--------ac--------ac--------ac----ac------",
-	 "-----------ac--------ac-------ac------ac------ac-",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
+	 ".................................................",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
+	 "-------------------------------------------------",
 	 "................................................."},
 	{0}};
 
-short laneVelocities[NUM_MAP_TILES] = {
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	-1,
-	1,
-	-1,
-	1,
-	1,
-	-1,
-	0,
-	1,
-	-2,
-	-1,
-	-1,
-	2,
-	1,
-	-1,
-	2,
-	1,
-	0,
-};
 
 #endif
