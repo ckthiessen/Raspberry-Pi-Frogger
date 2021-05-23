@@ -10,7 +10,6 @@
 #define NUM_HORIZONTAL_TILES 20
 #define ROW_OF_CASTLE 9
 #define NUM_OBSTACLES 80
-#define HORIZONTAL_OFFSET 0 // Offset horizontal rendering by 10 to eliminate obstacle pop-in
 #define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
 
 // void updateStage(int yOffset, int xOffset, int color);

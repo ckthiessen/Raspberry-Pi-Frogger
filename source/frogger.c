@@ -153,7 +153,7 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 		int i = 0;
 		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 		{
-			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+			for (int x = TILE_WIDTH * xOffset; x < TILE_WIDTH * (xOffset + 1); x++)
 			{
 				int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 				if (loc > 0)
@@ -171,7 +171,7 @@ void drawBackground(void)
 {
 	for (int row = game.scrollOffset; row < NUM_HORIZONTAL_TILES + game.scrollOffset; row++)
 	{
-		for (int col = HORIZONTAL_OFFSET; col < NUM_HORIZONTAL_TILES; col++)
+		for (int col = 0; col < NUM_HORIZONTAL_TILES; col++)
 		{
 			char tile = game.map.board[row][col];
 			short int *ptr;
@@ -246,13 +246,13 @@ void checkCollision(void)
 		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
-			// if (game.collisionBuffer[loc] == death)
-			// {
-			// 	collision = true;
-			// 	resetFrogPosition();
-			// 	game.lives--;
-			// 	break;
-			// }
+			if (game.collisionBuffer[loc] == death)
+			{
+				collision = true;
+				resetFrogPosition();
+				game.lives--;
+				break;
+			}
 			if (game.collisionBuffer[loc] == powerUp)
 			{
 				collision = true;
@@ -577,7 +577,7 @@ PowerUp generateRandomPowerUp(void)
 	enum powerUpTypes type = getRandomBetweenRange(0, 4);
 
 	Coordinate coord;
-	coord.col = (rand() % NUM_HORIZONTAL_TILES) + HORIZONTAL_OFFSET;
+	coord.col = rand() % NUM_HORIZONTAL_TILES;
 
 	// Always render powerup on screen
 	coord.row = min(max(ROW_OF_CASTLE + 1, (rand() % NUM_HORIZONTAL_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_VERTICAL_TILES - 1);
@@ -1115,18 +1115,6 @@ void initializeGame(void)
 
 void clearCollisionBuffer(void)
 {
-	// for (int i = 0; i < GAME_HEIGHT; i++)
-	// {
-	// 	for (int j = 0; j < GAME_WIDTH; j++)
-	// 	{
-	// 		if(game.collisionBuffer[(i * GAME_WIDTH) + j] == 1) {
-	// 			// printf("x: %d\n", i);
-	// 			// printf("y: %d\n", j);
-	// 		}
-	// 	}
-
-	// }
-
 	memset(game.collisionBuffer, 0, (GAME_WIDTH * GAME_HEIGHT) * sizeof(short));
 }
 
