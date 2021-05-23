@@ -155,7 +155,7 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 		{
 			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 			{
-				int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+				int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 				if (loc > 0)
 				{
 					game.collisionBuffer[loc] = type;
@@ -169,9 +169,9 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 
 void drawBackground(void)
 {
-	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
+	for (int row = game.scrollOffset; row < NUM_HORIZONTAL_TILES + game.scrollOffset; row++)
 	{
-		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES; col++)
+		for (int col = HORIZONTAL_OFFSET; col < NUM_HORIZONTAL_TILES; col++)
 		{
 			char tile = game.map.board[row][col];
 			short int *ptr;
@@ -245,7 +245,7 @@ void checkCollision(void)
 	{
 		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
-			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 			// if (game.collisionBuffer[loc] == death)
 			// {
 			// 	collision = true;
@@ -431,7 +431,7 @@ void moveFrog(int direction)
 		}
 		break;
 	case DOWN:
-		if (game.frogLocation.row < NUM_MAP_TILES - 1)
+		if (game.frogLocation.row < NUM_VERTICAL_TILES - 1)
 		{
 			game.frogLocation.row++;
 			moved = true;
@@ -531,7 +531,7 @@ void drawTile(short *img, int yOffset, int xOffset)
 	{
 		for (int x = xOffset; x < xOffset + TILE_WIDTH; x++)
 		{
-			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 			if (loc > 0)
 			{
 				game.map.stage[loc] = img[i];
@@ -577,10 +577,10 @@ PowerUp generateRandomPowerUp(void)
 	enum powerUpTypes type = getRandomBetweenRange(0, 4);
 
 	Coordinate coord;
-	coord.col = (rand() % NUM_RENDERED_TILES) + HORIZONTAL_OFFSET;
+	coord.col = (rand() % NUM_HORIZONTAL_TILES) + HORIZONTAL_OFFSET;
 
 	// Always render powerup on screen
-	coord.row = min(max(ROW_OF_CASTLE + 1, (rand() % NUM_RENDERED_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_MAP_TILES - 1);
+	coord.row = min(max(ROW_OF_CASTLE + 1, (rand() % NUM_HORIZONTAL_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_VERTICAL_TILES - 1);
 
 	return (PowerUp){
 		.powerUpLocation = coord,
@@ -787,9 +787,9 @@ void updateGameInfo(void)
 	}
 
 	short int *ptr;
-	for (int row = (NUM_RENDERED_TILES - 3); row < NUM_RENDERED_TILES; row++)
+	for (int row = (NUM_HORIZONTAL_TILES - 3); row < NUM_HORIZONTAL_TILES; row++)
 	{
-		for (int col = 0; col < NUM_RENDERED_TILES; col++)
+		for (int col = 0; col < NUM_HORIZONTAL_TILES; col++)
 		{
 			if (row == 17)
 			{
@@ -994,9 +994,12 @@ void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velo
 	for (; i < game.obstaclesInitialized + numObstacles; i++)
 	{
 		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
-		if (obst.type == snake) {
+		if (obst.type == snake)
+		{
 			startPos = TILE_WIDTH * 1;
-		} else {
+		}
+		else
+		{
 			startPos += (TILE_WIDTH * obst.numImgs * getRandomBetweenRange(1, 3)) % GAME_WIDTH;
 		}
 		obst.colPos = startPos;
@@ -1047,7 +1050,7 @@ void initializeObstacles(void)
 
 bool obstacleInView(int lane)
 {
-	if (lane > game.scrollOffset && lane < NUM_RENDERED_TILES + game.scrollOffset)
+	if (lane > game.scrollOffset && lane < NUM_HORIZONTAL_TILES + game.scrollOffset)
 	{
 		return true;
 	}
@@ -1077,7 +1080,7 @@ void drawObstacles(void)
 					int imgOffset = imgNo * TILE_WIDTH;
 					for (int x = obst.colPos + imgOffset; x < (obst.colPos + TILE_WIDTH) + imgOffset; x++)
 					{
-						int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+						int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 						if (loc > 0)
 						{
 							game.collisionBuffer[loc] = obst.collisionType;
@@ -1099,7 +1102,7 @@ void initializeGame(void)
 	game.elapsedTime = 0.0;
 	game.lastPowerUpTime = 0.0;
 	game.currentPowerUp.type = none;
-	game.secondsPerFrame = 1 / 120.0;
+	game.secondsPerFrame = 0;
 	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
 	game.lives = 3;
 	game.moves = 250;
@@ -1127,6 +1130,25 @@ void clearCollisionBuffer(void)
 	memset(game.collisionBuffer, 0, (GAME_WIDTH * GAME_HEIGHT) * sizeof(short));
 }
 
+void clearObstacleMemory(void)
+{
+	for (int obstacleNum = 0; obstacleNum < NUM_OBSTACLES; obstacleNum++)
+	{
+		free(game.obstacles[obstacleNum].imgs);
+	}
+}
+
+void *gameTimer(void *arg)
+{
+	while (!game.quit)
+	{
+		usleep(1000 * 1000);
+		game.elapsedTime += 1;
+		game.timeRemaining -= 1;
+	}
+	return NULL;
+}
+
 /* main function */
 int main(int argc, char *argv[])
 {
@@ -1135,15 +1157,13 @@ int main(int argc, char *argv[])
 	srand(time(NULL));
 
 	pthread_t controllerThread;
+	pthread_t timerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
+	pthread_create(&timerThread, NULL, gameTimer, NULL);
 	initializeGame();
 	pauseGame(true);
 	while (!game.quit)
 	{
-		// usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
-		game.elapsedTime += game.secondsPerFrame;
-		game.timeRemaining -= game.secondsPerFrame;
-
 		if (game.action != -1)
 		{
 			doUserAction();
@@ -1169,6 +1189,8 @@ int main(int argc, char *argv[])
 	{
 		endGame(losePromptPtr);
 	}
+
+	clearObstacleMemory();
 
 	// mummap = "memory unmap"; frees the following mapping from memory
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
