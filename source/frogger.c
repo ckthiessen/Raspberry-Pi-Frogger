@@ -144,118 +144,91 @@ short int *scorePtr = (short int *)score_img.pixel_data;
 short int *timePtr = (short int *)time_img.pixel_data;
 short int *valuePtr = (short int *)value_img.pixel_data;
 
-void updateStage(int yOffset, int xOffset, short int *img_ptr)
+void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionType type)
 {
 	int i = 0;
-
 	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 	{
 		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-			if (loc > 0)
+			if (loc > 0) {
+				game.collisionBuffer[loc] = type;
 				game.map.stage[loc] = img_ptr[i];
+			}
 			i++;
 		}
 	}
 }
 
-void mapBoardToStage(bool debug)
+void drawBackground(void)
 {
 	for (int row = game.scrollOffset; row < NUM_RENDERED_TILES + game.scrollOffset; row++)
 	{
-		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET; col++)
+		for (int col = HORIZONTAL_OFFSET; col < NUM_RENDERED_TILES; col++)
 		{
 			char tile = game.map.board[row][col];
 			short int *ptr;
-			if (debug)
-				printf("%c", tile);
+			enum CollisionType type; 
 			switch (tile)
 			{
 			// road
 			case '-':
+				type = safe;
 				ptr = blackRoadPtr;
-				break;
-			// front of bus/semi
-			case 'b':
-				ptr = busFrontPtr;
-				break;
-			// middle of bus/semi
-			case 'm':
-				ptr = busMidPtr;
-				break;
-			// back of bus/semi
-			case 'e':
-				ptr = busBackPtr;
-				break;
-			// front of car
-			case 'c':
-				ptr = carFrontPtr;
-				break;
-			// back of car
-			case 'a':
-				ptr = carBackPtr;
-				break;
-			// log
-			case 'l':
-				ptr = logPtr;
-				break;
-			// rock for lava
-			case 'r':
-				ptr = boulderPtr;
 				break;
 			// hole/pit for snakes and pits
 			case 'h':
+				type = death;
 				ptr = pitPtr;
-				break;
-			// left head of snake
-			case 's':
-				ptr = snakeLeftPtr;
-				break;
-			// right head of snake
-			case 't':
-				ptr = snakeRightPtr;
 				break;
 			// desert background for snakes and pits
 			case 'd':
+				type = safe;
 				ptr = desertPtr;
 				break;
 			// lava
 			case ';':
+				type = death;
 				ptr = lavaPtr;
 				break;
 			// water
 			case ',':
+				type = death;
 				ptr = waterPtr;
 				break;
 			// safe zone
 			case '.':
+				type = safe;
 				ptr = safePtr;
 				break;
 			// castle wall
 			case 'w':
+				type = safe;
 				ptr = castleWallPtr;
 				break;
 			// castle door
 			case 'o':
+				type = safe;
 				ptr = castleDoorPtr;
 				break;
 			// castle top
 			case 'p':
+				type = safe;
 				ptr = castleTopPtr;
 				break;
 			// castle sky
 			case '~':
+				type = safe;
 				ptr = castleSkyPtr;
 				break;
 			default:
+				type = safe;
 				ptr = blackRoadPtr;
 				break;
 			}
-			updateStage(row, col, ptr);
+			updateStage(row, col, ptr, type);
 		}
-		if (debug)
-			printf("\n");
 	}
 }
 
@@ -264,7 +237,7 @@ void checkCollision(void)
 	bool hit = false;
 	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
-		for (int x = (TILE_WIDTH + 1) * (game.frogLocation.col - HORIZONTAL_OFFSET); x < (TILE_WIDTH) * (game.frogLocation.col - HORIZONTAL_OFFSET + 1); x++)
+		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
 			if (game.collisionBuffer[loc] == 1)
@@ -603,7 +576,7 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
-void drawFrogToBuffer(void)
+void drawFrog(void)
 {
 	int i = 0;
 	for (int y = TILE_HEIGHT * (game.frogLocation.row - game.scrollOffset); y < TILE_HEIGHT * (game.frogLocation.row - game.scrollOffset + 1); y++)
@@ -643,7 +616,7 @@ void updateFrogLocation(void)
 				 }
 		}
 	}
-	drawFrogToBuffer();
+	drawFrog();
 	// char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
 	// if (obstacle == 'l' || obstacle == 'r')
 	// {
@@ -669,26 +642,27 @@ void displayPowerUp(void)
 {
 	int row = game.currentPowerUp.powerUpLocation.row;
 	int col = game.currentPowerUp.powerUpLocation.col;
-	// updateStage(row, col, frogPtr);
 
+	short * img; 
 	switch (game.currentPowerUp.type)
 	{
 	case lifeUp:
-		updateStage(row, col, moreLivesPtr);
+		img = moreLivesPtr;
 		break;
 	case timeUp:
-		updateStage(row, col, moreTimePtr);
+		img = moreTimePtr;
 		break;
 	case movesUp:
-		updateStage(row, col, moreStepsPtr);
+		img = moreStepsPtr;
 		break;
 	case slowDown:
-		updateStage(row, col, slowDownPtr);
+		img = slowDownPtr;
 		break;
 	default:
-		updateStage(row, col, moreLivesPtr);
 		break;
 	}
+	updateStage(row, col, img, powerUp);
+
 }
 
 int ones;
@@ -996,10 +970,11 @@ void updateGameInfo(void)
 	}
 }
 
-Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int velocity)
+Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int velocity)
 {
 	int numImgs;
 	short **imgs;
+	enum CollisionType collisionType; 
 	// Remember to free mem
 	switch (type)
 	{
@@ -1008,6 +983,7 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		imgs = malloc(numImgs * sizeof(short *));
 		imgs[0] = carBackPtr;
 		imgs[1] = carFrontPtr;
+		collisionType = death;
 		break;
 	case bus:
 		numImgs = 4;
@@ -1016,6 +992,7 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		imgs[1] = busMidPtr;
 		imgs[2] = busMidPtr;
 		imgs[3] = busBackPtr;
+		collisionType = death;
 		break;
 	case wood:
 		numImgs = getRandomBetweenRange(2, 4); // Log is random number between 2 and 4 tiles long
@@ -1024,6 +1001,7 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		{
 			imgs[i] = logPtr;
 		}
+		collisionType = safe;
 		break;
 	case rock:
 		numImgs = getRandomBetweenRange(2, 4); //  Random number of rocks between 2 and 4 tiles
@@ -1032,12 +1010,14 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		{
 			imgs[i] = boulderPtr;
 		}
+		collisionType = safe;
 		break;
 	case snake:
 		numImgs = 2;
 		imgs = malloc(numImgs * sizeof(short *));
 		imgs[0] = snakeLeftPtr;
 		imgs[1] = snakeRightPtr;
+		collisionType = death;
 		break;
 	}
 	return (Obstacle){
@@ -1046,7 +1026,9 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		.colPos = colPos,
 		.imgs = imgs,
 		.numImgs = numImgs,
-		.velocity = velocity};
+		.velocity = velocity,
+		.collisionType = collisionType
+		};
 }
 
 int getRandomBetweenRange(int low, int high)
@@ -1054,14 +1036,13 @@ int getRandomBetweenRange(int low, int high)
 	return (rand() % (high)) + low;
 }
 
-void initializeLane(enum obstacleType type, int numObstacles, int lane, int velocity)
+void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velocity)
 {
 	int startPos = 0;
 	int i = game.obstaclesInitialized;
 	for (; i < game.obstaclesInitialized + numObstacles; i++)
 	{
 		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
-		// int direction = velocity > 0 ? 1 : -1;
 		startPos += (TILE_WIDTH * obst.numImgs * getRandomBetweenRange(1, 3)) % GAME_WIDTH;
 		obst.colPos = startPos;
 		game.obstacles[i] = obst;
@@ -1125,13 +1106,8 @@ void drawObstacles(void)
 						int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
 						if (loc > 0)
 						{
-							game.collisionBuffer[loc] = 1;
+							game.collisionBuffer[loc] = obst.collisionType;
 							game.map.stage[loc] = obst.imgs[imgNo][i];
-						}
-						else
-						{
-							printf("%d\n", x);
-							printf("%d\n", y);
 						}
 						i++;
 					}
@@ -1139,7 +1115,6 @@ void drawObstacles(void)
 			}
 		}
 		game.obstacles[obstNum].colPos = obst.colPos;
-		// (game.obstacles[obstNum].colPos + game.obstacles[obstNum].velocity + GAME_WIDTH) % GAME_WIDTH;
 	}
 }
 
@@ -1202,13 +1177,13 @@ int main(int argc, char *argv[])
 		}
 
 		clearCollisionBuffer();
-		update();
-		mapBoardToStage(false);
+		// update();
+		drawBackground();
 		updateGameInfo();
 		drawObstacles();
 		updateFrogLocation();
 		checkPowerUps();
-		// checkCollision();
+		checkCollision();
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}

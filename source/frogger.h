@@ -22,7 +22,7 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr);
 // void movesPt(char movesDigit, short int **moveLeft);
 void digitPtr(char passedDigit, short int **digits);
 
-void mapBoardToStage(bool debug);
+void drawBackground(void);
 void checkCollision(void);
 void update(void);
 void pauseGame(bool isMainMenu);
@@ -73,7 +73,7 @@ typedef struct
 } PowerUp;
 
 
-enum obstacleType
+enum ObstacleType
 {
 	car,
 	bus,
@@ -82,15 +82,23 @@ enum obstacleType
 	snake
 };
 
+enum CollisionType 
+{
+	safe = 0,
+	death = 1,
+	powerUp = 2
+};
+
 typedef struct
 {
 	// int buff[TILE_HEIGHT * TILE_WIDTH];
-	enum obstacleType type;
+	enum ObstacleType type;
 	short lane;
 	int colPos;
 	short ** imgs;
 	int numImgs;
 	int velocity;
+	enum CollisionType collisionType;
 } Obstacle;
 
 struct Game
@@ -132,25 +140,25 @@ Map INITIAL_MAP = {
 	 "ppppppppppppppppppppppppppppppppppppppppppppppppp",
 	 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
 	 "wwowwowwowwowwowwowwowwowwowwowwowwowwowwowwowwow",
-	 ";;;;;rr;;;;;;;;;;rrrr;;;;;rrr;;;;rr;;;;rr;;;rrrrr",
-	 ";;;;;;rrrr;;;;;;;;;;;;;;rrrr;;;rrrr;;;;rrrr;;rrrr",
-	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
-	 ";;;;;rrrr;;;;;;rrrr;;;;;;rrr;;;;rrrr;;;;rrr;;rrr;",
-	 ";;;;;rr;;;;;;;;;;rrrr;;;;;rrr;;;;rr;;;;rr;;;rrrrr",
-	 ";;;;;;rrrr;;;;;;;;;;;;;;rrrr;;;rrrr;;;;rrrr;;rrrr",
-	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
-	 ";;;;;rrrr;;;;;;rrrr;;;;;;rrr;;;;rrrr;;;;rrr;;rrr;",
-	 ";;rrrr;;;;rrr;;;;rrr;;;;;;;;rrr;;rrrr;rr;;;rrrrr;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+	 ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
 	 ".................................................",
-	 ".......hhhhdhdhdhhdhhhdhhhhhhh...................",
-	 ".......hhhdstdddhhddstdddhhhhh...................",
-	 ".......hhhhddhddhhhdddddhhhhhh...................",
-	 ".......hhhhdhhdhhhdstdddddhhhd...................",
-	 ".......hhhdstdddddhdddhhddddhh...................",
-	 ".......hhhddddstdddhhdddstddhh...................",
-	 ".......hhhdhhdhhhhdstdddddddhh...................",
-	 ".......hhhddstdhhhhhhdstddddhh...................",
-	 ".......hhhhddddhhddstdddhhhdhh...................",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
+	 "ddddddddddddddddddddddddddddddddddddddddddddddddd",
 	 ".................................................",
 	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
 	 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
