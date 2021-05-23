@@ -42,8 +42,7 @@ typedef struct
 	int col;
 } Coordinate;
 
-// Coordinate FROG_START = {49, 9 * TILE_WIDTH};
-Coordinate FROG_START = {49, 9 };
+Coordinate FROG_START = {49, 9 * TILE_WIDTH };
 
 typedef struct
 {

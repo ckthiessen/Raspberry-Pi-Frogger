@@ -483,6 +483,16 @@ void endGame(short *menu)
 	}
 }
 
+int max(int a, int b)
+{
+	return a > b ? a : b;
+}
+
+int min(int a, int b)
+{
+	return a < b ? a : b;
+}
+
 void moveFrog(int direction)
 {
 	bool moved = false;
@@ -507,22 +517,22 @@ void moveFrog(int direction)
 			if (game.frogLocation.row >= 10)
 			{
 
-				game.scrollOffset = game.scrollOffset + 1 < 30 ? game.scrollOffset + 1 : 30;
+				game.scrollOffset = min(game.scrollOffset + 1, 30);
 			}
 		}
 		break;
 	case LEFT:
-		if (game.frogLocation.col > HORIZONTAL_OFFSET)
+		if (game.frogLocation.col > 0)
 		{
 			moved = true;
-			game.frogLocation.col--;
+			game.frogLocation.col = max(game.frogLocation.col - TILE_WIDTH, 0);
 		}
 		break;
 	case RIGHT:
-		if (game.frogLocation.col < NUM_RENDERED_TILES + HORIZONTAL_OFFSET - 1)
+		if (game.frogLocation.col < GAME_WIDTH)
 		{
 			moved = true;
-			game.frogLocation.col++;
+			game.frogLocation.col = min(game.frogLocation.col + TILE_WIDTH, GAME_WIDTH);
 		}
 		break;
 	}
@@ -577,7 +587,10 @@ void *getUserInput(void *arg)
 		{
 			game.action = buttonPress;
 			// If start pressed, sleep for half a second to not immediately unpause
-			if(buttonPress == START) { usleep(250*1000); }
+			if (buttonPress == START)
+			{
+				usleep(250 * 1000);
+			}
 		}
 	}
 	return NULL;
@@ -590,34 +603,53 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
-// void drawFrogToBuffer(void)
-// {
-// 	// Only render if obstacle is in view
-// 	for (int y = TILE_HEIGHT * ( - game.scrollOffset); y < TILE_HEIGHT * (obst.lane - game.scrollOffset + 1); y++)
-// 	{
-// 		int imgOffset = imgNo * TILE_WIDTH;
-// 		for (int x = obst.colPos + imgOffset; x < (obst.colPos + TILE_WIDTH) + imgOffset; x++)
-// 		{
-// 			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-// 			if (y > 0 && x > 0)
-// 			{
-// 				game.collisionBuffer[loc] = 1;
-// 				game.map.stage[loc] = obst.imgs[imgNo][i];
-// 			}
-// 			i++;
-// 		}
-// 	}
-// }
-
+void drawFrogToBuffer(void)
+{
+	int i = 0;
+	for (int y = TILE_HEIGHT * (game.frogLocation.row - game.scrollOffset); y < TILE_HEIGHT * (game.frogLocation.row - game.scrollOffset + 1); y++)
+	{
+		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
+		{
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+			if (loc > 0)
+			{
+				game.map.stage[loc] = frogPtr[i];
+			}
+			i++;
+		}
+	}
+}
 
 void updateFrogLocation(void)
 {
-	char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
-	if (obstacle == 'l' || obstacle == 'r')
+	// Could improve efficiency by skipping to logs 
+	// instead of iterating over all obstacles but this is easier for development
+	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
-		game.frogLocation.col += laneVelocities[game.frogLocation.row];
+		Obstacle obst = game.obstacles[obstNum];
+		if (obst.type == wood || obst.type == rock)
+		{
+			// If we are on the same lane as a log or rock
+			// and the frog is between the start of a log and the end of a log
+			// Add its velocity to the frogs velocity 
+			if (obst.lane == game.frogLocation.row &&
+				(game.frogLocation.col > obst.colPos - 1 &&
+				 game.frogLocation.col < obst.colPos + (obst.numImgs * TILE_WIDTH)))
+				 {
+					 // Still a little bugged but mostly working
+					 // Isaac test out the log carry and see if you can fix it
+					 game.frogLocation.col = ((game.frogLocation.col + obst.velocity) + GAME_WIDTH) % GAME_WIDTH;
+					 break;
+				 }
+		}
 	}
-	updateStage(game.frogLocation.row, game.frogLocation.col, frogPtr);
+	drawFrogToBuffer();
+	// char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
+	// if (obstacle == 'l' || obstacle == 'r')
+	// {
+	// 	game.frogLocation.col += laneVelocities[game.frogLocation.row];
+	// }
+	// updateStage(game.frogLocation.row, game.frogLocation.col, frogPtr);
 }
 
 PowerUp generateRandomPowerUp(void)
@@ -630,8 +662,7 @@ PowerUp generateRandomPowerUp(void)
 
 	return (PowerUp){
 		.powerUpLocation = coord,
-		.type = type
-	};
+		.type = type};
 }
 
 void displayPowerUp(void)
@@ -1018,7 +1049,8 @@ Obstacle obstacleFactory(enum obstacleType type, int lane, int colPos, int veloc
 		.velocity = velocity};
 }
 
-int getRandomBetweenRange(int low, int high) {
+int getRandomBetweenRange(int low, int high)
+{
 	return (rand() % (high)) + low;
 }
 
@@ -1069,14 +1101,15 @@ bool obstacleInView(int lane)
 void drawObstacles(void)
 {
 	// TODO: ONLY RENDER IF IN VIEWPORT
-	for (int obstNo = 0; obstNo < NUM_OBSTACLES; obstNo++)
+	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
-		Obstacle obst = game.obstacles[obstNo];
-		if(obst.type == snake && ((obst.colPos + game.obstacles[obstNo].velocity + (TILE_WIDTH * obst.numImgs) > GAME_WIDTH) || obst.colPos + game.obstacles[obstNo].velocity < 0)) {
+		Obstacle obst = game.obstacles[obstNum];
+		if (obst.type == snake && ((obst.colPos + game.obstacles[obstNum].velocity + (TILE_WIDTH * obst.numImgs) > GAME_WIDTH) || obst.colPos + game.obstacles[obstNum].velocity < 0))
+		{
 			// Reverse direction of snake when it reaches end of screen
-			game.obstacles[obstNo].velocity *= -1;  
+			game.obstacles[obstNum].velocity *= -1;
 		}
-		obst.colPos = (obst.colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
+		obst.colPos = (obst.colPos + game.obstacles[obstNum].velocity + GAME_WIDTH) % GAME_WIDTH;
 
 		if (obstacleInView(obst.lane))
 		{
@@ -1094,18 +1127,19 @@ void drawObstacles(void)
 						{
 							game.collisionBuffer[loc] = 1;
 							game.map.stage[loc] = obst.imgs[imgNo][i];
-						} else {
+						}
+						else
+						{
 							printf("%d\n", x);
 							printf("%d\n", y);
-
 						}
 						i++;
 					}
 				}
 			}
 		}
-		game.obstacles[obstNo].colPos = obst.colPos;
-		// (game.obstacles[obstNo].colPos + game.obstacles[obstNo].velocity + GAME_WIDTH) % GAME_WIDTH;
+		game.obstacles[obstNum].colPos = obst.colPos;
+		// (game.obstacles[obstNum].colPos + game.obstacles[obstNum].velocity + GAME_WIDTH) % GAME_WIDTH;
 	}
 }
 
@@ -1116,7 +1150,7 @@ void initializeGame(void)
 	game.elapsedTime = 0.0;
 	game.lastPowerUpTime = 0.0;
 	game.currentPowerUp.type = none;
-	game.secondsPerFrame = SECONDS_PER_FRAME;
+	game.secondsPerFrame = 1 / 120.0;
 	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
 	game.lives = 3;
 	game.moves = 250;
@@ -1157,7 +1191,7 @@ int main(int argc, char *argv[])
 	pauseGame(true);
 	while (!game.quit)
 	{
-		usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
+		// usleep(((game.secondsPerFrame) * 1000) * 1000); // 30 Frames per second
 		game.elapsedTime += game.secondsPerFrame;
 		game.timeRemaining -= game.secondsPerFrame;
 
