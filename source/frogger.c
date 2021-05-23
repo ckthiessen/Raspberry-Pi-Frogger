@@ -178,12 +178,12 @@ void drawBackground(void)
 				ptr = blackRoadPtr;
 				break;
 			// hole/pit for snakes and pits
-			case 'h':
+			case 'o':
 				type = death;
 				ptr = pitPtr;
 				break;
 			// desert background for snakes and pits
-			case 'd':
+			case '|':
 				type = safe;
 				ptr = desertPtr;
 				break;
@@ -208,7 +208,7 @@ void drawBackground(void)
 				ptr = castleWallPtr;
 				break;
 			// castle door
-			case 'o':
+			case 'd':
 				type = safe;
 				ptr = castleDoorPtr;
 				break;
@@ -253,71 +253,6 @@ void checkCollision(void)
 			break;
 		}
 	}
-
-	// if (
-	// 	obstacle == 'c' ||
-	// 	obstacle == 'a' ||
-	// 	obstacle == ',' ||
-	// 	obstacle == 'h' ||
-	// 	obstacle == 's' ||
-	// 	obstacle == 'b' ||
-	// 	obstacle == 'm' ||
-	// 	obstacle == 'e' ||
-	// 	obstacle == ';' ||
-	// 	obstacle == 'w')
-	// {
-	// 	resetFrogPosition();
-	// 	game.lives--;
-	// }
-}
-
-void update(void)
-{
-	char boardBuffer[NUM_MAP_TILES][NUM_MAP_TILES];
-	memcpy(boardBuffer, game.map.board, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	for (int row = 0; row < NUM_MAP_TILES; row++)
-	{
-		for (int col = 0; col < NUM_MAP_TILES; col++)
-		{
-			char prev = '\0';
-			char obstacle = game.map.board[row][col];
-			char background = '\0';
-			char newPos;
-			switch (obstacle)
-			{
-			case 'c':
-			case 'a':
-			case 'm':
-			case 'e':
-			case 'b':
-				background = '-';
-				break;
-			case 's':
-				background = 'd';
-				newPos = boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES];
-				if (newPos == 'h')
-				{ // Reverse snake direction when they hit a hole or rock
-					laneVelocities[row] = -laneVelocities[row];
-				}
-				break;
-			case 'l':
-				background = ',';
-				break;
-			case 'r':
-				background = ';';
-				break;
-			default:
-				break;
-			}
-			if (background != '\0')
-			{
-				boardBuffer[row][col] = background; //*******
-				boardBuffer[row][(col + laneVelocities[row] + NUM_MAP_TILES) % NUM_MAP_TILES] = obstacle;
-			}
-		}
-	}
-	memcpy(game.map.board, boardBuffer, NUM_MAP_TILES * NUM_MAP_TILES * sizeof(char));
-	// checkCollision();
 }
 
 void calculateScore(void)
@@ -617,12 +552,6 @@ void updateFrogLocation(void)
 		}
 	}
 	drawFrog();
-	// char obstacle = game.map.board[game.frogLocation.row][game.frogLocation.col];
-	// if (obstacle == 'l' || obstacle == 'r')
-	// {
-	// 	game.frogLocation.col += laneVelocities[game.frogLocation.row];
-	// }
-	// updateStage(game.frogLocation.row, game.frogLocation.col, frogPtr);
 }
 
 PowerUp generateRandomPowerUp(void)
@@ -962,9 +891,6 @@ void updateGameInfo(void)
 			else
 				ptr = blackRoadPtr;
 
-			// printf("row: %d", row);
-			// printf("col: %d", col);
-
 			drawGameInfo(row, col, ptr);
 		}
 	}
@@ -1065,9 +991,29 @@ void initializeObstacles(void)
 	initializeLane(wood, 3, 38, 6);
 	initializeLane(wood, 3, 37, 10);
 	initializeLane(wood, 3, 36, -6);
-	initializeLane(wood, 2, 35, 4);
+	initializeLane(wood, 2, 35, 5);
+	initializeLane(wood, 3, 34, 7);
+	initializeLane(wood, 3, 33, 4);
+	initializeLane(wood, 2, 32, -5);
+	initializeLane(wood, 3, 31, -8);
+	initializeLane(wood, 3, 30, 5);
 
-	initializeLane(snake, 1, 34, 14);
+	initializeLane(snake, 1, 28, 14);
+	initializeLane(snake, 1, 26, 12);
+	initializeLane(snake, 1, 25, 10);
+	initializeLane(snake, 1, 23, 11);
+	initializeLane(snake, 1, 21, 12);
+	initializeLane(snake, 1, 20, 16);
+
+	initializeLane(rock, 3, 18, -6);
+	initializeLane(rock, 3, 17, 10);
+	initializeLane(rock, 3, 16, 6);
+	initializeLane(rock, 2, 15, -5);
+	initializeLane(rock, 3, 14, -7);
+	initializeLane(rock, 3, 13, 4);
+	initializeLane(rock, 3, 12, -5);
+	initializeLane(rock, 3, 11, -8);
+	initializeLane(rock, 3, 10, 5);
 }
 
 bool obstacleInView(int lane)
@@ -1177,13 +1123,12 @@ int main(int argc, char *argv[])
 		}
 
 		clearCollisionBuffer();
-		// update();
 		drawBackground();
 		updateGameInfo();
 		drawObstacles();
 		updateFrogLocation();
 		checkPowerUps();
-		checkCollision();
+		// checkCollision();
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}
