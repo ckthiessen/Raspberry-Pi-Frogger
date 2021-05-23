@@ -148,18 +148,21 @@ short int *valuePtr = (short int *)value_img.pixel_data;
 
 void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionType type)
 {
-	int i = 0;
-	for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
+	if (obstacleInView(yOffset))
 	{
-		for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
+		int i = 0;
+		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 		{
-			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
-			if (loc > 0)
+			for (int x = TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET); x < TILE_WIDTH * (xOffset - HORIZONTAL_OFFSET + 1); x++)
 			{
-				game.collisionBuffer[loc] = type;
-				game.map.stage[loc] = img_ptr[i];
+				int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_RENDERED_TILES * TILE_WIDTH);
+				if (loc > 0)
+				{
+					game.collisionBuffer[loc] = type;
+					game.map.stage[loc] = img_ptr[i];
+				}
+				i++;
 			}
-			i++;
 		}
 	}
 }
@@ -577,7 +580,7 @@ PowerUp generateRandomPowerUp(void)
 	coord.col = (rand() % NUM_RENDERED_TILES) + HORIZONTAL_OFFSET;
 
 	// Always render powerup on screen
-	coord.row = min(max(0, (rand() % NUM_RENDERED_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_MAP_TILES - 1);
+	coord.row = min(max(ROW_OF_CASTLE + 1, (rand() % NUM_RENDERED_TILES) + game.scrollOffset + VERTICAL_OFFSET), NUM_MAP_TILES - 1);
 
 	return (PowerUp){
 		.powerUpLocation = coord,
@@ -614,15 +617,13 @@ void slowAllObstacles(void)
 {
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
-		if(game.obstacles[obstNum].velocity < -4 || game.obstacles[obstNum].velocity > 4)
+		if (game.obstacles[obstNum].velocity < -4 || game.obstacles[obstNum].velocity > 4)
 		{
 			game.obstacles[obstNum].velocity = game.obstacles[obstNum].velocity > 0
-												? game.obstacles[obstNum].velocity - 2
-												: game.obstacles[obstNum].velocity + 2;
+												   ? game.obstacles[obstNum].velocity - 2
+												   : game.obstacles[obstNum].velocity + 2;
 		}
-
 	}
-	
 }
 
 int ones;
@@ -960,10 +961,14 @@ Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int veloc
 		collisionType = safe;
 		break;
 	case snake:
-		numImgs = 2;
+		numImgs = getRandomBetweenRange(3, 5); // Snake is random number between 3 and 5 tiles long
 		imgs = malloc(numImgs * sizeof(short *));
 		imgs[0] = snakeLeftPtr;
-		imgs[1] = snakeRightPtr;
+		for (int i = 1; i < numImgs - 1; i++)
+		{
+			imgs[i] = snakeMidPtr;
+		}
+		imgs[numImgs - 1] = snakeRightPtr;
 		collisionType = death;
 		break;
 	}
@@ -989,7 +994,11 @@ void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velo
 	for (; i < game.obstaclesInitialized + numObstacles; i++)
 	{
 		Obstacle obst = obstacleFactory(type, lane, 0, velocity);
-		startPos += (TILE_WIDTH * obst.numImgs * getRandomBetweenRange(1, 3)) % GAME_WIDTH;
+		if (obst.type == snake) {
+			startPos = TILE_WIDTH * 1;
+		} else {
+			startPos += (TILE_WIDTH * obst.numImgs * getRandomBetweenRange(1, 3)) % GAME_WIDTH;
+		}
 		obst.colPos = startPos;
 		game.obstacles[i] = obst;
 	}

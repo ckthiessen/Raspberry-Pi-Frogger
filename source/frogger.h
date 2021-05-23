@@ -37,6 +37,7 @@ void initializeGame(void);
 void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
 int getRandomBetweenRange(int, int);
 void applyPowerUp(void);
+bool obstacleInView(int);
 
 typedef struct
 {
