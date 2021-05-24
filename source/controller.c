@@ -192,72 +192,17 @@ int Read_SNES(void)
     return checkForButtonPress(buttons);
 }
 
-/*
-@Returns: 0 if the program exits normally
-Handles the setup, the main program loop, and tear down of the application.
-*/
-// int sampleController()
-// {
-//     // Get gpio pointer
-//     gpioPtr = getGPIOPtr();
 
-//     // Initialize the SNES controller
-//     init_GPIO(gpioPtr);
+void initController(void) 
+{
+     // Get gpio pointer
+    gpioPtr = getGPIOPtr();
+	// Initialize the SNES controller
+    init_GPIO();
+}
 
-//     // Store sampled buttons
-//     int buttonIndex;
-
-//     printf("Please press a button...\n");
-
-//     // While a user has not pressed START
-//     while (buttonIndex != START)
-//     {
-//         buttonIndex = -1;
-
-//         // Delay to prevent printing too much -- 200000 microseconds because not too slow and still very responsive
-//         delayMicroseconds(50000);
-
-//         // Loop until button is pressed
-//         while (1)
-//         {
-//             buttonIndex = -1;
-
-//             // Get button code that corresponds to the button that is pressed or lack thereof
-//             buttonIndex = Read_SNES();
-
-//             // If pressed button is not the previously pressed button then break inner loop
-//             if (buttonIndex != -1)
-//             {
-//                 break;
-//             }
-//         }
-
-//         // If a new button was pressed and it was not the start button
-//         if (buttonIndex != prevPress && buttonIndex != START)
-//         {
-//             printf("\n");
-//             // Print appropriate message for button press
-//             Print_Message(buttonIndex);
-//             // Set previous button code to the button code that was just pressed
-//             prevPress = buttonIndex;
-//         }
-//     }
-//     return 0;
-// }
-
-/*
-@Returns: This subroutine does not return anything
-This subroutine ...
-*/
 int sampleController(void)
 {
-    // Get gpio pointer
-    gpioPtr = getGPIOPtr();
-
-    // printf("gpio ptr = %d\n", (int )gpioPtr);
-
-    // Initialize the SNES controller
-    init_GPIO();
 
     // Store sampled buttons
     int buttonIndex;

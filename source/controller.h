@@ -9,7 +9,7 @@
 #define NO_ACTION -1
 #define SELECT 9
 
-
+void initController(void);
 int sampleController(void);
 int Read_SNES(void);
 void init_GPIO(void);

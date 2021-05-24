@@ -1399,6 +1399,8 @@ int main(int argc, char *argv[])
 	framebufferstruct = initFbInfo();
 	srand(time(NULL));
 
+   initController(); 
+
 	pthread_t controllerThread;
 	pthread_t timerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
