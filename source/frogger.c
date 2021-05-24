@@ -1,18 +1,11 @@
 // Authors: Cole Thiessen (30027689) & Isaac Lutzko (30026703)
 // CPSC359 Winter 2021 Project (Part 2) Raspberry Pi Video Game
-// May 2021
+// May 2021 (extended deadline due to deferral)
 // Description:
 
 // Link/Reference for Frogger Image: https://www.funstockretro.co.uk/news/arcade-hall-of-fame-frogger-konami/
-//
 // Link/Reference for Crazy Frog Image: https://www.thesun.co.uk/living/2974489/crazy-frog-just-turned-20-relive-his-hellish-magic-here/
-//
 // Link/Reference for Pepe Frog Image: https://line.17qq.com/articles/doddbhdz.html
-//
-// link/references for figuring how to display stat bar
-//
-//
-// used for game.moves:
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1247,6 +1240,7 @@ This subroutine ...
 */
 void initializeObstacles(void)
 {
+	
 	// Remember to add to NUM_OBSTACLES if adding obstacles
 	initializeLane(car, 4, 48, 9);
 	initializeLane(bus, 2, 47, -4);
@@ -1309,6 +1303,7 @@ void drawObstacles(void)
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
 		Obstacle obst = game.obstacles[obstNum];
+		// check if obstacle is a snake
 		if (obst.type == snake && ((obst.colPos + game.obstacles[obstNum].velocity + (TILE_WIDTH * obst.numImgs) > GAME_WIDTH) || obst.colPos + game.obstacles[obstNum].velocity < 0))
 		{
 			// Reverse direction of snake when it reaches end of screen
@@ -1437,6 +1432,7 @@ int main(int argc, char *argv[])
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}
+	
 
 	if (game.win)
 	{
