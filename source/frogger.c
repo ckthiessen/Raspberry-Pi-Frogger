@@ -291,7 +291,7 @@ This subroutine calculates a players' score when the game is over - whether the 
 */
 void calculateScore(void)
 {
-	if (game.lives > 0)	// If the game is won, add to the score for winning, otherwise do not add the below additions to the score if game lost
+	if (game.win)	// If the game is won, add to the score for winning, otherwise do not add the below additions to the score if game lost
 	{
 		game.score += ((400 - game.movesMade) * 5);	// The fewer the moves made to win, the higher the score
 		game.score += ((500 + game.timeRemaining) * 5); // The faster the game is won, the higher the score
@@ -546,7 +546,7 @@ void moveFrog(int direction)
 		}
 		else if (game.movesMade <= 150)
 		{
-			game.score += 2;
+			game.score += 1;
 		}
 	}
 }
@@ -771,7 +771,7 @@ appropriate actions are made, and then the powerUp is then displayed by calling 
 */
 void checkPowerUps(void)
 {
-	// generate powerups every 30 seconds starting on the first 30 minutes
+	// generate powerups every 30 seconds starting on the first 30 seconds
 	if ((game.lastPowerUpTime + POWERUP_TIME_INTERVAL) - game.elapsedTime < 0)
 	{
 		game.lastPowerUpTime = game.elapsedTime;
