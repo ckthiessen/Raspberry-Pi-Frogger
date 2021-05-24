@@ -1334,7 +1334,7 @@ void initializeGame(void)
 	game.currentPowerUp.type = none;
 	game.secondsPerFrame = 0;
 	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
-	game.lives = 3;
+	game.lives = 4;
 	game.moves = 250;
 	game.map = INITIAL_MAP;
 	game.obstaclesInitialized = 0;
