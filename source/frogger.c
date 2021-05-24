@@ -21,16 +21,15 @@
 #include "controller.h"
 #include "images/frog.h"
 
-// #include "images/menus/main_menu_start.h"
-// #include "images/menus/main_menu_quit.h"
+// import main menu image header files
 #include "images/menus/main_menu_quit_game.h"
 #include "images/menus/main_menu_start_game.h"
-
 #include "images/menus/pause_menu_quit.h"
 #include "images/menus/pause_menu_restart.h"
 #include "images/menus/you_lose_prompt_w_score.h"
 #include "images/menus/you_win_prompt_w_score.h"
 
+// import images for life packs, the safe zone, obstacles, the status bar, and the castle
 #include "images/safe_zone.h"
 #include "images/life_packs/more_lives.h"
 #include "images/life_packs/more_time.h"
@@ -143,18 +142,21 @@ short int *valuePtr = (short int *)value_img.pixel_data;
 
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: yOffset: integer that is used for offsetting what row the image is being drawn to
+@Params: xOffset: integer that is used for offsetting what column the image is being drawn to
+@Params: *img_ptr: short int pointer that contains a short int image pointer that is being drawn to position in the stage
+@Params: type: CollisionType that is defined in frogger.h that declares as to what kind collision the tile is - (safe, death, powerUp)
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in a yOffset and an xOffset that corresponds as to what tile the image (image as a pointer in *img_ptr) is being
+drawn to.  The location of the pixel being drawn also has a type as per the CollisionType that is also being passed.
 */
 void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionType type)
 {
+	// If the obstacle that is being drawn to the stage will be displayed on the screen then draw to stage, otherwise don't draw to stage
 	if (obstacleInView(yOffset))
 	{
 		int i = 0;
+		// Draw image from *img_ptr with 2 for loops similar to DrawImage zip file in tutorial content
 		for (int y = TILE_HEIGHT * (yOffset - game.scrollOffset); y < TILE_HEIGHT * (yOffset - game.scrollOffset + 1); y++)
 		{
 			for (int x = TILE_WIDTH * xOffset; x < TILE_WIDTH * (xOffset + 1); x++)
@@ -162,8 +164,8 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 				int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 				if (loc > 0)
 				{
-					game.collisionBuffer[loc] = type;
-					game.map.stage[loc] = img_ptr[i];
+					game.collisionBuffer[loc] = type;	// Set pixel collisionType in collisionBuffer to the passed tile which is used for collision detection
+					game.map.stage[loc] = img_ptr[i];	// Set pixel to color from *img_ptr
 				}
 				i++;
 			}
@@ -172,12 +174,12 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine is used for drawing the background as per the map that is defined in frogger.h.  Each character in the map corresponds to a specific
+image for drawing the background (e.g., 'o' corresponds to a pit in challenge #3, ';' corresponds to the lava in challenge #4).  Iterating through
+the characters in the map, using a switch statement we set each character to a specific image pointer and a collisionType for updateStage().  By
+setting each tile to an image and a collisionType we can then call updateStage for that tile, and then the stage can be drawn to the frame
+buffer to display the background screen.
 */
 void drawBackground(void)
 {
@@ -185,7 +187,7 @@ void drawBackground(void)
 	{
 		for (int col = 0; col < NUM_HORIZONTAL_TILES; col++)
 		{
-			char tile = game.map.board[row][col];
+			char tile = game.map.board[row][col];	// Tile that corresponds to specific tile in the game board as per the row and column
 			short int *ptr;
 			enum CollisionType type;
 			switch (tile)
@@ -245,43 +247,39 @@ void drawBackground(void)
 				ptr = blackRoadPtr;
 				break;
 			}
-			updateStage(row, col, ptr, type);
+			updateStage(row, col, ptr, type);	// Call updateStage for the tile by its row, its column, the short int image pointer and the collisionType
 		}
 	}
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine is used to check if the frog has collided with an object kills him or has collided with a powerUp.  
 */
 void checkCollision(void)
 {
-	bool collision = false;
+	bool collision = false;	// Collision default set to false here
 	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
 		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
-			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
-			if (game.collisionBuffer[loc] == death)
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);  // Get location of pixel 
+			if (game.collisionBuffer[loc] == death)	// Check if frog colliding with pixel kills the frog
 			{
-				collision = true;
-				resetFrogPosition();
-				game.lives--;
+				collision = true;		// Set collision to true since the frog collided with a pixel that kills it
+				resetFrogPosition();	// Move frog back to the start
+				game.lives--;			// Decrement the number of lives the frog has
 				break;
 			}
-			if (game.collisionBuffer[loc] == powerUp)
+			if (game.collisionBuffer[loc] == powerUp)	// Check if frog collided with a pixel that corresponds to a powerUp
 			{
-				collision = true;
-				applyPowerUp();
-				game.score += 50;
+				collision = true;		// Set collision to true since the frog collided with a pixel that corresponds to a powerUp
+				applyPowerUp();			// Apply appropriate powerUp
+				game.score += 50;		// Increment score of player by 50
 				game.currentPowerUp.type = none;
 			}
 		}
-		if (collision)
+		if (collision)	// If frog collided with a lethal pixel or a pixel that corresponds to a powerUp, break loop
 		{
 			break;
 		}
@@ -1240,7 +1238,7 @@ This subroutine ...
 */
 void initializeObstacles(void)
 {
-	
+
 	// Remember to add to NUM_OBSTACLES if adding obstacles
 	initializeLane(car, 4, 48, 9);
 	initializeLane(bus, 2, 47, -4);
