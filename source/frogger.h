@@ -142,13 +142,12 @@ struct Game
 	int movesMade;			 // Moves made by player
 	char scoreStr[4];		 // Score char array that is converted from int for displaying score on status bar and win or lose prompt
 	Obstacle obstacles[NUM_OBSTACLES];	// Obstacles array that contains the obstacles that are in the game
-	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];	// 
+	short collisionBuffer[GAME_WIDTH * GAME_HEIGHT];	// Collision buffer maps 1-to-1 with each pixel and determines the collision type of that pixel (death, safe or power up)
 	int obstaclesInitialized;			// Number of obstacles that are initialized during the game
 } game;
 
 // Game map that contains characters that correspond to the background tiles
 Map INITIAL_MAP = {
-	// Make holes have safe spots 2-3 wide
 	{"~~~~~~~~~~~~~~~~~~~~",
 	 "~~~~~~~~~~~~~~~~~~~~",
 	 "~~~~~~~~~~~~~~~~~~~~",
