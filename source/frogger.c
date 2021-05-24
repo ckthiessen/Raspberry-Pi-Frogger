@@ -403,7 +403,7 @@ void pauseGame(bool isMainMenu)
 			}
 			usleep(500 * 1000);
 		}
-		if (game.action == SELECT || game.action == START)
+		if (game.action == SELECT)
 		{
 			switch (currentOption)
 			{
