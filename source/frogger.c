@@ -553,20 +553,11 @@ void updateFrogLocation(void)
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
 		Obstacle obst = game.obstacles[obstNum];
-		if (obst.type == wood || obst.type == rock)
+		// If we are on the same lane as a log or rock and the platform is safe, move us with the platform
+		if ((obst.type == wood || obst.type == rock) && obst.lane == game.frogLocation.row)
 		{
-			// If we are on the same lane as a log or rock
-			// and the frog is between the start of a log and the end of a log
-			// Add its velocity to the frogs velocity
-			if (obst.lane == game.frogLocation.row &&
-				(game.frogLocation.col > obst.colPos - 1 &&
-				 game.frogLocation.col < obst.colPos + (obst.numImgs * TILE_WIDTH)))
-			{
-				// Still a little bugged but mostly working
-				// Isaac test out the log carry and see if you can fix it
-				game.frogLocation.col = ((game.frogLocation.col + obst.velocity) + GAME_WIDTH) % GAME_WIDTH;
-				break;
-			}
+			game.frogLocation.col = ((game.frogLocation.col + obst.velocity) + GAME_WIDTH) % GAME_WIDTH;
+			break;
 		}
 	}
 	drawFrog();
@@ -1157,7 +1148,6 @@ int main(int argc, char *argv[])
 			doUserAction();
 			game.action = -1;
 		}
-
 		clearCollisionBuffer();
 		drawBackground();
 		updateGameInfo();
