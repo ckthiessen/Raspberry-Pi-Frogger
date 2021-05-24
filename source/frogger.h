@@ -16,7 +16,7 @@
 #define NUM_VERTICAL_TILES 50		// Game board is 50 tiles high (only 20 tiles high displayed at a time)
 #define NUM_HORIZONTAL_TILES 20		// Game board is 20 tiles wide (only 20 tiles wide displayed at a time)
 #define ROW_OF_CASTLE 9				// 9 rows at top of game board is reserved for the castle at the end
-#define NUM_OBSTACLES 80			// Number of obstacles on the full game board at a time - note that not all 80 displayed on screen at a time (20x20 game map)
+#define NUM_OBSTACLES 77			// Number of obstacles on the full game board at a time - note that not all 80 displayed on screen at a time (20x20 game map)
 #define VERTICAL_OFFSET 3			// Offset vertical rendering by 3 to make room for game statistics
 #define TIME_STAT_BAR_TO_CHARS 50	// Number of chars for converting the time remaining of the game to an array of chars for displaying time on the status bar
 #define MOVES_STAT_BAR_TO_CHARS 5	// Number of chars for converting the # of moves that a player has left of the game to an array of chars for displaying time on the status bar 
@@ -44,6 +44,7 @@ void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
 int getRandomBetweenRange(int, int);
 void applyPowerUp(void);
 bool obstacleInView(int);
+void clearObstacleMemory(void);
 
 // Struct defined for the coordinates of where a tile is on the game map
 typedef struct
@@ -69,7 +70,8 @@ enum options
 {
 	resume,
 	quit,
-	restart
+	restart,
+	exitGame
 };
 
 // powerUpTypes data type for what powerup the frog currently has during the game
@@ -137,7 +139,9 @@ struct Game
 	Map map;				 // Game map
 	bool win;				 // Won game
 	bool lose;				 // Lost game
-	bool quit;				 // Quit game
+	bool quit;				 // Quit to main menu
+	bool exitGame;				 // Exit the program
+	bool paused;			 // Pause game
 	int score;				 // Player/Frog score
 	int movesMade;			 // Moves made by player
 	char scoreStr[4];		 // Score char array that is converted from int for displaying score on status bar and win or lose prompt
