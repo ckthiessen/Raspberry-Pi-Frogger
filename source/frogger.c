@@ -1233,11 +1233,11 @@ void initializeObstacles(void)
 	initializeLane(car, 3, 48, 4);
 	initializeLane(bus, 2, 47, -4);
 	initializeLane(car, 3, 46, 5);
-	initializeLane(car, 3, 45, 7);
+	initializeLane(car, 3, 45, 6);
 	initializeLane(bus, 2, 43, -4);
 	initializeLane(car, 3, 42, 4);
-	initializeLane(bus, 2, 41, -6);
-	initializeLane(bus, 2, 40, -8);
+	initializeLane(bus, 2, 41, -4);
+	initializeLane(bus, 2, 40, -6);
 
 	// 25 logs
 	initializeLane(wood, 3, 38, 6);
@@ -1255,8 +1255,8 @@ void initializeObstacles(void)
 	initializeLane(snake, 1, 26, 8);
 	initializeLane(snake, 1, 25, 6);
 	initializeLane(snake, 1, 23, 8);
-	initializeLane(snake, 1, 21, 11);
-	initializeLane(snake, 1, 20, 14);
+	initializeLane(snake, 1, 21, 9);
+	initializeLane(snake, 1, 20, 11);
 
 	// 26 rocks
 	initializeLane(rock, 3, 18, -4);
