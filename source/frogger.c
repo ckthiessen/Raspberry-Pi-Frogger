@@ -385,13 +385,13 @@ void pauseGame(bool isMainMenu)
 	game.paused = true;
 	while (game.paused)
 	{
-		if (game.action == LEFT || game.action == RIGHT)
+		if (game.action == LEFT || game.action == RIGHT || game.action == UP || game.action == DOWN)
 		{
 			if (isMainMenu)
 			{
 				game.action = -1;
 				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
-				currentOption = menu == mainMenuStartPtr ? resume : quit;
+				currentOption = menu == mainMenuStartPtr ? resume : exitGame;
 				displayMenu(menu, 0, 0);
 			}
 			else
@@ -415,6 +415,9 @@ void pauseGame(bool isMainMenu)
 			case restart:
 				clearObstacleMemory();
 				initializeGame();
+				break;
+			case exitGame:
+				game.exitGame = true;
 				break;
 			}
 			game.paused = false;
@@ -1337,7 +1340,7 @@ void initializeGame(void)
 	game.lastPowerUpTime = 0.0;
 	game.currentPowerUp.type = none;
 	game.secondsPerFrame = 0;
-	game.timeRemaining = 60.0 * 3.0; // Player starts with 5 minutes
+	game.timeRemaining = 60.0 * 5.0; // Player starts with 5 minutes
 	game.lives = 4;
 	game.moves = 250;
 	game.map = INITIAL_MAP;
@@ -1347,6 +1350,7 @@ void initializeGame(void)
 	game.win = false;
 	game.lose = false;
 	game.paused = false;
+	game.quit = false;
 }
 
 /*
@@ -1408,11 +1412,11 @@ int main(int argc, char *argv[])
 	pthread_t timerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
 	pthread_create(&timerThread, NULL, gameTimer, NULL);
-	while (!game.quit)
+	while (!game.exitGame)
 	{
 		initializeGame();
 		pauseGame(true);
-		while (!game.lose && !game.win && !game.quit)
+		while (!game.lose && !game.win && !game.quit && !game.exitGame)
 		{
 			if (game.action != -1)
 			{

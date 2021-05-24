@@ -216,8 +216,8 @@ int sampleController(void)
 
     buttonIndex = -1;
 
-    // Delay to prevent printing too much -- 200000 microseconds because not too slow and still very responsive
-    delayMicroseconds(100000);
+    // Delay input to improve responsiveness
+    delayMicroseconds(125000);
 
     // Get button code that corresponds to the button that is pressed or lack thereof
     buttonIndex = Read_SNES();

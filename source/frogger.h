@@ -70,7 +70,8 @@ enum options
 {
 	resume,
 	quit,
-	restart
+	restart,
+	exitGame
 };
 
 // powerUpTypes data type for what powerup the frog currently has during the game
@@ -138,7 +139,8 @@ struct Game
 	Map map;				 // Game map
 	bool win;				 // Won game
 	bool lose;				 // Lost game
-	bool quit;				 // Quit game
+	bool quit;				 // Quit to main menu
+	bool exitGame;				 // Exit the program
 	bool paused;			 // Pause game
 	int score;				 // Player/Frog score
 	int movesMade;			 // Moves made by player
