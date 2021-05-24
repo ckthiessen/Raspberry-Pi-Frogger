@@ -1,18 +1,11 @@
 // Authors: Cole Thiessen (30027689) & Isaac Lutzko (30026703)
 // CPSC359 Winter 2021 Project (Part 2) Raspberry Pi Video Game
-// Februar 2021
+// May 2021 (extended deadline due to deferral)
 // Description:
 
 // Link/Reference for Frogger Image: https://www.funstockretro.co.uk/news/arcade-hall-of-fame-frogger-konami/
-//
 // Link/Reference for Crazy Frog Image: https://www.thesun.co.uk/living/2974489/crazy-frog-just-turned-20-relive-his-hellish-magic-here/
-//
 // Link/Reference for Pepe Frog Image: https://line.17qq.com/articles/doddbhdz.html
-//
-// link/references for figuring how to display stat bar
-//
-//
-// used for game.moves:
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,8 +74,10 @@
 #include "images/castle/castle_sky.h"
 #include "images/castle/castle_top.h"
 
+// instance of the frame buffer struct in framebuffer.h
 struct fbs framebufferstruct;
 
+// Pointers for graphics:
 // Frog Pointer
 short int *frogPtr = (short int *)frog_img.pixel_data;
 
@@ -146,6 +141,15 @@ short int *scorePtr = (short int *)score_img.pixel_data;
 short int *timePtr = (short int *)time_img.pixel_data;
 short int *valuePtr = (short int *)value_img.pixel_data;
 
+
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionType type)
 {
 	if (obstacleInView(yOffset))
@@ -167,6 +171,14 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void drawBackground(void)
 {
 	for (int row = game.scrollOffset; row < NUM_HORIZONTAL_TILES + game.scrollOffset; row++)
@@ -238,6 +250,14 @@ void drawBackground(void)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void checkCollision(void)
 {
 	bool collision = false;
@@ -268,6 +288,14 @@ void checkCollision(void)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void calculateScore(void)
 {
 	if (game.lives > 0)
@@ -310,6 +338,14 @@ void calculateScore(void)
 	drawGameInfo(13, 13, calcScorePtr);
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void displayMenu(short *menu, int heightOffset, int widthOffset)
 {
 	int i = 0;
@@ -328,6 +364,14 @@ void displayMenu(short *menu, int heightOffset, int widthOffset)
 	drawStageToFrameBuffer();
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void pauseGame(bool isMainMenu)
 {
 	enum options currentOption;
@@ -389,6 +433,14 @@ void pauseGame(bool isMainMenu)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void endGame(short *menu)
 {
 	game.action = NO_ACTION;
@@ -404,16 +456,40 @@ void endGame(short *menu)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 int max(int a, int b)
 {
 	return a > b ? a : b;
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 int min(int a, int b)
 {
 	return a < b ? a : b;
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void moveFrog(int direction)
 {
 	bool moved = false;
@@ -476,6 +552,14 @@ void moveFrog(int direction)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void doUserAction(void)
 {
 	if (game.action == START)
@@ -488,12 +572,28 @@ void doUserAction(void)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 /* Draw a frame */
 void drawStageToFrameBuffer(void)
 {
 	memcpy(framebufferstruct.fptr, game.map.stage, 1280 * 720 * 2);
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void *getUserInput(void *arg)
 {
 	while (true)
@@ -517,6 +617,14 @@ void *getUserInput(void *arg)
 	return NULL;
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void resetFrogPosition(void)
 {
 	game.scrollOffset = 30;
@@ -524,6 +632,14 @@ void resetFrogPosition(void)
 	game.frogLocation = FROG_START;
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void drawTile(short *img, int yOffset, int xOffset)
 {
 	int i = 0;
@@ -541,11 +657,27 @@ void drawTile(short *img, int yOffset, int xOffset)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void drawFrog(void)
 {
 	drawTile(frogPtr, game.frogLocation.row, game.frogLocation.col);
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void updateFrogLocation(void)
 {
 	// Could improve efficiency by skipping to logs
@@ -563,6 +695,14 @@ void updateFrogLocation(void)
 	drawFrog();
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 PowerUp generateRandomPowerUp(void)
 {
 	enum powerUpTypes type = getRandomBetweenRange(0, 4);
@@ -578,6 +718,14 @@ PowerUp generateRandomPowerUp(void)
 		.type = type};
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void displayPowerUp(void)
 {
 	int row = game.currentPowerUp.powerUpLocation.row;
@@ -604,6 +752,15 @@ void displayPowerUp(void)
 	updateStage(row, col, img, powerUp);
 }
 
+
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void slowAllObstacles(void)
 {
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
@@ -617,8 +774,18 @@ void slowAllObstacles(void)
 	}
 }
 
-int ones;
-int tens;
+
+// int ones;
+// int tens;
+
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void applyPowerUp(void)
 {
 	switch (game.currentPowerUp.type)
@@ -640,8 +807,17 @@ void applyPowerUp(void)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void checkPowerUps(void)
 {
+	// generate powerups every 30 seconds starting on the first 30 minutes
 	if ((game.lastPowerUpTime + POWERUP_TIME_INTERVAL) - game.elapsedTime < 0)
 	{
 		game.lastPowerUpTime = game.elapsedTime;
@@ -656,6 +832,14 @@ void checkPowerUps(void)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void checkEndCondition(void)
 {
 	if (game.frogLocation.row == ROW_OF_CASTLE)
@@ -670,8 +854,14 @@ void checkEndCondition(void)
 	}
 }
 
-//--------------------------------------------
-
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr)
 {
 	int i = 0;
@@ -686,6 +876,12 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void digitPtr(char passedDigit, short int **digits)
 {
 	switch (passedDigit)
@@ -726,35 +922,39 @@ void digitPtr(char passedDigit, short int **digits)
 	}
 }
 
+/*
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void updateGameInfo(void)
 {
 	// game.timeRemaining double converted for string for displaying time
-	char timeStr[50];
+	char timeStr[TIME_STAT_BAR_TO_CHARS];
 	sprintf(timeStr, "%f", game.timeRemaining);
 
 	if (game.timeRemaining < 100)
 	{
-		memmove(timeStr + 1, timeStr, 4);
+		memmove(timeStr + 1, timeStr, TIME_MOVE_PREPEND_ZERO);
 		timeStr[0] = '0';
 	}
 
 	// game.moves int converted to string for displaying number of moves left
-	char movesStr[5];
+	char movesStr[MOVES_STAT_BAR_TO_CHARS];
 	sprintf(movesStr, "%d", game.moves);
 
 	if (game.moves < 100)
 	{
-		memmove(movesStr + 1, movesStr, 4);
+		memmove(movesStr + 1, movesStr, TIME_MOVE_PREPEND_ZERO);
 		movesStr[0] = '0';
 		if (game.moves < 10)
 		{
-			memmove(movesStr + 1, movesStr, 4);
+			memmove(movesStr + 1, movesStr, TIME_MOVE_PREPEND_ZERO);
 			movesStr[0] = '0';
 		}
 	}
 
 	// game.lives int converted to string for displaying number of lives left
-	char livesStr[3];
+	char livesStr[LIVES_STAT_BAR_TO_CHARS];
 	sprintf(livesStr, "%d", game.lives);
 
 	// game.score int converted to string for displaying score
@@ -763,15 +963,15 @@ void updateGameInfo(void)
 
 	if (game.score < 1000)
 	{
-		memmove(game.scoreStr + 1, game.scoreStr, 3);
+		memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 		game.scoreStr[0] = '0';
 		if (game.score < 100)
 		{
-			memmove(game.scoreStr + 1, game.scoreStr, 3);
+			memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 			game.scoreStr[0] = '0';
 			if (game.score < 10)
 			{
-				memmove(game.scoreStr + 1, game.scoreStr, 3);
+				memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 				game.scoreStr[0] = '0';
 			}
 		}
@@ -782,7 +982,7 @@ void updateGameInfo(void)
 	{
 		for (int col = 0; col < NUM_HORIZONTAL_TILES; col++)
 		{
-			if (row == 17)
+			if (row == TOP_ROW_STAT_BAR)
 			{
 				switch (col)
 				{
@@ -837,7 +1037,7 @@ void updateGameInfo(void)
 				}
 			}
 
-			else if (row == 19)
+			else if (row == BOTTOM_ROW_STAT_BAR)
 			{
 				switch (col)
 				{
@@ -909,6 +1109,14 @@ void updateGameInfo(void)
 	}
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int velocity)
 {
 	int numImgs;
@@ -973,11 +1181,25 @@ Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int veloc
 		.collisionType = collisionType};
 }
 
+/*
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 int getRandomBetweenRange(int low, int high)
 {
 	return (rand() % (high)) + low;
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velocity)
 {
 	int startPos = 0;
@@ -999,8 +1221,17 @@ void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velo
 	game.obstaclesInitialized = i;
 }
 
+/*
+@Params:
+@Params:
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void initializeObstacles(void)
 {
+	
 	// Remember to add to NUM_OBSTACLES if adding obstacles
 	initializeLane(car, 4, 48, 9);
 	initializeLane(bus, 2, 47, -4);
@@ -1039,6 +1270,12 @@ void initializeObstacles(void)
 	initializeLane(rock, 3, 10, 5);
 }
 
+/*
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine checks whether or not a lane with obstacles is in the screen or not
+i.e., is an obstacle that is on the game board also on the currently displayed screen
+*/
 bool obstacleInView(int lane)
 {
 	if (lane > game.scrollOffset && lane < NUM_HORIZONTAL_TILES + game.scrollOffset)
@@ -1048,11 +1285,16 @@ bool obstacleInView(int lane)
 	return false;
 }
 
+/*
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void drawObstacles(void)
 {
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
 		Obstacle obst = game.obstacles[obstNum];
+		// check if obstacle is a snake
 		if (obst.type == snake && ((obst.colPos + game.obstacles[obstNum].velocity + (TILE_WIDTH * obst.numImgs) > GAME_WIDTH) || obst.colPos + game.obstacles[obstNum].velocity < 0))
 		{
 			// Reverse direction of snake when it reaches end of screen
@@ -1086,6 +1328,10 @@ void drawObstacles(void)
 	}
 }
 
+/*
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void initializeGame(void)
 {
 	resetFrogPosition();
@@ -1099,16 +1345,23 @@ void initializeGame(void)
 	game.moves = 250;
 	game.map = INITIAL_MAP;
 	game.obstaclesInitialized = 0;
-	//-----------------------
 	game.score = 0;
 	game.movesMade = 0;
 }
 
+/*
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void clearCollisionBuffer(void)
 {
 	memset(game.collisionBuffer, 0, (GAME_WIDTH * GAME_HEIGHT) * sizeof(short));
 }
 
+/*
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void clearObstacleMemory(void)
 {
 	for (int obstacleNum = 0; obstacleNum < NUM_OBSTACLES; obstacleNum++)
@@ -1117,6 +1370,11 @@ void clearObstacleMemory(void)
 	}
 }
 
+/*
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 void *gameTimer(void *arg)
 {
 	while (!game.quit)
@@ -1128,6 +1386,12 @@ void *gameTimer(void *arg)
 	return NULL;
 }
 
+/*
+@Params:
+@Params:
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 /* main function */
 int main(int argc, char *argv[])
 {
@@ -1138,9 +1402,9 @@ int main(int argc, char *argv[])
 	pthread_t controllerThread;
 	pthread_t timerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
-	pthread_create(&timerThread, NULL, gameTimer, NULL);
 	initializeGame();
 	pauseGame(true);
+	pthread_create(&timerThread, NULL, gameTimer, NULL);
 	while (!game.quit)
 	{
 		if (game.action != -1)
@@ -1158,6 +1422,7 @@ int main(int argc, char *argv[])
 		drawStageToFrameBuffer();
 		checkEndCondition();
 	}
+	
 
 	if (game.win)
 	{
