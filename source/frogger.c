@@ -140,7 +140,6 @@ short int *scorePtr = (short int *)score_img.pixel_data;
 short int *timePtr = (short int *)time_img.pixel_data;
 short int *valuePtr = (short int *)value_img.pixel_data;
 
-
 /*
 @Params: yOffset: integer that is used for offsetting what row the image is being drawn to
 @Params: xOffset: integer that is used for offsetting what column the image is being drawn to
@@ -750,7 +749,6 @@ void displayPowerUp(void)
 	updateStage(row, col, img, powerUp);
 }
 
-
 /*
 @Params:
 @Params:
@@ -771,7 +769,6 @@ void slowAllObstacles(void)
 		}
 	}
 }
-
 
 // int ones;
 // int tens;
@@ -843,12 +840,10 @@ void checkEndCondition(void)
 	if (game.frogLocation.row == ROW_OF_CASTLE)
 	{
 		game.win = true;
-		game.quit = true;
 	}
 	else if (game.lives <= 0 || game.moves <= 0 || game.timeRemaining <= 0)
 	{
 		game.lose = true;
-		game.quit = true;
 	}
 }
 
@@ -1345,6 +1340,8 @@ void initializeGame(void)
 	game.obstaclesInitialized = 0;
 	game.score = 0;
 	game.movesMade = 0;
+	game.win = false;
+	game.lose = false;
 }
 
 /*
@@ -1397,43 +1394,46 @@ int main(int argc, char *argv[])
 	framebufferstruct = initFbInfo();
 	srand(time(NULL));
 
-   initController(); 
+	initController();
 
 	pthread_t controllerThread;
 	pthread_t timerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
-	initializeGame();
-	pauseGame(true);
-	pthread_create(&timerThread, NULL, gameTimer, NULL);
 	while (!game.quit)
 	{
-		if (game.action != -1)
+		initializeGame();
+		pauseGame(true);
+		pthread_create(&timerThread, NULL, gameTimer, NULL);
+		while (!game.lose && !game.win && !game.quit)
 		{
-			doUserAction();
-			game.action = -1;
+			if (game.action != -1)
+			{
+				doUserAction();
+				game.action = -1;
+			}
+			clearCollisionBuffer();
+			drawBackground();
+			updateGameInfo();
+			drawObstacles();
+			updateFrogLocation();
+			checkPowerUps();
+			checkCollision();
+			drawStageToFrameBuffer();
+			checkEndCondition();
 		}
-		clearCollisionBuffer();
-		drawBackground();
-		updateGameInfo();
-		drawObstacles();
-		updateFrogLocation();
-		checkPowerUps();
-		checkCollision();
-		drawStageToFrameBuffer();
-		checkEndCondition();
-	}
-	
 
-	if (game.win)
-	{
-		endGame(winPromptPtr);
+		if (game.win)
+		{
+			endGame(winPromptPtr);
+		}
+		else if (game.lose)
+		{
+			endGame(losePromptPtr);
+		}
+		pthread_cancel(timerThread);
+		system("clear");
+		clearObstacleMemory();
 	}
-	else if (game.lose)
-	{
-		endGame(losePromptPtr);
-	}
-
-	clearObstacleMemory();
 
 	// mummap = "memory unmap"; frees the following mapping from memory
 	munmap(framebufferstruct.fptr, framebufferstruct.screenSize);
