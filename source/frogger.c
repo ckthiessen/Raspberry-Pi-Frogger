@@ -1244,7 +1244,7 @@ void initializeObstacles(void)
 	initializeLane(wood, 3, 37, 8);
 	initializeLane(wood, 3, 36, -6);
 	initializeLane(wood, 2, 35, 5);
-	initializeLane(wood, 3, 34, 7);
+	initializeLane(wood, 3, 34, -7);
 	initializeLane(wood, 3, 33, 4);
 	initializeLane(wood, 2, 32, -5);
 	initializeLane(wood, 3, 31, -8);
