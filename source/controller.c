@@ -192,15 +192,22 @@ int Read_SNES(void)
     return checkForButtonPress(buttons);
 }
 
-
+/*
+Initializes the controller.
+*/
 void initController(void) 
 {
      // Get gpio pointer
     gpioPtr = getGPIOPtr();
+
 	// Initialize the SNES controller
     init_GPIO();
 }
 
+/*
+@Returns: Integer: button number from 1-12 if that button has been pressed or -1 if no button has been pressed
+This subroutine checks if a button has been pressed and returns the corresponding button code
+*/
 int sampleController(void)
 {
 
