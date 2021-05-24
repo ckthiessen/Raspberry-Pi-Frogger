@@ -12,12 +12,17 @@
 #define NUM_OBSTACLES 80
 #define VERTICAL_OFFSET 3	// Offset vertical rendering by 3 to make room for game statistics
 
+#define TIME_STAT_BAR_TO_CHARS 50
+#define MOVES_STAT_BAR_TO_CHARS 5
+#define LIVES_STAT_BAR_TO_CHARS 3
+#define TIME_MOVE_PREPEND_ZERO 4
+#define SCORE_PREPEND_ZERO 3
+#define TOP_ROW_STAT_BAR 17
+#define BOTTOM_ROW_STAT_BAR 19
+
 // void updateStage(int yOffset, int xOffset, int color);
 void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr);
-// void timePt(char timeDigit, short int **time);
-// void movesPt(char movesDigit, short int **moveLeft);
 void digitPtr(char passedDigit, short int **digits);
-
 void drawBackground(void);
 void checkCollision(void);
 void update(void);
@@ -116,7 +121,7 @@ struct Game
 	bool lose;				 // Lost game
 	bool quit;				 // Quit game
 	//-----------
-	// int statBarCounter;			// Used to diplay the correct time output
+	// bool end;		// for back to main menu after game
 	int score;
 	int movesMade;
 	char scoreStr[4];

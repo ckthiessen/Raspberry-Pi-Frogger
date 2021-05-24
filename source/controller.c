@@ -245,6 +245,10 @@ Handles the setup, the main program loop, and tear down of the application.
 //     return 0;
 // }
 
+/*
+@Returns: This subroutine does not return anything
+This subroutine ...
+*/
 int sampleController(void)
 {
     // Get gpio pointer
