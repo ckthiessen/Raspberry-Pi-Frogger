@@ -287,57 +287,59 @@ void checkCollision(void)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine calculates a players' score when the game is over - whether the player loses or wins
 */
 void calculateScore(void)
 {
-	if (game.lives > 0)
+	if (game.lives > 0)	// If the game is won, add to the score for winning, otherwise do not add the below additions to the score if game lost
 	{
-		game.score += ((400 - game.movesMade) * 5);
-		game.score += ((500 + game.timeRemaining) * 5);
-		game.score += (200 * game.lives);
+		game.score += ((400 - game.movesMade) * 5);	// The fewer the moves made to win, the higher the score
+		game.score += ((500 + game.timeRemaining) * 5); // The faster the game is won, the higher the score
+		game.score += (200 * game.lives); // The most lives you finish with after the win, the higher the score
 	}
 
-	sprintf(game.scoreStr, "%d", game.score);
+	sprintf(game.scoreStr, "%d", game.score);	// Convert game score integer to string for displaying score correctly on screen
 
-	if (game.score < 1000)
+	if (game.score < 1000)	// If game score is less than 1000, prepend a zero for displaying score correctly on screen
 	{
-		memmove(game.scoreStr + 1, game.scoreStr, 3);
+		memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 		game.scoreStr[0] = '0';
-		if (game.score < 100)
+		if (game.score < 100)	// if game score is less than 100, prepend a zero for displaying score correctly on screen
 		{
-			memmove(game.scoreStr + 1, game.scoreStr, 3);
+			memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 			game.scoreStr[0] = '0';
-			if (game.score < 10)
+			if (game.score < 10)	// if game score is less than 10, prepend a zero for displaying score correctly on screen
 			{
-				memmove(game.scoreStr + 1, game.scoreStr, 3);
+				memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 				game.scoreStr[0] = '0';
 			}
 		}
 	}
 
-	short int *calcScorePtr;
+	short int *calcScorePtr;	// Short int pointer used for getting correct image pointer for a digit on the status bar 
 
-	digitPtr(game.scoreStr[0], &calcScorePtr);
-	drawGameInfo(13, 10, calcScorePtr);
+	digitPtr(game.scoreStr[0], &calcScorePtr);	// Get image pointer for thousandth digit 
+	drawGameInfo(13, 10, calcScorePtr);			// Draw digit for thousandth digit
 
-	digitPtr(game.scoreStr[1], &calcScorePtr);
-	drawGameInfo(13, 11, calcScorePtr);
+	digitPtr(game.scoreStr[1], &calcScorePtr);	// Get image pointer for hundredth digit
+	drawGameInfo(13, 11, calcScorePtr);			// Draw digit for hundredth digit
 
-	digitPtr(game.scoreStr[2], &calcScorePtr);
-	drawGameInfo(13, 12, calcScorePtr);
+	digitPtr(game.scoreStr[2], &calcScorePtr);	// Get image pointer for tens digit
+	drawGameInfo(13, 12, calcScorePtr);			// Draw digit for tens digit
 
-	digitPtr(game.scoreStr[3], &calcScorePtr);
-	drawGameInfo(13, 13, calcScorePtr);
+	digitPtr(game.scoreStr[3], &calcScorePtr);	// Get image pointer for ones digit
+	drawGameInfo(13, 13, calcScorePtr);			// Draw digit for ones digit
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: *menu: short image pointer that takes in a specific menu image pointer (e.g., pause menu when restart is selected)
+@Params: heightOffset: integer that corresponds to the height of the menu that is passed (e.g., pause menu has different height than main menu)
+@Params: widthOffset: integer that corresponds to the width of the menu that is passed (e.g., pause menu has different width than main menu)
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in the short image pointer that is being drawn and it's respective height and width by its' tiles and sets
+each pixel in the stage to the appropriate color from the menu short image pointer that is passed.  If the game ends, the calculateScore()
+function is called that sets the score digits in the win or lose prompt/menu.  After the stage has been set, the drawStageToFrameBuffer()
+function is called to display the appropriate screen
 */
 void displayMenu(short *menu, int heightOffset, int widthOffset)
 {
@@ -351,31 +353,35 @@ void displayMenu(short *menu, int heightOffset, int widthOffset)
 		}
 	}
 
-	if (game.win == true || game.lose == true)
+	if (game.win == true || game.lose == true)	// if game has ended, set tiles in stage for displaying score
 		calculateScore();
 
 	drawStageToFrameBuffer();
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: isMainMenu: boolean that checks if menu is the main menu or not
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine displays the correct menu - either the main menu or the pause menu, starting with the start game main menu 
+or the restart game pause menu and changes depending on user action on the joypad on the SNES - and makes appropriate changes
+to the game state.  First if at main menu, display the start game main menu and set game option to resume, otherwise display 
+the restart game pause menu and set game option to restart.  From then, the menu that is displayed changes depending on user movement
+on the joypad.  If user presses left or right on the joypad, the menu that is displayed changes to show that the player wants to 
+select a different option (e.g., user sees restart game pause menu, then presses left to select quit game pause menu).  From there,
+if the user selects the option that is shown to them - either resume game, quit game, or restart game - then the appropriate actions
+are made to game state.
 */
 void pauseGame(bool isMainMenu)
 {
 	enum options currentOption;
 	short *menu;
-	if (isMainMenu)
+	if (isMainMenu) // If menu is the main menu then display the default main menu and set default game option to resume for starting the game
 	{
 		menu = mainMenuStartPtr;
 		currentOption = resume;
 		displayMenu(menu, 0, 0);
 	}
-	else
+	else // Menu is pause menu so display default pause menu and set default game option to restarting game
 	{
 		currentOption = restart;
 		menu = pauseMenuRestartPtr;
@@ -383,18 +389,18 @@ void pauseGame(bool isMainMenu)
 	}
 	game.action = NO_ACTION;
 	bool paused = true;
-	while (paused)
+	while (paused) // Loop that acts depending on user input on SNES
 	{
-		if (game.action == LEFT || game.action == RIGHT)
+		if (game.action == LEFT || game.action == RIGHT)  // If user changes selection on menu
 		{
-			if (isMainMenu)
+			if (isMainMenu)	// If main menu then change selected option on menu
 			{
 				game.action = -1;
 				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
 				currentOption = menu == mainMenuStartPtr ? resume : quit;
 				displayMenu(menu, 0, 0);
 			}
-			else
+			else	// Since pause menu then change selected option on menu
 			{
 				game.action = -1;
 				menu = menu == pauseMenuQuitPtr ? pauseMenuRestartPtr : pauseMenuQuitPtr;
@@ -403,7 +409,7 @@ void pauseGame(bool isMainMenu)
 			}
 			usleep(500 * 1000);
 		}
-		if (game.action == SELECT)
+		if (game.action == SELECT)	// If user has selected the current option then make appropriate action
 		{
 			switch (currentOption)
 			{
@@ -418,7 +424,7 @@ void pauseGame(bool isMainMenu)
 			}
 			paused = false;
 		}
-		if (game.action == START && !isMainMenu)
+		if (game.action == START && !isMainMenu)	// If user wants to resume game after pausing it
 		{
 			paused = false;
 			usleep(500 * 1000);
