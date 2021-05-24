@@ -287,10 +287,6 @@ void checkCollision(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
 This subroutine ...
 */
@@ -934,6 +930,11 @@ void updateGameInfo(void)
 	{
 		memmove(timeStr + 1, timeStr, TIME_MOVE_PREPEND_ZERO);
 		timeStr[0] = '0';
+		if (game.timeRemaining < 10)
+		{
+			memmove(timeStr + 1, timeStr, TIME_MOVE_PREPEND_ZERO);
+			timeStr[0] = '0';
+		}
 	}
 
 	// game.moves int converted to string for displaying number of moves left
