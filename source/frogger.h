@@ -112,7 +112,6 @@ enum CollisionType
 // Struct defined for each obstacle and its' respective properties
 typedef struct
 {
-	// int buff[TILE_HEIGHT * TILE_WIDTH];
 	enum ObstacleType type;				// Each obstacle has a type (car, bus, wood, rock, or snake)
 	short lane;							// What lane/row the obstacle is in
 	int colPos;							// What column the obstacle is in at a specific time as it moves across the screen
