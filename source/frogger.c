@@ -448,7 +448,7 @@ void endGame(short *menu)
 	displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 	while (paused)
 	{
-		if (game.action == START)
+		if (game.action != -1)
 		{
 			paused = false;
 			usleep(500 * 1000);
