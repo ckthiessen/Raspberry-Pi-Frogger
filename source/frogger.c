@@ -1063,12 +1063,14 @@ void updateGameInfo(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine ...
+@Params: type: the type of the obstacle - car, bus, wood, rock, or snake
+@Params: lane: the row of the game map that the obstacle is on
+@Params: colPos: the column position of the obstacle - important for creating smooth animation of obstacles moving
+@Params: velocity: the speed or direction (left to right or right to left) of the obstacle
+@Returns: Obstacle: returns an obstacle as per the struct definition of an obstacle in frogger.h
+This subroutine creates obstacles - which are either cars, busses, logs, rocks, or snakes - for the game.  Each obstacle has a different number
+of images to display, a different amount of memory that needs to be allocated, different short int image pointers, and collision type set in
+the cases.  Once the obstacle's properties are set, the obstacle is returned
 */
 Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int velocity)
 {
@@ -1135,10 +1137,10 @@ Obstacle obstacleFactory(enum ObstacleType type, int lane, int colPos, int veloc
 }
 
 /*
-@Params:
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine ...
+@Params: low: integer that is less than the high integer for generating a random integer between this integer and the high integer
+@Params: high: integer that is greater than the low integer for generating a random integer between this integer and the low integer
+@Returns: int: returns an integer that is in between the range of the passed integers low, and high
+This subroutine takes in two integers, one lower and one higher, and returns a random integer such that low <= returned random integer <= high
 */
 int getRandomBetweenRange(int low, int high)
 {
@@ -1146,12 +1148,15 @@ int getRandomBetweenRange(int low, int high)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: type: the type of the obstacle - car, bus, wood, rock, or snake
+@Params: numObstacles: the number of obstacles
+@Params: lane: the row of the game map that the obstacle is on
+@Params: velocity: the speed or direction (left to right or right to left) of the obstacle
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in a lane and initializes that lane by setting the start position of each obstacle in that lane to the obstacle 
+column position.  To do this, we iterate through the number of obstacles (numObstacles passed in) that can be initialized in a lane - that
+entails creating the obstacles by calling obstacleFactory() and then setting the column position of the obstacle to a start position.  The
+index of the obstacles array in the instance of the game struct in frogger.h is then set to the next empty element.
 */
 void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velocity)
 {
@@ -1175,12 +1180,9 @@ void initializeLane(enum ObstacleType type, int numObstacles, int lane, int velo
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine populates each lane by filling it with its respective obstacle (different number of obstacles).  e.g., the first
+lane contains 3 car obstacles and the cars are moving from left to right since the last parameter of initializeLane is positive.
 */
 void initializeObstacles(void)
 {
@@ -1226,10 +1228,10 @@ void initializeObstacles(void)
 }
 
 /*
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine checks whether or not a lane with obstacles is in the screen or not
-i.e., is an obstacle that is on the game board also on the currently displayed screen
+@Params: lane: the row of the game map that the obstacle is on
+@Returns: bool: returns true or false depending on if a lane is displayed to the player.
+This subroutine checks whether or not a lane is displayed on the screen or not
+i.e., is an lane that is on the game board also on the currently displayed screen
 */
 bool obstacleInView(int lane)
 {
@@ -1242,7 +1244,7 @@ bool obstacleInView(int lane)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine draws the 
 */
 void drawObstacles(void)
 {
@@ -1285,7 +1287,8 @@ void drawObstacles(void)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine sets up the game for the start of the game - timer set back to 5 minutes, lives set back to 4, moves set back to 250, 
+score set back to 0, set frog back to start position, etc.
 */
 void initializeGame(void)
 {
@@ -1310,7 +1313,8 @@ void initializeGame(void)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine clears the memory of the collision buffer by calling memset back to 0.  Called in every iteration of the while loop in 
+the main function to reset the memory of the collision buffer.
 */
 void clearCollisionBuffer(void)
 {
@@ -1319,7 +1323,7 @@ void clearCollisionBuffer(void)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine clears the memory of the obstacles in the game after the game has ended (a player has either won or lost the game)
 */
 void clearObstacleMemory(void)
 {
@@ -1330,9 +1334,10 @@ void clearObstacleMemory(void)
 }
 
 /*
-@Params:
+@Params: *arg: NULL argument that is passed to the controller user input thread
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine is the thread for the game timer.  It is used for displaying the status bar, tracking how much time has elapsed in the game,
+and stops game time if the game is paused.
 */
 void *gameTimer(void *arg)
 {
@@ -1349,10 +1354,11 @@ void *gameTimer(void *arg)
 }
 
 /*
-@Params:
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine ...
+@Params: argc: number of command line arguments passed when running program
+@Params: *argv[]: array that contains the command line arguments that are passed when running program
+@Returns: int: returns an integer (0) at the end of the program to show that the program is done.
+This subroutine is the main function of frogger.c program.  This contains the creation of the controller thread and
+the timer thread, the game logic, calling functions for graphics, updating game state, and clearing or unmapping memory.
 */
 /* main function */
 int main(int argc, char *argv[])
