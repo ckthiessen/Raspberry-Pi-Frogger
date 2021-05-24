@@ -44,6 +44,7 @@ void updateScoreEnd(int yOffset, int xOffset, short int *score_ptr);
 int getRandomBetweenRange(int, int);
 void applyPowerUp(void);
 bool obstacleInView(int);
+void clearObstacleMemory(void);
 
 // Struct defined for the coordinates of where a tile is on the game map
 typedef struct
@@ -138,6 +139,7 @@ struct Game
 	bool win;				 // Won game
 	bool lose;				 // Lost game
 	bool quit;				 // Quit game
+	bool paused;			 // Pause game
 	int score;				 // Player/Frog score
 	int movesMade;			 // Moves made by player
 	char scoreStr[4];		 // Score char array that is converted from int for displaying score on status bar and win or lose prompt

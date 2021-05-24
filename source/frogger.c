@@ -163,8 +163,8 @@ void updateStage(int yOffset, int xOffset, short int *img_ptr, enum CollisionTyp
 				int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);
 				if (loc > 0)
 				{
-					game.collisionBuffer[loc] = type;	// Set pixel collisionType in collisionBuffer to the passed tile which is used for collision detection
-					game.map.stage[loc] = img_ptr[i];	// Set pixel to color from *img_ptr
+					game.collisionBuffer[loc] = type; // Set pixel collisionType in collisionBuffer to the passed tile which is used for collision detection
+					game.map.stage[loc] = img_ptr[i]; // Set pixel to color from *img_ptr
 				}
 				i++;
 			}
@@ -186,7 +186,7 @@ void drawBackground(void)
 	{
 		for (int col = 0; col < NUM_HORIZONTAL_TILES; col++)
 		{
-			char tile = game.map.board[row][col];	// Tile that corresponds to specific tile in the game board as per the row and column
+			char tile = game.map.board[row][col]; // Tile that corresponds to specific tile in the game board as per the row and column
 			short int *ptr;
 			enum CollisionType type;
 			switch (tile)
@@ -246,7 +246,7 @@ void drawBackground(void)
 				ptr = blackRoadPtr;
 				break;
 			}
-			updateStage(row, col, ptr, type);	// Call updateStage for the tile by its row, its column, the short int image pointer and the collisionType
+			updateStage(row, col, ptr, type); // Call updateStage for the tile by its row, its column, the short int image pointer and the collisionType
 		}
 	}
 }
@@ -257,28 +257,28 @@ This subroutine is used to check if the frog has collided with an object kills h
 */
 void checkCollision(void)
 {
-	bool collision = false;	// Collision default set to false here
+	bool collision = false; // Collision default set to false here
 	for (int y = (TILE_HEIGHT + 1) * (game.frogLocation.row - game.scrollOffset); y < (TILE_HEIGHT) * (game.frogLocation.row - game.scrollOffset + 1); y++)
 	{
 		for (int x = game.frogLocation.col; x < game.frogLocation.col + TILE_WIDTH; x++)
 		{
-			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH);  // Get location of pixel 
-			if (game.collisionBuffer[loc] == death)	// Check if frog colliding with pixel kills the frog
+			int loc = ((y * GAME_WIDTH) + x) - (((VERTICAL_OFFSET * TILE_HEIGHT) * GAME_WIDTH) + NUM_HORIZONTAL_TILES * TILE_WIDTH); // Get location of pixel
+			if (game.collisionBuffer[loc] == death)																					 // Check if frog colliding with pixel kills the frog
 			{
-				collision = true;		// Set collision to true since the frog collided with a pixel that kills it
-				resetFrogPosition();	// Move frog back to the start
-				game.lives--;			// Decrement the number of lives the frog has
+				collision = true;	 // Set collision to true since the frog collided with a pixel that kills it
+				resetFrogPosition(); // Move frog back to the start
+				game.lives--;		 // Decrement the number of lives the frog has
 				break;
 			}
-			if (game.collisionBuffer[loc] == powerUp)	// Check if frog collided with a pixel that corresponds to a powerUp
+			if (game.collisionBuffer[loc] == powerUp) // Check if frog collided with a pixel that corresponds to a powerUp
 			{
-				collision = true;		// Set collision to true since the frog collided with a pixel that corresponds to a powerUp
-				applyPowerUp();			// Apply appropriate powerUp
-				game.score += 50;		// Increment score of player by 50
+				collision = true; // Set collision to true since the frog collided with a pixel that corresponds to a powerUp
+				applyPowerUp();	  // Apply appropriate powerUp
+				game.score += 50; // Increment score of player by 50
 				game.currentPowerUp.type = none;
 			}
 		}
-		if (collision)	// If frog collided with a lethal pixel or a pixel that corresponds to a powerUp, break loop
+		if (collision) // If frog collided with a lethal pixel or a pixel that corresponds to a powerUp, break loop
 		{
 			break;
 		}
@@ -382,8 +382,8 @@ void pauseGame(bool isMainMenu)
 		displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 	}
 	game.action = NO_ACTION;
-	bool paused = true;
-	while (paused)
+	game.paused = true;
+	while (game.paused)
 	{
 		if (game.action == LEFT || game.action == RIGHT)
 		{
@@ -413,14 +413,15 @@ void pauseGame(bool isMainMenu)
 				game.quit = true;
 				break;
 			case restart:
+				clearObstacleMemory();
 				initializeGame();
 				break;
 			}
-			paused = false;
+			game.paused = false;
 		}
 		if (game.action == START && !isMainMenu)
 		{
-			paused = false;
+			game.paused = false;
 			usleep(500 * 1000);
 		}
 	}
@@ -437,13 +438,13 @@ This subroutine ...
 void endGame(short *menu)
 {
 	game.action = NO_ACTION;
-	bool paused = true;
+	game.paused = true;
 	displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
-	while (paused)
+	while (game.paused)
 	{
 		if (game.action != -1)
 		{
-			paused = false;
+			game.paused = false;
 			usleep(500 * 1000);
 		}
 	}
@@ -1225,7 +1226,6 @@ This subroutine ...
 */
 void initializeObstacles(void)
 {
-
 	// Remember to add to NUM_OBSTACLES if adding obstacles
 	initializeLane(car, 4, 48, 9);
 	initializeLane(bus, 2, 47, -4);
@@ -1343,6 +1343,7 @@ void initializeGame(void)
 	game.movesMade = 0;
 	game.win = false;
 	game.lose = false;
+	game.paused = false;
 }
 
 /*
@@ -1373,11 +1374,14 @@ This subroutine ...
 */
 void *gameTimer(void *arg)
 {
-	while (!game.quit)
+	while (true)
 	{
-		usleep(1000 * 1000);
-		game.elapsedTime += 1;
-		game.timeRemaining -= 1;
+		while (!game.paused)
+		{
+			usleep(1000 * 1000);
+			game.elapsedTime += 1;
+			game.timeRemaining -= 1;
+		}
 	}
 	return NULL;
 }
@@ -1400,11 +1404,11 @@ int main(int argc, char *argv[])
 	pthread_t controllerThread;
 	pthread_t timerThread;
 	pthread_create(&controllerThread, NULL, getUserInput, NULL);
+	pthread_create(&timerThread, NULL, gameTimer, NULL);
 	while (!game.quit)
 	{
 		initializeGame();
 		pauseGame(true);
-		pthread_create(&timerThread, NULL, gameTimer, NULL);
 		while (!game.lose && !game.win && !game.quit)
 		{
 			if (game.action != -1)
@@ -1431,8 +1435,6 @@ int main(int argc, char *argv[])
 		{
 			endGame(losePromptPtr);
 		}
-		pthread_cancel(timerThread);
-		system("clear");
 		clearObstacleMemory();
 	}
 
