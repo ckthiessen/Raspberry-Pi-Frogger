@@ -143,7 +143,7 @@ short int *valuePtr = (short int *)value_img.pixel_data;
 /*
 @Params: yOffset: integer that is used for offsetting what row the image is being drawn to
 @Params: xOffset: integer that is used for offsetting what column the image is being drawn to
-@Params: *img_ptr: short int pointer that contains a short int image pointer that is being drawn to position in the stage
+@Params: *img_ptr: short int image pointer that is being drawn to a position in the stage
 @Params: type: CollisionType that is defined in frogger.h that declares as to what kind collision the tile is - (safe, death, powerUp)
 @Returns: This subroutine does not return anything
 This subroutine takes in a yOffset and an xOffset that corresponds as to what tile the image (image as a pointer in *img_ptr) is being
@@ -287,57 +287,59 @@ void checkCollision(void)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine calculates a players' score when the game is over - whether the player loses or wins
 */
 void calculateScore(void)
 {
-	if (game.lives > 0)
+	if (game.lives > 0)	// If the game is won, add to the score for winning, otherwise do not add the below additions to the score if game lost
 	{
-		game.score += ((400 - game.movesMade) * 5);
-		game.score += ((500 + game.timeRemaining) * 5);
-		game.score += (200 * game.lives);
+		game.score += ((400 - game.movesMade) * 5);	// The fewer the moves made to win, the higher the score
+		game.score += ((500 + game.timeRemaining) * 5); // The faster the game is won, the higher the score
+		game.score += (200 * game.lives); // The most lives you finish with after the win, the higher the score
 	}
 
-	sprintf(game.scoreStr, "%d", game.score);
+	sprintf(game.scoreStr, "%d", game.score);	// Convert game score integer to string for displaying score correctly on screen
 
-	if (game.score < 1000)
+	if (game.score < 1000)	// If game score is less than 1000, prepend a zero for displaying score correctly on screen
 	{
-		memmove(game.scoreStr + 1, game.scoreStr, 3);
+		memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 		game.scoreStr[0] = '0';
-		if (game.score < 100)
+		if (game.score < 100)	// if game score is less than 100, prepend a zero for displaying score correctly on screen
 		{
-			memmove(game.scoreStr + 1, game.scoreStr, 3);
+			memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 			game.scoreStr[0] = '0';
-			if (game.score < 10)
+			if (game.score < 10)	// if game score is less than 10, prepend a zero for displaying score correctly on screen
 			{
-				memmove(game.scoreStr + 1, game.scoreStr, 3);
+				memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 				game.scoreStr[0] = '0';
 			}
 		}
 	}
 
-	short int *calcScorePtr;
+	short int *calcScorePtr;	// Short int pointer used for getting correct image pointer for a digit on the status bar 
 
-	digitPtr(game.scoreStr[0], &calcScorePtr);
-	drawGameInfo(13, 10, calcScorePtr);
+	digitPtr(game.scoreStr[0], &calcScorePtr);	// Get image pointer for thousandth digit 
+	drawGameInfo(13, 10, calcScorePtr);			// Draw digit for thousandth digit
 
-	digitPtr(game.scoreStr[1], &calcScorePtr);
-	drawGameInfo(13, 11, calcScorePtr);
+	digitPtr(game.scoreStr[1], &calcScorePtr);	// Get image pointer for hundredth digit
+	drawGameInfo(13, 11, calcScorePtr);			// Draw digit for hundredth digit
 
-	digitPtr(game.scoreStr[2], &calcScorePtr);
-	drawGameInfo(13, 12, calcScorePtr);
+	digitPtr(game.scoreStr[2], &calcScorePtr);	// Get image pointer for tens digit
+	drawGameInfo(13, 12, calcScorePtr);			// Draw digit for tens digit
 
-	digitPtr(game.scoreStr[3], &calcScorePtr);
-	drawGameInfo(13, 13, calcScorePtr);
+	digitPtr(game.scoreStr[3], &calcScorePtr);	// Get image pointer for ones digit
+	drawGameInfo(13, 13, calcScorePtr);			// Draw digit for ones digit
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: *menu: short image pointer that takes in a specific menu image pointer (e.g., pause menu when restart is selected)
+@Params: heightOffset: integer that corresponds to the height of the menu that is passed (e.g., pause menu has different height than main menu)
+@Params: widthOffset: integer that corresponds to the width of the menu that is passed (e.g., pause menu has different width than main menu)
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in the short image pointer that is being drawn and it's respective height and width by its' tiles and sets
+each pixel in the stage to the appropriate color from the menu short image pointer that is passed.  If the game ends, the calculateScore()
+function is called that sets the score digits in the win or lose prompt/menu.  After the stage has been set, the drawStageToFrameBuffer()
+function is called to display the appropriate screen
 */
 void displayMenu(short *menu, int heightOffset, int widthOffset)
 {
@@ -351,50 +353,54 @@ void displayMenu(short *menu, int heightOffset, int widthOffset)
 		}
 	}
 
-	if (game.win == true || game.lose == true)
+	if (game.win == true || game.lose == true)	// if game has ended, set tiles in stage for displaying score
 		calculateScore();
 
 	drawStageToFrameBuffer();
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: isMainMenu: boolean that checks if menu is the main menu or not
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine displays the correct menu - either the main menu or the pause menu, starting with the start game main menu 
+or the restart game pause menu and changes depending on user action on the joypad on the SNES - and makes appropriate changes
+to the game state.  First if at main menu, display the start game main menu and set game option to resume, otherwise display 
+the restart game pause menu and set game option to restart.  From then, the menu that is displayed changes depending on user movement
+on the joypad.  If user presses left or right on the joypad, the menu that is displayed changes to show that the player wants to 
+select a different option (e.g., user sees restart game pause menu, then presses left to select quit game pause menu).  From there,
+if the user selects the option that is shown to them - either resume game, quit game, or restart game - then the appropriate actions
+are made to game state.
 */
 void pauseGame(bool isMainMenu)
 {
 	enum options currentOption;
 	short *menu;
-	if (isMainMenu)
+	if (isMainMenu) // If menu is the main menu then display the default main menu and set default game option to resume for starting the game
 	{
 		menu = mainMenuStartPtr;
 		currentOption = resume;
 		displayMenu(menu, 0, 0);
 	}
-	else
+	else // Menu is pause menu so display default pause menu and set default game option to restarting game
 	{
 		currentOption = restart;
 		menu = pauseMenuRestartPtr;
 		displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 	}
 	game.action = NO_ACTION;
-	game.paused = true;
-	while (game.paused)
+	bool paused = true;
+	while (paused) // Loop that acts depending on user input on SNES
 	{
-		if (game.action == LEFT || game.action == RIGHT || game.action == UP || game.action == DOWN)
+		if (game.action == LEFT || game.action == RIGHT)  // If user changes selection on menu
 		{
-			if (isMainMenu)
+			if (isMainMenu)	// If main menu then change selected option on menu
 			{
 				game.action = -1;
 				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
 				currentOption = menu == mainMenuStartPtr ? resume : exitGame;
 				displayMenu(menu, 0, 0);
 			}
-			else
+			else	// Since pause menu then change selected option on menu
 			{
 				game.action = -1;
 				menu = menu == pauseMenuQuitPtr ? pauseMenuRestartPtr : pauseMenuQuitPtr;
@@ -403,7 +409,7 @@ void pauseGame(bool isMainMenu)
 			}
 			usleep(500 * 1000);
 		}
-		if (game.action == SELECT)
+		if (game.action == SELECT)	// If user has selected the current option then make appropriate action
 		{
 			switch (currentOption)
 			{
@@ -422,7 +428,7 @@ void pauseGame(bool isMainMenu)
 			}
 			game.paused = false;
 		}
-		if (game.action == START && !isMainMenu)
+		if (game.action == START && !isMainMenu)	// If user wants to resume game after pausing it
 		{
 			game.paused = false;
 			usleep(500 * 1000);
@@ -431,12 +437,9 @@ void pauseGame(bool isMainMenu)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: *menu: short image pointer that takes in the win or lose prompt menu
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in the win or lose prompt depending on if the player won or lost and displays the appropriate menu
 */
 void endGame(short *menu)
 {
@@ -454,12 +457,10 @@ void endGame(short *menu)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine ...
+@Params: a: integer that is used for determining the max of the two passed integers
+@Params: b: integer that is used for determining the max of the two passed integers
+@Returns: int: returns the maximum of the two passed integers
+This subroutine takes in two integers and returns the maximum of the two
 */
 int max(int a, int b)
 {
@@ -467,12 +468,10 @@ int max(int a, int b)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine ...
+@Params: a: integer that is used for determining the minimum of the two passed integers
+@Params: b: integer that is used for determining the minimum of the two passed integers
+@Returns: int: returns the minimum of the two passed integers
+This subroutine takes in two integers and returns the minimum of the two
 */
 int min(int a, int b)
 {
@@ -480,18 +479,18 @@ int min(int a, int b)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: direction: integer that takes in the 
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine moves the location of the frog on the game map depending on a users input on the SNES from game.action.  
+The screen also moves along with the frog to keep the frog in the center of the screen, done with the game.scrollOffset. 
+When a player moves the frog, that also adds to the players score.
 */
 void moveFrog(int direction)
 {
 	bool moved = false;
 	switch (game.action)
 	{
+	// Player presses up on the SNES joypad
 	case UP:
 		if (game.frogLocation.row > 1)
 		{
@@ -503,6 +502,7 @@ void moveFrog(int direction)
 			}
 		}
 		break;
+	// Player presses down on the SNES joypad
 	case DOWN:
 		if (game.frogLocation.row < NUM_VERTICAL_TILES - 1)
 		{
@@ -515,6 +515,7 @@ void moveFrog(int direction)
 			}
 		}
 		break;
+	// Player presses left on the SNES joypad
 	case LEFT:
 		if (game.frogLocation.col > 0)
 		{
@@ -522,6 +523,7 @@ void moveFrog(int direction)
 			game.frogLocation.col = max(game.frogLocation.col - TILE_WIDTH, 0);
 		}
 		break;
+	// Player presses right on the SNES joypad
 	case RIGHT:
 		if (game.frogLocation.col < GAME_WIDTH)
 		{
@@ -530,7 +532,7 @@ void moveFrog(int direction)
 		}
 		break;
 	}
-	if (moved)
+	if (moved)	// If Player moves frog, decrement moves left to display correct status bar, increment moves made by player to increase score
 	{
 		game.moves--;
 		game.movesMade++;
@@ -550,12 +552,9 @@ void moveFrog(int direction)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine presents the main menu if the user starts the program by calling pauseGame(false), otherwise makes appropriate
+changes to game state when the player moves the frog
 */
 void doUserAction(void)
 {
@@ -570,26 +569,19 @@ void doUserAction(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine draws the frame buffer from the set stage by calling memcpy
 */
-/* Draw a frame */
 void drawStageToFrameBuffer(void)
 {
 	memcpy(framebufferstruct.fptr, game.map.stage, 1280 * 720 * 2);
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: *arg: NULL argument that is passed to the controller user input thread
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine is the thread for user input on the SNES controller.  Checks whether the player has pressed a button
+on the SNES controller and then makes the appropriate changes to game state.
 */
 void *getUserInput(void *arg)
 {
@@ -615,12 +607,9 @@ void *getUserInput(void *arg)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine resets the frog back to the start position and resets the scroll offset of the screen.  Called at the beginning of
+the game and if the frog died.
 */
 void resetFrogPosition(void)
 {
@@ -630,12 +619,11 @@ void resetFrogPosition(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: *img: short image pointer to be drawn/set to the stage
+@Params: yOffset: integer that is used for offsetting what row the image is being drawn to
+@Params: xOffset: integer that is used for offsetting what column the image is being drawn to
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in an image pointer and coordinates of a tile and sets/draws the image to the game stage.
 */
 void drawTile(short *img, int yOffset, int xOffset)
 {
@@ -655,12 +643,8 @@ void drawTile(short *img, int yOffset, int xOffset)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine draws the frog to the stage by calling drawTile with the frog short image pointer and it's current location as its parameter.
 */
 void drawFrog(void)
 {
@@ -668,12 +652,8 @@ void drawFrog(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine updates the location of the frog on the game map.  If frog moves to a log or a rock, the frog moves with the log or the rock moving.
 */
 void updateFrogLocation(void)
 {
@@ -693,12 +673,8 @@ void updateFrogLocation(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
-@Returns: This subroutine does not return anything
-This subroutine ...
+@Returns: PowerUp: struct defined in frogger.h where each powerUp has coordinates and a powerUp type.  
+This subroutine generates a random powerup on a random tile on the game screen and returns that powerup.
 */
 PowerUp generateRandomPowerUp(void)
 {
@@ -716,12 +692,9 @@ PowerUp generateRandomPowerUp(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine displays a powerUp on the game screen by taking the currentPowerUp coordinates and its type, setting an image pointer to the
+appropriate powerUp type, and then calling updateStage to add the powerUp to the stage.
 */
 void displayPowerUp(void)
 {
@@ -732,16 +705,16 @@ void displayPowerUp(void)
 	switch (game.currentPowerUp.type)
 	{
 	case lifeUp:
-		img = moreLivesPtr;
+		img = moreLivesPtr;	// Add a life - Heart Image
 		break;
 	case timeUp:
-		img = moreTimePtr;
+		img = moreTimePtr;	// Increase time - Clock Image
 		break;
 	case movesUp:
-		img = moreStepsPtr;
+		img = moreStepsPtr;	// Increase the number of moves remaining - Shoe Image
 		break;
 	case slowDown:
-		img = slowDownPtr;
+		img = slowDownPtr;	// Slow all moving obstacles - Lightning Bolt Image
 		break;
 	default:
 		break;
@@ -750,12 +723,8 @@ void displayPowerUp(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine slows the obstacles of the game.  This is called when the frog has hit the Lightning Bolt image powerUp.
 */
 void slowAllObstacles(void)
 {
@@ -770,16 +739,9 @@ void slowAllObstacles(void)
 	}
 }
 
-// int ones;
-// int tens;
-
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine is called to apply powerUps if the frog collides with a powerUp.  
 */
 void applyPowerUp(void)
 {
@@ -803,12 +765,9 @@ void applyPowerUp(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine checks for powerUps depending on the last time a powerUp has been generated.  If it is time to generate a new powerUp then the 
+appropriate actions are made, and then the powerUp is then displayed by calling displayPowerUp().
 */
 void checkPowerUps(void)
 {
@@ -828,12 +787,9 @@ void checkPowerUps(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine checks if the game has ended or not.  If the frog has reached the castle then the game has ended and the player has won the game.
+If the frog has run out of lives or moves or time left, the player has lost the game.
 */
 void checkEndCondition(void)
 {
@@ -848,12 +804,11 @@ void checkEndCondition(void)
 }
 
 /*
-@Params:
-@Params:
-@Params:
-@Params:
+@Params: yOffset: integer that is used for offsetting what row the image is being drawn to
+@Params: xOffset: integer that is used for offsetting what column the image is being drawn to
+@Params: *stat_ptr: short int image pointer for the status bar that is to be drawn/set to the stage
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine draws a tile on the status bar depending on the image pointer and the coordinates of a tile.  
 */
 void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr)
 {
@@ -870,10 +825,12 @@ void drawGameInfo(int yOffset, int xOffset, short int *stat_ptr)
 }
 
 /*
-@Params:
-@Params:
+@Params: passedDigit: char that corresponds to a digit from the numbers that need to be displayed on the status bar
+@Params: **digits: short int pointer that is passed in so that it can set another pointer from another function
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine takes in the character that corresponds to a digit and the pointer from a different function and then sets
+that pointer from a different function to the short int image pointer that correspond to the passedDigit character.  (e.g., char passedDigit = '1'
+then set pointer from a different function to the '1' short int image pointer to display correct digit to game screen)
 */
 void digitPtr(char passedDigit, short int **digits)
 {
@@ -917,7 +874,12 @@ void digitPtr(char passedDigit, short int **digits)
 
 /*
 @Returns: This subroutine does not return anything
-This subroutine ...
+This subroutine updates the game info for the status bar at the bottom of the screen and then calls drawGameInfo() for each tile of the status 
+bar to set the stage of the screen.  First, to display the correct digits for the score, time, moves left, and lives left, the timeRemaining 
+double of the game is converted to a string and 0 prepended depending on how much time is left, the moves int of the game is coverted to a string
+and 0 prepended depending on how many moves are left, the lives int converted to a string, and the score int converted to a string and 0 prepended
+depending on what the score is.  Next, the tiles of the status bar are iterated over to set the short int pointer *ptr to the respective
+short int image pointers for the status bar for calling drawGameInfo for the appropriate tile.
 */
 void updateGameInfo(void)
 {
@@ -925,11 +887,11 @@ void updateGameInfo(void)
 	char timeStr[TIME_STAT_BAR_TO_CHARS];
 	sprintf(timeStr, "%f", game.timeRemaining);
 
-	if (game.timeRemaining < 100)
+	if (game.timeRemaining < 100) // If time remaining on timer less than 100 then prepend 0 to string
 	{
 		memmove(timeStr + 1, timeStr, TIME_MOVE_PREPEND_ZERO);
 		timeStr[0] = '0';
-		if (game.timeRemaining < 10)
+		if (game.timeRemaining < 10) // If time remaining on timer less then 10 then prepend a second 0 to string
 		{
 			memmove(timeStr + 1, timeStr, TIME_MOVE_PREPEND_ZERO);
 			timeStr[0] = '0';
@@ -940,11 +902,11 @@ void updateGameInfo(void)
 	char movesStr[MOVES_STAT_BAR_TO_CHARS];
 	sprintf(movesStr, "%d", game.moves);
 
-	if (game.moves < 100)
+	if (game.moves < 100) // If player moves left less than 100 then prepend 0 to string
 	{
 		memmove(movesStr + 1, movesStr, TIME_MOVE_PREPEND_ZERO);
 		movesStr[0] = '0';
-		if (game.moves < 10)
+		if (game.moves < 10) // if player moves left less than 10 then prepend a second 0 to string
 		{
 			memmove(movesStr + 1, movesStr, TIME_MOVE_PREPEND_ZERO);
 			movesStr[0] = '0';
@@ -956,18 +918,17 @@ void updateGameInfo(void)
 	sprintf(livesStr, "%d", game.lives);
 
 	// game.score int converted to string for displaying score
-	// char scoreStr[4];
 	sprintf(game.scoreStr, "%d", game.score);
 
-	if (game.score < 1000)
+	if (game.score < 1000)	// If player score is less than 1000 then prepend a 0 to string
 	{
 		memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 		game.scoreStr[0] = '0';
-		if (game.score < 100)
+		if (game.score < 100)	// If player score is less than 100 then prepend a second 0 to string
 		{
 			memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 			game.scoreStr[0] = '0';
-			if (game.score < 10)
+			if (game.score < 10)	// If player score is less than 10 then prepend a third 0 to string
 			{
 				memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 				game.scoreStr[0] = '0';
@@ -986,47 +947,44 @@ void updateGameInfo(void)
 				{
 				// score
 				case 2:
-					ptr = scorePtr;
+					ptr = scorePtr; // score label
 					break;
 				case 3:
-					digitPtr(game.scoreStr[0], &ptr);
+					digitPtr(game.scoreStr[0], &ptr); // score thousandths digit
 					break;
 				case 4:
-					digitPtr(game.scoreStr[1], &ptr);
+					digitPtr(game.scoreStr[1], &ptr); // score hundredths digit
 					break;
 				case 5:
-					digitPtr(game.scoreStr[2], &ptr);
+					digitPtr(game.scoreStr[2], &ptr); // score tens digit
 					break;
 				case 6:
-					digitPtr(game.scoreStr[3], &ptr);
+					digitPtr(game.scoreStr[3], &ptr); // score ones digit
 					break;
 
 				// time
 				case 9:
-					ptr = timePtr;
+					ptr = timePtr; // time label
 					break;
-				// hundreds digits
 				case 10:
-					digitPtr(timeStr[0], &ptr);
+					digitPtr(timeStr[0], &ptr); // time hundreds digits
 					break;
-				// tens digit
 				case 11:
-					digitPtr(timeStr[1], &ptr);
+					digitPtr(timeStr[1], &ptr); // time tens digit
 					break;
-				// ones digit
 				case 12:
-					digitPtr(timeStr[2], &ptr);
+					digitPtr(timeStr[2], &ptr); // time ones digit
 					break;
 
 				// lives left
 				case 15:
-					ptr = livesPtr;
+					ptr = livesPtr; // 'lives' label
 					break;
 				case 16:
-					ptr = leftPtr;
+					ptr = leftPtr; // 'left' label
 					break;
 				case 17:
-					digitPtr(livesStr[0], &ptr);
+					digitPtr(livesStr[0], &ptr); // number of lifes left digit
 					break;
 
 				default:
@@ -1041,53 +999,50 @@ void updateGameInfo(void)
 				{
 				// moves left
 				case 4:
-					ptr = movesPtr;
+					ptr = movesPtr; // 'moves' label
 					break;
 				case 5:
-					ptr = leftPtr;
+					ptr = leftPtr; // 'left' label
 					break;
-				// hundreds
 				case 6:
-					digitPtr(movesStr[0], &ptr);
+					digitPtr(movesStr[0], &ptr); // moves left hundredths digit
 					break;
-				// tens
 				case 7:
-					digitPtr(movesStr[1], &ptr);
+					digitPtr(movesStr[1], &ptr); // moves left tens digit
 					break;
-				// ones
 				case 8:
-					digitPtr(movesStr[2], &ptr);
+					digitPtr(movesStr[2], &ptr); // moves left ones digit
 					break;
 
 				// value-pack
 				case 13:
-					ptr = valuePtr;
+					ptr = valuePtr;	// 'value' label
 					break;
 				case 14:
-					ptr = packPtr;
+					ptr = packPtr;	// 'pack' label
 					break;
 				case 15:
 					switch (game.currentPowerUp.type)
 					{
 					// case none:
 					case -1:
-						ptr = naPtr;
+						ptr = naPtr;	// N/A ptr image
 						break;
 					// case lifeUp:
 					case 0:
-						ptr = moreLivesPtr;
+						ptr = moreLivesPtr; // Heart image powerUp
 						break;
 					// case timeUp:
 					case 1:
-						ptr = moreTimePtr;
+						ptr = moreTimePtr;	// Clock image powerUp
 						break;
 					// case movesUp:
 					case 2:
-						ptr = moreStepsPtr;
+						ptr = moreStepsPtr;	// Shoe image powerUp
 						break;
 					// case slowDown:
 					case 3:
-						ptr = slowDownPtr;
+						ptr = slowDownPtr;	// Lightning Bolt image powerUp
 						break;
 					default:
 						ptr = naPtr;
