@@ -758,7 +758,7 @@ void slowAllObstacles(void)
 {
 	for (int obstNum = 0; obstNum < NUM_OBSTACLES; obstNum++)
 	{
-		if (game.obstacles[obstNum].velocity < -4 || game.obstacles[obstNum].velocity > 4)
+		if (game.obstacles[obstNum].velocity < -3 || game.obstacles[obstNum].velocity > 3)
 		{
 			game.obstacles[obstNum].velocity = game.obstacles[obstNum].velocity > 0
 												   ? game.obstacles[obstNum].velocity - 2
@@ -1226,18 +1226,19 @@ This subroutine ...
 */
 void initializeObstacles(void)
 {
-	// Remember to add to NUM_OBSTACLES if adding obstacles
-	initializeLane(car, 4, 48, 9);
+	// 20 Cars and Busses
+	initializeLane(car, 3, 48, 4);
 	initializeLane(bus, 2, 47, -4);
-	initializeLane(car, 4, 46, 6);
-	initializeLane(car, 3, 45, 12);
+	initializeLane(car, 3, 46, 5);
+	initializeLane(car, 3, 45, 7);
 	initializeLane(bus, 2, 43, -4);
-	initializeLane(car, 4, 42, 10);
+	initializeLane(car, 3, 42, 4);
 	initializeLane(bus, 2, 41, -6);
 	initializeLane(bus, 2, 40, -8);
 
+	// 25 logs
 	initializeLane(wood, 3, 38, 6);
-	initializeLane(wood, 3, 37, 10);
+	initializeLane(wood, 3, 37, 8);
 	initializeLane(wood, 3, 36, -6);
 	initializeLane(wood, 2, 35, 5);
 	initializeLane(wood, 3, 34, 7);
@@ -1246,21 +1247,23 @@ void initializeObstacles(void)
 	initializeLane(wood, 3, 31, -8);
 	initializeLane(wood, 3, 30, 5);
 
-	initializeLane(snake, 1, 28, 14);
-	initializeLane(snake, 1, 26, 12);
-	initializeLane(snake, 1, 25, 10);
-	initializeLane(snake, 1, 23, 11);
-	initializeLane(snake, 1, 21, 12);
-	initializeLane(snake, 1, 20, 16);
+	// 6 snakes
+	initializeLane(snake, 1, 28, 10);
+	initializeLane(snake, 1, 26, 8);
+	initializeLane(snake, 1, 25, 6);
+	initializeLane(snake, 1, 23, 8);
+	initializeLane(snake, 1, 21, 11);
+	initializeLane(snake, 1, 20, 14);
 
-	initializeLane(rock, 3, 18, -6);
-	initializeLane(rock, 3, 17, 10);
-	initializeLane(rock, 3, 16, 6);
+	// 26 rocks
+	initializeLane(rock, 3, 18, -4);
+	initializeLane(rock, 3, 17, 5);
+	initializeLane(rock, 3, 16, 7);
 	initializeLane(rock, 2, 15, -5);
 	initializeLane(rock, 3, 14, -7);
 	initializeLane(rock, 3, 13, 4);
 	initializeLane(rock, 3, 12, -5);
-	initializeLane(rock, 3, 11, -8);
+	initializeLane(rock, 3, 11, -7);
 	initializeLane(rock, 3, 10, 5);
 }
 
