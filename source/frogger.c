@@ -393,10 +393,10 @@ void pauseGame(bool isMainMenu)
 		displayMenu(menu, TILE_HEIGHT * 5, TILE_WIDTH * 5);
 	}
 	game.action = NO_ACTION;
-	bool paused = true;
-	while (paused) // Loop that acts depending on user input on SNES
+	game.paused = true;
+	while (game.paused) // Loop that acts depending on user input on SNES
 	{
-		if (game.action == LEFT || game.action == RIGHT)  // If user changes selection on menu
+		if (game.action == LEFT || game.action == RIGHT || game.action == UP || game.action == DOWN)  // If user changes selection on menu
 		{
 			if (isMainMenu)	// If main menu then change selected option on menu
 			{
