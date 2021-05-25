@@ -1,7 +1,12 @@
 // Authors: Cole Thiessen (30027689) & Isaac Lutzko (30026703)
 // CPSC359 Winter 2021 Project (Part 2) Raspberry Pi Video Game
 // May 2021 (extended deadline due to deferral)
-// Description:
+// Description: Frogger implemented in C. Draws images to the screen using a frame buffer.
+// Goal is to get the frogger to the castle by traversing through obstacles
+// Maximize score by using fewest moves, lives, and time
+// Has 4 stages: Road, River, Desert, Lava
+// Has 4 powerups: More lives, more moves, more time, slow all obstacles
+// Uses a SNES controller to control the frog 
 
 // Link/Reference for Frogger Image: https://www.funstockretro.co.uk/news/arcade-hall-of-fame-frogger-konami/
 // Link/Reference for Crazy Frog Image: https://www.thesun.co.uk/living/2974489/crazy-frog-just-turned-20-relive-his-hellish-magic-here/
@@ -1242,9 +1247,11 @@ bool obstacleInView(int lane)
 	return false;
 }
 
-/*
+/* 
 @Returns: This subroutine does not return anything
-This subroutine draws the 
+This subroutine calculates the obstacles new location based on their velocity, 
+determines whether the obstacle is in view to be rendered, 
+and draws all of the game obstacles to the screen based on the number of tiles they take up. 
 */
 void drawObstacles(void)
 {
@@ -1257,16 +1264,19 @@ void drawObstacles(void)
 			// Reverse direction of snake when it reaches end of screen
 			game.obstacles[obstNum].velocity *= -1;
 		}
+
+		// Calculate obstacle new position
 		obst.colPos = (obst.colPos + game.obstacles[obstNum].velocity + GAME_WIDTH) % GAME_WIDTH;
 
+		// Only render if obstacle is in view
 		if (obstacleInView(obst.lane))
 		{
-			// Only render if obstacle is in view
 			for (int imgNo = 0; imgNo < obst.numImgs; imgNo++)
 			{
 				int i = 0;
 				for (int y = TILE_HEIGHT * (obst.lane - game.scrollOffset); y < TILE_HEIGHT * (obst.lane - game.scrollOffset + 1); y++)
 				{
+					// Offset by the number of images in the obstacle
 					int imgOffset = imgNo * TILE_WIDTH;
 					for (int x = obst.colPos + imgOffset; x < (obst.colPos + TILE_WIDTH) + imgOffset; x++)
 					{
@@ -1281,6 +1291,7 @@ void drawObstacles(void)
 				}
 			}
 		}
+		// Update new position in the game struct
 		game.obstacles[obstNum].colPos = obst.colPos;
 	}
 }
