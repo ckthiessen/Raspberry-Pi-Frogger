@@ -1,9 +1,11 @@
 # Raspberry-Pi-Frogger
 
-Driver for a SNES Controller. It will output what buttons are pressed in the console.
+CPSC359 W21 Raspberry Pi Frogger Video Game.  Played with SNES controller connected to Raspberry Pi.
 
 ## Running Instructions
 
-1. make 
-2. make run 
+1. Download .tar.gz file in directory that does not contain another makefile
+2. Open/Untar the .tar.gz file - if on a computer with a linux OS like a raspberry pi: tar -zxvf c359-pp2.tar.gz
+3. make 
+4. make run 
 
