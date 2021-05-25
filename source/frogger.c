@@ -6,7 +6,7 @@
 // Maximize score by using fewest moves, lives, and time
 // Has 4 stages: Road, River, Desert, Lava
 // Has 4 powerups: More lives, more moves, more time, slow all obstacles
-// Uses a SNES controller to control the frog 
+// Uses a SNES controller to control the frog
 
 // Link/Reference for Frogger Image: https://www.funstockretro.co.uk/news/arcade-hall-of-fame-frogger-konami/
 // Link/Reference for Crazy Frog Image: https://www.thesun.co.uk/living/2974489/crazy-frog-just-turned-20-relive-his-hellish-magic-here/
@@ -279,7 +279,6 @@ void checkCollision(void)
 			{
 				collision = true; // Set collision to true since the frog collided with a pixel that corresponds to a powerUp
 				applyPowerUp();	  // Apply appropriate powerUp
-				game.score += 50; // Increment score of player by 50
 				game.currentPowerUp.type = none;
 			}
 		}
@@ -296,24 +295,19 @@ This subroutine calculates a players' score when the game is over - whether the 
 */
 void calculateScore(void)
 {
-	if (game.win)	// If the game is won, add to the score for winning, otherwise do not add the below additions to the score if game lost
-	{
-		game.score += ((400 - game.movesMade) * 5);	// The fewer the moves made to win, the higher the score
-		game.score += ((500 + game.timeRemaining) * 5); // The faster the game is won, the higher the score
-		game.score += (200 * game.lives); // The most lives you finish with after the win, the higher the score
-	}
+	getScore();
 
-	sprintf(game.scoreStr, "%d", game.score);	// Convert game score integer to string for displaying score correctly on screen
+	sprintf(game.scoreStr, "%d", game.score); // Convert game score integer to string for displaying score correctly on screen
 
-	if (game.score < 1000)	// If game score is less than 1000, prepend a zero for displaying score correctly on screen
+	if (game.score < 1000) // If game score is less than 1000, prepend a zero for displaying score correctly on screen
 	{
 		memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 		game.scoreStr[0] = '0';
-		if (game.score < 100)	// if game score is less than 100, prepend a zero for displaying score correctly on screen
+		if (game.score < 100) // if game score is less than 100, prepend a zero for displaying score correctly on screen
 		{
 			memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 			game.scoreStr[0] = '0';
-			if (game.score < 10)	// if game score is less than 10, prepend a zero for displaying score correctly on screen
+			if (game.score < 10) // if game score is less than 10, prepend a zero for displaying score correctly on screen
 			{
 				memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 				game.scoreStr[0] = '0';
@@ -321,19 +315,19 @@ void calculateScore(void)
 		}
 	}
 
-	short int *calcScorePtr;	// Short int pointer used for getting correct image pointer for a digit on the status bar 
+	short int *calcScorePtr; // Short int pointer used for getting correct image pointer for a digit on the status bar
 
-	digitPtr(game.scoreStr[0], &calcScorePtr);	// Get image pointer for thousandth digit 
-	drawGameInfo(13, 10, calcScorePtr);			// Draw digit for thousandth digit
+	digitPtr(game.scoreStr[0], &calcScorePtr); // Get image pointer for thousandth digit
+	drawGameInfo(13, 10, calcScorePtr);		   // Draw digit for thousandth digit
 
-	digitPtr(game.scoreStr[1], &calcScorePtr);	// Get image pointer for hundredth digit
-	drawGameInfo(13, 11, calcScorePtr);			// Draw digit for hundredth digit
+	digitPtr(game.scoreStr[1], &calcScorePtr); // Get image pointer for hundredth digit
+	drawGameInfo(13, 11, calcScorePtr);		   // Draw digit for hundredth digit
 
-	digitPtr(game.scoreStr[2], &calcScorePtr);	// Get image pointer for tens digit
-	drawGameInfo(13, 12, calcScorePtr);			// Draw digit for tens digit
+	digitPtr(game.scoreStr[2], &calcScorePtr); // Get image pointer for tens digit
+	drawGameInfo(13, 12, calcScorePtr);		   // Draw digit for tens digit
 
-	digitPtr(game.scoreStr[3], &calcScorePtr);	// Get image pointer for ones digit
-	drawGameInfo(13, 13, calcScorePtr);			// Draw digit for ones digit
+	digitPtr(game.scoreStr[3], &calcScorePtr); // Get image pointer for ones digit
+	drawGameInfo(13, 13, calcScorePtr);		   // Draw digit for ones digit
 }
 
 /*
@@ -358,7 +352,7 @@ void displayMenu(short *menu, int heightOffset, int widthOffset)
 		}
 	}
 
-	if (game.win == true || game.lose == true)	// if game has ended, set tiles in stage for displaying score
+	if (game.win == true || game.lose == true) // if game has ended, set tiles in stage for displaying score
 		calculateScore();
 
 	drawStageToFrameBuffer();
@@ -398,14 +392,14 @@ void pauseGame(bool isMainMenu)
 	{
 		if (game.action == LEFT || game.action == RIGHT || game.action == UP || game.action == DOWN)  // If user changes selection on menu
 		{
-			if (isMainMenu)	// If main menu then change selected option on menu
+			if (isMainMenu) // If main menu then change selected option on menu
 			{
 				game.action = -1;
 				menu = menu == mainMenuStartPtr ? mainMenuQuitPtr : mainMenuStartPtr;
 				currentOption = menu == mainMenuStartPtr ? resume : exitGame;
 				displayMenu(menu, 0, 0);
 			}
-			else	// Since pause menu then change selected option on menu
+			else // Since pause menu then change selected option on menu
 			{
 				game.action = -1;
 				menu = menu == pauseMenuQuitPtr ? pauseMenuRestartPtr : pauseMenuQuitPtr;
@@ -414,7 +408,7 @@ void pauseGame(bool isMainMenu)
 			}
 			usleep(500 * 1000);
 		}
-		if (game.action == SELECT)	// If user has selected the current option then make appropriate action
+		if (game.action == SELECT) // If user has selected the current option then make appropriate action
 		{
 			switch (currentOption)
 			{
@@ -433,7 +427,7 @@ void pauseGame(bool isMainMenu)
 			}
 			game.paused = false;
 		}
-		if (game.action == START && !isMainMenu)	// If user wants to resume game after pausing it
+		if (game.action == START && !isMainMenu) // If user wants to resume game after pausing it
 		{
 			game.paused = false;
 			usleep(500 * 1000);
@@ -537,22 +531,10 @@ void moveFrog(int direction)
 		}
 		break;
 	}
-	if (moved)	// If Player moves frog, decrement moves left to display correct status bar, increment moves made by player to increase score
+	if (moved) // If Player moves frog, decrement moves left to display correct status bar, increment moves made by player to increase score
 	{
 		game.moves--;
 		game.movesMade++;
-		if (game.movesMade <= 50)
-		{
-			game.score += 3;
-		}
-		else if (game.movesMade <= 100)
-		{
-			game.score += 2;
-		}
-		else if (game.movesMade <= 150)
-		{
-			game.score += 1;
-		}
 	}
 }
 
@@ -710,16 +692,16 @@ void displayPowerUp(void)
 	switch (game.currentPowerUp.type)
 	{
 	case lifeUp:
-		img = moreLivesPtr;	// Add a life - Heart Image
+		img = moreLivesPtr; // Add a life - Heart Image
 		break;
 	case timeUp:
-		img = moreTimePtr;	// Increase time - Clock Image
+		img = moreTimePtr; // Increase time - Clock Image
 		break;
 	case movesUp:
-		img = moreStepsPtr;	// Increase the number of moves remaining - Shoe Image
+		img = moreStepsPtr; // Increase the number of moves remaining - Shoe Image
 		break;
 	case slowDown:
-		img = slowDownPtr;	// Slow all moving obstacles - Lightning Bolt Image
+		img = slowDownPtr; // Slow all moving obstacles - Lightning Bolt Image
 		break;
 	default:
 		break;
@@ -888,6 +870,9 @@ short int image pointers for the status bar for calling drawGameInfo for the app
 */
 void updateGameInfo(void)
 {
+	// Calculate new score
+	getScore();
+
 	// game.timeRemaining double converted for string for displaying time
 	char timeStr[TIME_STAT_BAR_TO_CHARS];
 	sprintf(timeStr, "%f", game.timeRemaining);
@@ -925,15 +910,15 @@ void updateGameInfo(void)
 	// game.score int converted to string for displaying score
 	sprintf(game.scoreStr, "%d", game.score);
 
-	if (game.score < 1000)	// If player score is less than 1000 then prepend a 0 to string
+	if (game.score < 1000) // If player score is less than 1000 then prepend a 0 to string
 	{
 		memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 		game.scoreStr[0] = '0';
-		if (game.score < 100)	// If player score is less than 100 then prepend a second 0 to string
+		if (game.score < 100) // If player score is less than 100 then prepend a second 0 to string
 		{
 			memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 			game.scoreStr[0] = '0';
-			if (game.score < 10)	// If player score is less than 10 then prepend a third 0 to string
+			if (game.score < 10) // If player score is less than 10 then prepend a third 0 to string
 			{
 				memmove(game.scoreStr + 1, game.scoreStr, SCORE_PREPEND_ZERO);
 				game.scoreStr[0] = '0';
@@ -1021,17 +1006,17 @@ void updateGameInfo(void)
 
 				// value-pack
 				case 13:
-					ptr = valuePtr;	// 'value' label
+					ptr = valuePtr; // 'value' label
 					break;
 				case 14:
-					ptr = packPtr;	// 'pack' label
+					ptr = packPtr; // 'pack' label
 					break;
 				case 15:
 					switch (game.currentPowerUp.type)
 					{
 					// case none:
 					case -1:
-						ptr = naPtr;	// N/A ptr image
+						ptr = naPtr; // N/A ptr image
 						break;
 					// case lifeUp:
 					case 0:
@@ -1039,15 +1024,15 @@ void updateGameInfo(void)
 						break;
 					// case timeUp:
 					case 1:
-						ptr = moreTimePtr;	// Clock image powerUp
+						ptr = moreTimePtr; // Clock image powerUp
 						break;
 					// case movesUp:
 					case 2:
-						ptr = moreStepsPtr;	// Shoe image powerUp
+						ptr = moreStepsPtr; // Shoe image powerUp
 						break;
 					// case slowDown:
 					case 3:
-						ptr = slowDownPtr;	// Lightning Bolt image powerUp
+						ptr = slowDownPtr; // Lightning Bolt image powerUp
 						break;
 					default:
 						ptr = naPtr;
@@ -1296,6 +1281,15 @@ void drawObstacles(void)
 	}
 }
 
+
+void getScore(void) 
+{
+	game.score = (game.moves * 3 + game.timeRemaining * 3 + game.lives * 1000);
+	// The fewer the moves made to win, the higher the score
+	// The faster the game is won, the higher the score
+	// The most lives you finish with after the win, the higher the score
+}
+
 /*
 @Returns: This subroutine does not return anything
 This subroutine sets up the game for the start of the game - timer set back to 5 minutes, lives set back to 4, moves set back to 250, 
@@ -1364,6 +1358,7 @@ void *gameTimer(void *arg)
 	return NULL;
 }
 
+
 /*
 @Params: argc: number of command line arguments passed when running program
 @Params: *argv[]: array that contains the command line arguments that are passed when running program
@@ -1397,11 +1392,11 @@ int main(int argc, char *argv[])
 			}
 			clearCollisionBuffer();
 			drawBackground();
-			updateGameInfo();
 			drawObstacles();
 			updateFrogLocation();
 			checkPowerUps();
 			checkCollision();
+			updateGameInfo();
 			drawStageToFrameBuffer();
 			checkEndCondition();
 		}

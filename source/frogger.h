@@ -45,6 +45,7 @@ int getRandomBetweenRange(int, int);
 void applyPowerUp(void);
 bool obstacleInView(int);
 void clearObstacleMemory(void);
+void getScore(void);
 
 // Struct defined for the coordinates of where a tile is on the game map
 typedef struct
