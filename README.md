@@ -5,8 +5,6 @@ Classic arcade game Frogger played with SNES controller connected to Raspberry P
 This version expands upon the original with two extra stages. In total, it has has 4 stages – City Roads, River and Logs, Snakes and Pits, and the Lava Moat. The player can also collect powerups to increase their lives, increase their moves remaining, increase their time remaining, and slow down moving obstacles.  
 
 ## Game Image
-The image quality is poor because it was taken using a laptop camera. Apologies! 
-
 <img width="508" alt="image" src="https://user-images.githubusercontent.com/26128858/182435171-64cc91a9-a618-4f98-a1cd-3bae49635226.png">
 <img width="696" alt="image" src="https://user-images.githubusercontent.com/26128858/182436635-a8fe473d-efad-496e-a714-2ee601be857a.png">
 
